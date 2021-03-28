@@ -1,0 +1,465 @@
+<template>
+  <v-container>
+    <v-toolbar dense>
+      <v-toolbar-title>Dispersion de pagos</v-toolbar-title>
+      <v-spacer> </v-spacer>
+      <v-btn
+        depressed
+        color="primary"
+        @click="generaLote"
+        :disabled="!selectedToFile.length"
+        style="margin-right: 10px"
+      >
+        Generar
+      </v-btn>
+    </v-toolbar>
+    <div>
+      <!-- Sociedad & Sucursal -->
+      <v-row>
+        <v-col
+          class="d-flex"
+          cols="6"
+        >
+          <v-select
+            label="Tipo de operación"
+            dense
+            outfilled
+            v-model="operacion"
+            :items="[{d: '02', n: 'TERCEROS '}, {d: '04', n: 'SPEI'}]"
+            :item-text="getOperacionText"
+            item-value="d"
+          ></v-select>
+        </v-col>
+        <v-col
+          class="d-flex"
+          cols="6"
+          md="6"
+        >
+          <v-select
+            label="Seleccione la Sociedad o Empresa"
+            dense
+            outfilled
+            :items="sociedades"
+            v-model="selectedSociedad"
+            :item-text="getSociedadText"
+            item-value="u_CompnyName"
+            return-object
+            @input="cargarDatos"
+            :disabled="selectedToFile.length > 0"
+          ></v-select>
+        </v-col>
+      </v-row>
+      <!-- Operacion & Cuenta -->
+      <v-row>
+        <v-col
+          class="d-flex"
+          cols="6"
+        >
+          <v-select
+            label="Surcural"
+            dense
+            outfilled
+            :items="sucursales"
+            v-model="selectedSucursal"
+            :item-text="getSucursalText"
+            return-object
+            item-value="bplName"
+            @input="cargarDatos2"
+            :disabled="selectedToFile.length > 0"
+          ></v-select>
+        </v-col>
+        <v-col
+          class="d-flex"
+          cols="6"
+        >
+          <v-select
+            label="Cuenta origen"
+            dense
+            outfilled
+            :items="cuentas"
+            :disabled="!operacion || selectedToFile.length > 0"
+            :item-text="getCuentaText"
+            item-value="glAccount"
+            @input="cargarDatos3"
+          ></v-select>
+        </v-col>
+      </v-row>
+      <!-- Tablas -->
+      <v-row>
+        <v-col
+          cols="4"
+          md="4"
+          class=""
+        >
+          <v-data-table
+            dense
+            v-if="!loadTable"
+            v-model="selected"
+            :headers="headers"
+            :items="transferencias"
+            :search="search"
+            hide-default-footer
+            disable-pagination
+            disable-sort
+            fixed-header
+            item-key="name"
+            class="elevation-1"
+            ref="table"
+            style="max-height: 500px"
+            height="400px"
+          >
+            <template v-slot:top>
+              <v-banner
+                sticky
+                icon="search"
+                elevation="5"
+                class="black"
+              >
+                <v-text-field
+                  v-model="search"
+                  label="Buscar transferencia"
+                  class="mx-4"
+                  @keydown.stop.enter="handlerEvent"
+                ></v-text-field>
+              </v-banner>
+            </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <v-icon
+                small
+                @click="addItem(item)"
+              >
+                forward
+              </v-icon>
+            </template>
+            <template v-slot:[`item.docTotal`]="{ item }">
+              <span> {{item.docTotal | currency}} </span>
+            </template>
+          </v-data-table>
+          <v-skeleton-loader
+            v-if="loadTable"
+            class="mx-auto"
+            type="table"
+          ></v-skeleton-loader>
+        </v-col>
+        <v-col
+          class=""
+          cols="8"
+          md="8"
+        >
+          <v-data-table
+            dense
+            :headers="headers2"
+            :items="selectedToFile"
+            class="elevation-1"
+            hide-default-footer
+            disable-pagination
+            disable-sort
+            :fixed-header="true"
+            style="max-height: 500px"
+            height="500px"
+            id="tabledetalle"
+          >
+            <template v-slot:top>
+              <v-btn
+                rounded
+                icon
+                @click="selectedToFile = []"
+              >
+                <v-icon>delete</v-icon>
+              </v-btn>
+              <v-dialog
+                v-model="dialogDelete"
+                max-width="600px"
+              >
+                <v-card>
+                  <v-card-title class="headline">¿Esta seguro que desea borrar esta factura?</v-card-title>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      color="blue darken-1"
+                      text
+                      @click="closeDelete"
+                    >Cancelar</v-btn>
+                    <v-btn
+                      color="blue darken-1"
+                      text
+                      @click="deleteItemConfirm"
+                    >OK</v-btn>
+                    <v-spacer></v-spacer>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <v-icon
+                small
+                @click="deleteItem(item)"
+              >
+                delete
+              </v-icon>
+            </template>
+            <template v-slot:[`item.docTotal`]="{ item }">
+              <span> {{item.docTotal | currency}} </span>
+            </template>
+            <template v-slot:[`item.cardName`]="{ item }">
+              <span :title="item.cardName"> {{item.cardName | textcrop(18)}} </span>
+            </template>
+          </v-data-table>
+        </v-col>
+      </v-row>
+    </div>
+    <!-- Dialog -->
+    <v-dialog
+      v-model="alertlote"
+      persistent
+      width="400"
+    >
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          Resultado
+        </v-card-title>
+        <v-card-text>
+          <v-btn
+            text
+            color="primary"
+            :href="'ftp://192.168.1.34/' + archivo.filename"
+            target="_blank"
+            @click="alertlote = false"
+          >{{archivo.filename}}</v-btn>
+
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-model="alertuno"
+      persistent
+      width="700"
+    >
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          Resultado
+        </v-card-title>
+        <v-card-text>
+          <v-list
+            subheader
+            two-line
+          >
+            <v-subheader inset>Archivos</v-subheader>
+
+            <v-list-item
+              v-for="(file, index) in archivos"
+              :key="index"
+            >
+              <v-list-item-avatar>
+                <v-icon
+                  class="grey lighten-1"
+                  dark
+                >
+                  attachment
+                </v-icon>
+              </v-list-item-avatar>
+
+              <v-list-item-content>
+                <v-list-item-title v-text="file"></v-list-item-title>
+              </v-list-item-content>
+
+              <v-list-item-action>
+                <v-btn
+                  icon
+                  :href="'ftp://192.168.1.34/' + file"
+                  target="_blank"
+                >
+                  <v-icon color="grey lighten-1">information</v-icon>
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            text
+            color="primary"
+            @click="alertuno = false"
+          >Cerrar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-overlay :value="overlay">
+      <v-progress-circular
+        indeterminate
+        size="64"
+      ></v-progress-circular>
+    </v-overlay>
+  </v-container>
+</template>
+
+<script>
+//const setClass = new Set()
+export default {
+  name: 'Dispersion',
+  data: () => ({
+    archivo: '',
+    archivos: [],
+    dialog: false,
+    dialogDelete: false,
+    editedIndex: -1,
+    selectedSociedad: null,
+    selectedSucursal: null,
+    operacion: null,
+    search: '',
+    selected: [],
+    selectedToFile: [],
+    loadSucural: false,
+    loadRest: false,
+    loadTable: false,
+    overlay: false,
+    headers: [
+      { text: 'Documento', value: 'docNum' },
+      { text: 'Total', value: 'docTotal', align: 'right' },
+      { text: 'Add', value: 'actions' },
+    ],
+    headers2: [
+      { text: 'Borrar', value: 'actions' },
+      { text: 'DocNum', value: 'docNum' },
+      { text: 'DocTotal', value: 'docTotal' },
+      { text: 'CardName', value: 'cardName' },
+      { text: 'Sociedad', value: 'sociedad' },
+      { text: 'VATRegNum', value: 'vatRegNum' },
+      { text: 'BankCtlKey', value: 'bankCtlKey' },
+      { text: 'MandateID', value: 'mandateID' },
+      { text: 'Account', value: 'account' },
+      { text: 'DflAccount', value: 'dflAccount' },
+      { text: 'JrnlMemo', value: 'jrnlMemo' },
+      { text: 'County', value: 'county' },
+      { text: 'LicTradNum', value: 'licTradNum' },
+      { text: 'IVA', value: 'IVA' },
+      { text: 'E_Mail', value: 'e_Mail' },
+      { text: 'DocDate', value: 'docDate' },
+      { text: 'DocEntry', value: 'docEntry' }
+    ],
+    alertlote: false,
+    alertuno: false
+  }),
+  watch: {
+    dialog (val) {
+      val || this.close()
+    },
+    dialogDelete (val) {
+      val || this.closeDelete()
+    },
+  },
+  methods: {
+    getSociedadText (item) {
+      return `${item.code} - ${item.u_CompnyName}`
+    },
+    getSucursalText (item) {
+      return `${item.bplName} - ${item.bplFrName}`
+    },
+    getOperacionText (item) {
+      return `${item.d} - ${item.n}`
+    },
+    getCuentaText (item) {
+      return `${item.glAccount} - ${item.acctName}`
+    },
+    cargarDatos (sociedad) {
+      this.loadSucural = true
+      this.$store.dispatch("getSucursales", sociedad.u_DB)
+        .then(res => {
+          this.loadSucural = false
+        })
+    },
+    cargarDatos2 (sucursal) {
+      this.loadRest = true
+      this.$store.dispatch("getCuentas", { sociedad: this.selectedSociedad.u_DB, sucursal: sucursal.bplName })
+        .then(res => {
+          this.loadRest = false
+        })
+    },
+    cargarDatos3 (cuenta) {
+      this.loadTable = true
+      this.$store.dispatch("getTransfers", { sociedad: this.selectedSociedad.u_DB, sucursal: this.selectedSucursal.bplName, cuenta, operacion: this.operacion })
+        .then(res => {
+          this.loadTable = false
+        })
+    },
+    handlerEvent (e) {
+      this.selectedToFile.push(this.$refs.table._data.internalCurrentItems[0])
+      this.selectedToFile = [...new Set(this.selectedToFile)]
+      this.search = ''
+    },
+    addItem (item) {
+      this.selectedToFile.push(item)
+      this.selectedToFile = [...new Set(this.selectedToFile)]
+    },
+    deleteItem (item) {
+      this.editedIndex = this.selectedToFile.indexOf(item)
+      this.dialogDelete = true
+    },
+    deleteItemConfirm () {
+      this.selectedToFile.splice(this.editedIndex, 1)
+      this.closeDelete()
+    },
+    closeDelete () {
+      this.dialogDelete = false
+      this.$nextTick(() => {
+        this.editedIndex = -1
+      })
+    },
+    generaLote () {
+      this.overlay = true
+      let data = {
+        transferencias: this.selectedToFile,
+        sociedad: this.selectedSociedad.u_DB,
+        sucursal: this.selectedSucursal.bplName,
+        operacion: this.operacion
+      }
+      this.$store.dispatch("generarTxtxLote", data)
+        .then(res => {
+          if (res != null) {
+            this.archivo = res
+            this.overlay = false
+            this.alertlote = true
+            this.cancelProcess()
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+    },
+    cancelProcess () {
+      this.search = ''
+      this.selectedToFile = []
+      //this.operacion = null
+      //this.selectedSucursal = null
+      //this.$store.commit("SET_SUCURSALES", [])
+      this.$store.commit("SET_TRANSFERS", [])
+      //this.$store.commit("SET_CUENTAS", [])
+    }
+  },
+  computed: {
+    sociedades () {
+      return this.$store.state.dispersion.sociedades
+    },
+    sucursales () {
+      return this.$store.state.dispersion.sucursales
+    },
+    cuentas () {
+      return this.$store.state.dispersion.cuentas
+    },
+    transferencias () {
+      return this.$store.state.dispersion.transferencias
+    },
+    getValuesFromSet () {
+      return this.selectedToFile.entries().next().value
+    },
+  },
+  mounted () {
+    this.$store.commit("SET_TRANSFERS", [])
+    this.$store.dispatch("getSociedades")
+  }
+}
+</script>
+
+<style scoped>
+</style>
