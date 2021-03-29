@@ -84,6 +84,7 @@ export default {
             if (res) {
               localStorage.setItem('jwt', escape(JSON.stringify({ email: this.email, jwt: this.password })))
               localStorage.setItem('user', this.username)
+              localStorage.setItem('pass', this.password)
               this.$router.push('/')
             }
             this.loadTable = false

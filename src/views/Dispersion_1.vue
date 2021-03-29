@@ -98,6 +98,7 @@
               >
                 <v-icon>delete</v-icon>
               </v-btn>
+              {{selectedToFile.length}} seleccionadas | Total: {{getTotal | currency}}
               <v-dialog
                 v-model="dialogDelete"
                 max-width="600px"
@@ -320,6 +321,9 @@ export default {
     getValuesFromSet () {
       return this.selectedToFile.entries().next().value
     },
+    getTotal () {
+      return this.selectedToFile.reduce((a, b) => a + (b['docTotal'] || 0), 0)
+    }
   },
   mounted () {
     this.$store.commit("SET_TRANSFERS", [])

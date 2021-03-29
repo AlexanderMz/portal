@@ -3,8 +3,8 @@ import Vuex from 'vuex'
 import axios from 'axios'
 
 Vue.use(Vuex)
-//let url = ''
-let url = 'https://localhost:44393'
+let url = ''
+//let url = 'https://localhost:44393'
 //let url = 'http://localhost:8082'
 
 /**
@@ -91,7 +91,8 @@ const Dispersion = {
     },
     generarTxtxLote: ({ commit }, data) => {
       let user = localStorage.getItem('user')
-      let postUrl = `${url}/api/dataapp/transferencias?sociedad=${data.sociedad}&sucursal=${data.sucursal}&operacion=${data.operacion}&u=${user}`
+      let pass = localStorage.getItem('pass')
+      let postUrl = `${url}/api/dataapp/transferencias?sociedad=${data.sociedad}&sucursal=${data.sucursal}&operacion=${data.operacion}&u=${user}&p=${pass}`
       return new Promise((resolve, reject) => {
         fetch(postUrl, {
           method: 'POST',
@@ -113,7 +114,8 @@ const Dispersion = {
     },
     generarTxtUnoxUno: ({ commit }, data) => {
       let user = localStorage.getItem('user')
-      let postUrl = `${url}/api/dataapp/transferenciasbyone?u=${user}`
+      let pass = localStorage.getItem('pass')
+      let postUrl = `${url}/api/dataapp/transferenciasbyone?u=${user}&p=${pass}`
       return new Promise((resolve, reject) => {
         fetch(postUrl, {
           method: 'POST',
