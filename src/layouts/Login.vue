@@ -89,6 +89,13 @@ export default {
             }
             this.loadTable = false
           })
+          .catch(err => {
+
+          })
+        // if (this.$store.dispatch("loginSap", { UserName: this.username, Password: this.password })) {
+
+        // }
+
       }
     },
     clear () {

@@ -1,11 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
+import { axiosInstance } from '../main'
 
 Vue.use(Vuex)
-let url = ''
-//let url = 'https://localhost:44393'
-//let url = 'http://localhost:8082'
 
 /**
  * Dispercion
@@ -36,14 +33,14 @@ const Dispersion = {
   },
   actions: {
     getSociedades: ({ commit }) => {
-      axios.get(`${url}/api/dataapp/sociedades`)
+      axiosInstance.get(`/api/dataapp/sociedades`)
         .then(res => {
           commit('SET_SOCIEDADES', res.data)
         })
     },
     getSucursales: ({ commit }, sociedad) => {
       return new Promise((resolve, reject) => {
-        axios.get(`${url}/api/dataapp/sucursales?sociedad=${sociedad}`)
+        axiosInstance.get(`/api/dataapp/sucursales?sociedad=${sociedad}`)
           .then(res => {
             commit('SET_SUCURSALES', res.data)
             resolve(true)
@@ -55,7 +52,7 @@ const Dispersion = {
     },
     getCuentas: ({ commit }, data) => {
       return new Promise((resolve, reject) => {
-        axios.get(`${url}/api/dataapp/cuentas?sociedad=${data.sociedad}&sucursal=${data.sucursal}`)
+        axiosInstance.get(`/api/dataapp/cuentas?sociedad=${data.sociedad}&sucursal=${data.sucursal}`)
           .then(res => {
             commit('SET_CUENTAS', res.data)
             resolve(true)
@@ -67,7 +64,7 @@ const Dispersion = {
     },
     getTransfers: ({ commit }, data) => {
       return new Promise((resolve, reject) => {
-        axios.get(`${url}/api/dataapp/transferencias?sociedad=${data.sociedad}&sucursal=${data.sucursal}&cuenta=${data.cuenta}&operacion=${data.operacion}`)
+        axiosInstance.get(`/api/dataapp/transferencias?sociedad=${data.sociedad}&sucursal=${data.sucursal}&cuenta=${data.cuenta}&operacion=${data.operacion}`)
           .then(res => {
             commit('SET_TRANSFERS', res.data)
             resolve(true)
@@ -79,7 +76,7 @@ const Dispersion = {
     },
     getAllTransfers: ({ commit }, data) => {
       return new Promise((resolve, reject) => {
-        axios.get(`${url}/api/dataapp/transferencias`)
+        axiosInstance.get(`/api/dataapp/transferencias`)
           .then(res => {
             commit('SET_TRANSFERS', res.data)
             resolve(true)
@@ -92,7 +89,7 @@ const Dispersion = {
     generarTxtxLote: ({ commit }, data) => {
       let user = localStorage.getItem('user')
       let pass = localStorage.getItem('pass')
-      let postUrl = `${url}/api/dataapp/transferencias?sociedad=${data.sociedad}&sucursal=${data.sucursal}&operacion=${data.operacion}&u=${user}&p=${pass}`
+      let postUrl = `/api/dataapp/transferencias?sociedad=${data.sociedad}&sucursal=${data.sucursal}&operacion=${data.operacion}&u=${user}&p=${pass}`
       return new Promise((resolve, reject) => {
         fetch(postUrl, {
           method: 'POST',
@@ -115,7 +112,7 @@ const Dispersion = {
     generarTxtUnoxUno: ({ commit }, data) => {
       let user = localStorage.getItem('user')
       let pass = localStorage.getItem('pass')
-      let postUrl = `${url}/api/dataapp/transferenciasbyone?u=${user}&p=${pass}`
+      let postUrl = `/api/dataapp/transferenciasbyone?u=${user}&p=${pass}`
       return new Promise((resolve, reject) => {
         fetch(postUrl, {
           method: 'POST',
@@ -149,7 +146,7 @@ const Informes = {
   actions: {
     getDatos: ({ commit }, fecha) => {
       commit('SET_SD', [])
-      axios.get(`${url}/api/dataapp/sdaldia?fecha=${fecha}`)
+      axiosInstance.get(`/api/dataapp/sdaldia?fecha=${fecha}`)
         .then(res => {
           commit('SET_SD', res.data)
         })
@@ -171,14 +168,32 @@ const LoginModule = {
   actions: {
     login: ({ commit }, data) => {
       return new Promise((resolve, reject) => {
-        axios.post(`${url}/api/dataapp/login`, data)
+        axiosInstance.post(`/api/dataapp/login`, data)
           .then(res => {
             commit('SET_LOGIN', true)
+            localStorage.setItem('b1session', res.headers['b1session'])
+            localStorage.setItem('routeid', res.headers['routeid'])
             resolve(true)
           }).catch(err => {
             reject(false)
           })
       })
+    },
+    loginSap: async ({ commit }, data) => {
+      try {
+        const req = await axiosInstance.post('https://192.168.1.30:50000/b1s/v1/Login', {
+          CompanyDB: 'SBODEMOGOVI2020',
+          UserName: data.UserName,
+          Password: data.Password
+        }, { withCredentials: true })
+        const res = await req.data
+
+        console.log(res)
+        return true
+      } catch (error) {
+        console.error(error)
+        return false
+      }
     }
   }
 }
@@ -197,28 +212,30 @@ const AjustesModule = {
   actions: {
     getCedis: async ({ commit }) => {
       try {
-        const req = await axios.get(`${url}/api/dataapp/cedis`)
+        const req = await axiosInstance.get(`/api/dataapp/cedis`)
         const data = await req.data
         commit('setCedis', data)
       } catch (error) {
         console.log(error)
       }
     },
-    postSalida: async ({ commit }, info) => {
-      try {
-        let user = localStorage.getItem('user')
-        const req = await axios.post(`${url}/api/dataapp/salida?u=${user}`, info)
-        const data = await req.data
-        return true
-      } catch (error) {
-        console.log(error)
-        return false
-      }
+    postSalida: ({ commit }, info) => {
+      return new Promise((resolve, reject) => {
+        try {
+          let user = localStorage.getItem('user')
+          axiosInstance.post(`/api/dataapp/salida?u=${user}`, info)
+            .then(res => resolve(res))
+            .catch(err => reject(err))
+        } catch (error) {
+          console.log(error)
+          reject(error)
+        }
+      })
     },
     postEntradas: async ({ commit }) => {
       try {
         let user = localStorage.getItem('user')
-        const req = await axios.post(`${url}/api/dataapp/entrada?u=${user}`, info)
+        const req = await axiosInstance.post(`/api/dataapp/entrada?u=${user}`, info)
         const data = await req.data
         return true
       } catch (error) {

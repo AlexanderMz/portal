@@ -92,6 +92,38 @@
         </v-col>
       </v-row>
     </div>
+    <!--  -->
+    <v-dialog
+      v-model="showAlert"
+      persistent
+      width="600"
+    >
+      <v-card>
+        <v-card-title class="headline">
+          Documento Generado en SAP: {{response.DocNum}}
+        </v-card-title>
+        <v-card-text>
+          <v-data-table
+            dense
+            :items="response.DocumentLines"
+            :headers="responseColumns"
+            hide-default-footer
+            disable-pagination
+            fixed-header
+            disable-sort
+            class="elevation-1"
+          >
+          </v-data-table>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            text
+            color="primary"
+            @click="showAlert = false; response = []"
+          >Cerrar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-overlay :value="overlay">
       <v-progress-circular
         indeterminate
@@ -113,9 +145,43 @@ export default {
     selectedFile: undefined,
     selectedFile2: undefined,
     motivo: '',
-    overlay: false
+    overlay: false,
+    response: [],
+    showAlert: false,
+    responseColumns: [
+      { text: 'Producto', value: 'ItemCode' },
+      { text: 'Descripcion', value: 'ItemDescription' },
+      { text: 'Ajuste', value: 'Quantity', align: 'right' },
+    ],
   }),
   methods: {
+    EnviarSap () {
+      this.overlay = true
+      const info = {
+        Ajustes: this.rows,
+        Sucursal: this.selectedSucursal,
+        Motivo: this.motivo
+      }
+      this.$store.dispatch("postSalida", info)
+        .then((res) => {
+          if (res) {
+            this.overlay = false
+            this.rows = []
+            this.selectedFile = undefined
+            this.response = res.data
+            this.showAlert = true
+          }
+        })
+        .catch(err => {
+          this.overlay = false
+          this.response = err.data
+          alert(this.response)
+          console.error(err)
+        })
+        .finally(() => {
+          this.overlay = false
+        })
+    },
     getSucursalText (item) {
       return `${item.bplId} - ${item.bplFrName}`
     },
@@ -208,22 +274,6 @@ export default {
       };
       fileReader.readAsBinaryString(this.selectedFile);
     },
-    onFileChange2 () {
-
-    },
-    EnviarSap () {
-      this.overlay = true
-      const info = {
-        Ajustes: this.rows,
-        Sucursal: this.selectedSucursal,
-        Motivo: this.motivo
-      }
-      if (this.$store.dispatch("postSalida", info)) {
-        this.overlay = false
-        this.rows = []
-        this.selectedFile = undefined
-      }
-    }
 
   },
   computed: {
