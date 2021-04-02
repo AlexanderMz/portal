@@ -35,7 +35,6 @@
             label="Buscar comprobante"
             outlined
             dense
-            @change="onFileChange2"
             v-model="selectedFile2"
           ></v-file-input>
         </v-col>
@@ -112,6 +111,8 @@
             fixed-header
             disable-sort
             class="elevation-1"
+            style="max-height: 300px"
+            height="300px"
           >
           </v-data-table>
         </v-card-text>
@@ -125,6 +126,7 @@
       </v-card>
     </v-dialog>
     <v-overlay :value="overlay">
+      Generando ajuste <br>
       <v-progress-circular
         indeterminate
         size="64"
@@ -160,10 +162,11 @@ export default {
       const info = {
         Ajustes: this.rows,
         Sucursal: this.selectedSucursal,
-        Motivo: this.motivo
+        Motivo: this.motivo,
+        Tipo: 'salida'
       }
-      this.$store.dispatch("postSalida", info)
-        .then((res) => {
+      this.$store.dispatch("postAjuste", info)
+        .then(res => {
           if (res) {
             this.overlay = false
             this.rows = []
@@ -215,27 +218,13 @@ export default {
     },
     setTable (headers, excellist) {
       const tableTitleData = []; // Store table header data
-      //const tableMapTitle = {}; // Set table content for Chinese and English
       headers.forEach((_, i) => {
-        //tableMapTitle[_] = _;
         tableTitleData.push({
           text: _.toUpperCase(),
           value: _.toUpperCase(),
         });
       });
-      //console.log("tableTitleData", tableTitleData);
-      // Mapping table content attribute name is English
-      // const newTableData = [];
-      // excellist.forEach(_ => {
-      //   const newObj = {};
-      //   Object.keys(_).forEach(key => {
-      //     newObj[tableMapTitle[key]] = _[key];
-      //   });
-      //   newTableData.push(newObj);
-      // });
-      // console.log('newTableData', newTableData);
       this.columns = tableTitleData;
-      //this.rows = newTableData;
       this.rows = excellist;
     },
     onFileChange (event) {
@@ -258,12 +247,6 @@ export default {
               element["DESCRIPCION"] = ''
             }
           });
-          console.log(ws)
-          //const excellist = [];  // Clear received data
-          // Edit data
-          // for (var i = 0; i < ws.length; i++) {
-          //   excellist.push(ws[i]);
-          // }
           const a = workbook.Sheets[workbook.SheetNames[0]];
           const headers = this.getHeader(a)
           this.setTable(headers, ws)

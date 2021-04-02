@@ -92,7 +92,42 @@
         </v-col>
       </v-row>
     </div>
+    <!--  -->
+    <v-dialog
+      v-model="showAlert"
+      persistent
+      width="600"
+    >
+      <v-card>
+        <v-card-title class="headline">
+          Documento Generado en SAP: {{response.DocNum}}
+        </v-card-title>
+        <v-card-text>
+          <v-data-table
+            dense
+            :items="response.DocumentLines"
+            :headers="responseColumns"
+            hide-default-footer
+            disable-pagination
+            fixed-header
+            disable-sort
+            class="elevation-1"
+            style="max-height: 300px"
+            height="300px"
+          >
+          </v-data-table>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            text
+            color="primary"
+            @click="showAlert = false; response = []"
+          >Cerrar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-overlay :value="overlay">
+      Generando ajuste <br>
       <v-progress-circular
         indeterminate
         size="64"
@@ -113,9 +148,44 @@ export default {
     selectedFile: undefined,
     selectedFile2: undefined,
     motivo: '',
-    overlay: false
+    overlay: false,
+    response: [],
+    showAlert: false,
+    responseColumns: [
+      { text: 'Producto', value: 'ItemCode' },
+      { text: 'Descripcion', value: 'ItemDescription' },
+      { text: 'Ajuste', value: 'Quantity', align: 'right' },
+    ],
   }),
   methods: {
+    EnviarSap () {
+      this.overlay = true
+      const info = {
+        Ajustes: this.rows,
+        Sucursal: this.selectedSucursal,
+        Motivo: this.motivo,
+        Tipo: 'entrada'
+      }
+      this.$store.dispatch("postAjuste", info)
+        .then(res => {
+          if (res) {
+            this.overlay = false
+            this.rows = []
+            this.selectedFile = undefined
+            this.response = res.data
+            this.showAlert = true
+          }
+        })
+        .catch(err => {
+          this.overlay = false
+          this.response = err.data
+          alert(this.response)
+          console.error(err)
+        })
+        .finally(() => {
+          this.overlay = false
+        })
+    },
     getSucursalText (item) {
       return `${item.bplId} - ${item.bplFrName}`
     },
@@ -149,27 +219,13 @@ export default {
     },
     setTable (headers, excellist) {
       const tableTitleData = []; // Store table header data
-      //const tableMapTitle = {}; // Set table content for Chinese and English
       headers.forEach((_, i) => {
-        //tableMapTitle[_] = _;
         tableTitleData.push({
           text: _.toUpperCase(),
           value: _.toUpperCase(),
         });
       });
-      //console.log("tableTitleData", tableTitleData);
-      // Mapping table content attribute name is English
-      // const newTableData = [];
-      // excellist.forEach(_ => {
-      //   const newObj = {};
-      //   Object.keys(_).forEach(key => {
-      //     newObj[tableMapTitle[key]] = _[key];
-      //   });
-      //   newTableData.push(newObj);
-      // });
-      // console.log('newTableData', newTableData);
       this.columns = tableTitleData;
-      //this.rows = newTableData;
       this.rows = excellist;
     },
     onFileChange (event) {
@@ -192,11 +248,6 @@ export default {
               element["DESCRIPCION"] = ''
             }
           });
-          //const excellist = [];  // Clear received data
-          // Edit data
-          // for (var i = 0; i < ws.length; i++) {
-          //   excellist.push(ws[i]);
-          // }
           const a = workbook.Sheets[workbook.SheetNames[0]];
           const headers = this.getHeader(a)
           this.setTable(headers, ws)
@@ -207,23 +258,6 @@ export default {
       };
       fileReader.readAsBinaryString(this.selectedFile);
     },
-    onFileChange2 () {
-
-    },
-    EnviarSap () {
-      this.overlay = true
-      const info = {
-        Ajustes: this.rows,
-        Sucursal: this.selectedSucursal,
-        Motivo: this.motivo
-      }
-      if (this.$store.dispatch("postEntrada", info)) {
-        this.overlay = false
-        this.rows = []
-        this.selectedFile = undefined
-      }
-    }
-
   },
   computed: {
     cedis () {

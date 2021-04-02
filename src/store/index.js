@@ -219,11 +219,11 @@ const AjustesModule = {
         console.log(error)
       }
     },
-    postSalida: ({ commit }, info) => {
+    postAjuste: ({ commit }, info) => {
       return new Promise((resolve, reject) => {
         try {
           let user = localStorage.getItem('user')
-          axiosInstance.post(`/api/dataapp/salida?u=${user}`, info)
+          axiosInstance.post(`/api/dataapp/${info.Tipo}?u=${user}`, info)
             .then(res => resolve(res))
             .catch(err => reject(err))
         } catch (error) {
@@ -232,17 +232,6 @@ const AjustesModule = {
         }
       })
     },
-    postEntradas: async ({ commit }) => {
-      try {
-        let user = localStorage.getItem('user')
-        const req = await axiosInstance.post(`/api/dataapp/entrada?u=${user}`, info)
-        const data = await req.data
-        return true
-      } catch (error) {
-        console.log(error)
-        return false
-      }
-    }
   }
 }
 export default new Vuex.Store({
