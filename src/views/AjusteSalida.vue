@@ -1,5 +1,5 @@
 <template>
-  <v-main>
+  <v-container>
     <v-toolbar dense>
       <v-toolbar-title>Ajustes de salida de inventario</v-toolbar-title>
       <v-spacer> </v-spacer>
@@ -132,7 +132,7 @@
         size="64"
       ></v-progress-circular>
     </v-overlay>
-  </v-main>
+  </v-container>
 </template>
 
 <script>
@@ -152,7 +152,7 @@ export default {
     showAlert: false,
     responseColumns: [
       { text: 'Producto', value: 'ItemCode' },
-      { text: 'Descripcion', value: 'ItemDescription' },
+      { text: 'Descripción', value: 'ItemDescription' },
       { text: 'Ajuste', value: 'Quantity', align: 'right' },
     ],
   }),

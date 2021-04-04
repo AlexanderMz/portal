@@ -4,56 +4,87 @@
       <v-container
         fluid
         fill-height
-        class="loginOverlay"
+        justify-center
       >
-        <v-layout
-          flex
-          align-center
-          justify-center
+        <v-row
+          align="center"
+          justify="center"
         >
-          <v-flex
-            xs12
-            sm3
-            elevation-6
+          <v-col
+            cols="12"
+            md="7"
+            sm="8"
           >
-            <v-toolbar class="pt-5 blue darken-4">
-              <v-toolbar-title class="white--text">
-                <h4>Portal GOVI</h4>
-              </v-toolbar-title>
-            </v-toolbar>
-            <v-card>
-              <v-card-text class="pt-4">
-                <div>
-                  <v-form
-                    v-model="valid"
-                    ref="form"
+            <v-sheet rounded="lg">
+              <v-row
+                class="ma-0"
+                style="height: 80vh; align-content: center;"
+              >
+                <v-col
+                  cols="12"
+                  md="6"
+                  class="pa-0"
+                >
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <v-card
+                    elevation="2"
+                    color="#26c6da"
                   >
-                    <v-text-field
-                      label="Usuario"
-                      v-model="username"
-                      :rules="emailRules"
-                      required
-                    ></v-text-field>
-                    <v-text-field
-                      label="Contraseña"
-                      v-model="password"
-                      type="password"
-                      :rules="passwordRules"
-                      counter
-                      required
-                    ></v-text-field>
-                    <v-layout justify-space-between>
-                      <v-btn
-                        @click="submit"
-                        :class=" { 'blue darken-4 white--text' : valid, disabled: !valid }"
-                      >Entrar</v-btn>
-                    </v-layout>
-                  </v-form>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-flex>
-        </v-layout>
+                    <div
+                      class="white--text pt-5"
+                      height="200px"
+                    >
+                      <v-card-title>PORTAL GOVI</v-card-title>
+                    </div>
+
+                    <v-card-subtitle class="pb-0">
+                      Inicio de sessión
+                    </v-card-subtitle>
+                    <v-divider light />
+                    <v-card-text class="pt-4">
+                      <div>
+                        <v-form
+                          v-model="valid"
+                          ref="form"
+                        >
+                          <v-text-field
+                            label="Usuario"
+                            v-model="username"
+                            :rules="emailRules"
+                            required
+                            solo
+                            prepend-inner-icon="people"
+                          ></v-text-field>
+                          <v-text-field
+                            label="Contraseña"
+                            v-model="password"
+                            type="password"
+                            :rules="passwordRules"
+                            required
+                            solo
+                            prepend-inner-icon="password"
+                          ></v-text-field>
+                          <v-card-actions>
+                            <v-btn
+                              block
+                              @click="submit"
+                              :class=" { '#26c6da white--text' : valid, disabled: !valid }"
+                            >Entrar</v-btn>
+                          </v-card-actions>
+                        </v-form>
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+
+            </v-sheet>
+          </v-col>
+        </v-row>
       </v-container>
     </v-content>
   </v-app>
@@ -79,23 +110,19 @@ export default {
   methods: {
     submit () {
       if (this.$refs.form.validate()) {
-        this.$store.dispatch("login", { UserName: this.username, Password: this.password })
-          .then(res => {
-            if (res) {
-              localStorage.setItem('jwt', escape(JSON.stringify({ email: this.email, jwt: this.password })))
-              localStorage.setItem('user', this.username)
-              localStorage.setItem('pass', this.password)
-              this.$router.push('/')
-            }
-            this.loadTable = false
-          })
-          .catch(err => {
+        // this.$store.dispatch("login", { UserName: this.username, Password: this.password })
+        //   .then(res => {
+        //     if (res) {
+        localStorage.setItem('jwt', escape(JSON.stringify({ email: this.email, jwt: this.password })))
+        localStorage.setItem('user', this.username)
+        localStorage.setItem('pass', this.password)
+        this.$router.push('/')
+        //     }
+        //     this.loadTable = false
+        //   })
+        //   .catch(err => {
 
-          })
-        // if (this.$store.dispatch("loginSap", { UserName: this.username, Password: this.password })) {
-
-        // }
-
+        //   })
       }
     },
     clear () {

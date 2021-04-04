@@ -153,7 +153,7 @@ export default {
     showAlert: false,
     responseColumns: [
       { text: 'Producto', value: 'ItemCode' },
-      { text: 'Descripcion', value: 'ItemDescription' },
+      { text: 'Descripción', value: 'ItemDescription' },
       { text: 'Ajuste', value: 'Quantity', align: 'right' },
     ],
   }),

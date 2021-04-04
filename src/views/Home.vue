@@ -12,32 +12,43 @@
         md="4"
         lg="3"
       >
-        <v-card
-          color="#26c6da"
-          dark
-          max-width="400"
-          :to="item.path"
-        >
-          <v-card-title>
-            <v-icon
-              large
-              left
-            >
-              link
-            </v-icon>
-            <span class="title font-weight-light">{{item.desc}}</span>
-          </v-card-title>
+        <v-hover v-slot="{ hover }">
+          <v-card
+            color="#26c6da"
+            dark
+            max-width="400"
+            :to="item.path"
+          >
+            <v-card-title>
+              <v-icon
+                large
+                left
+              >
+                link
+              </v-icon>
+              <span class="title font-weight-light">{{item.desc}}</span>
+            </v-card-title>
 
-          <v-card-text class="headline font-weight-bold">
+            <v-card-text class="headline font-weight-bold">
 
-          </v-card-text>
+            </v-card-text>
 
-          <v-card-actions>
-            <v-list-item class="grow">
+            <v-card-actions>
+              <v-list-item class="grow">
 
-            </v-list-item>
-          </v-card-actions>
-        </v-card>
+              </v-list-item>
+            </v-card-actions>
+            <v-fade-transition>
+              <v-overlay
+                v-if="hover"
+                absolute
+                color="#036358"
+              >
+                <span class="subtitle-2">{{item.desc}}</span>
+              </v-overlay>
+            </v-fade-transition>
+          </v-card>
+        </v-hover>
       </v-col>
     </v-row>
   </v-container>
