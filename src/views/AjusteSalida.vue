@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-main>
     <v-toolbar dense>
       <v-toolbar-title>Ajustes de salida de inventario</v-toolbar-title>
       <v-spacer> </v-spacer>
@@ -132,7 +132,7 @@
         size="64"
       ></v-progress-circular>
     </v-overlay>
-  </v-container>
+  </v-main>
 </template>
 
 <script>

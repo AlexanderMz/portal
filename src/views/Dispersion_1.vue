@@ -313,7 +313,7 @@ export default {
   },
   computed: {
     tableHeight () {
-      return window.innerHeight - 200;
+      return window.innerHeight - 0;
     },
     transferencias () {
       return this.$store.state.dispersion.transferencias
