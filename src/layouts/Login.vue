@@ -110,19 +110,19 @@ export default {
   methods: {
     submit () {
       if (this.$refs.form.validate()) {
-        // this.$store.dispatch("login", { UserName: this.username, Password: this.password })
-        //   .then(res => {
-        //     if (res) {
-        localStorage.setItem('jwt', escape(JSON.stringify({ email: this.email, jwt: this.password })))
-        localStorage.setItem('user', this.username)
-        localStorage.setItem('pass', this.password)
-        this.$router.push('/')
-        //     }
-        //     this.loadTable = false
-        //   })
-        //   .catch(err => {
+        this.$store.dispatch("login", { UserName: this.username, Password: this.password })
+          .then(res => {
+            if (res) {
+              localStorage.setItem('jwt', escape(JSON.stringify({ email: this.email, jwt: this.password })))
+              localStorage.setItem('user', this.username)
+              localStorage.setItem('pass', this.password)
+              this.$router.push('/')
+            }
+            this.loadTable = false
+          })
+          .catch(err => {
 
-        //   })
+          })
       }
     },
     clear () {
