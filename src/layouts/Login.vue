@@ -99,11 +99,11 @@ export default {
       e1: false,
       password: '',
       passwordRules: [
-        (v) => !!v || 'Contraseña is required',
+        (v) => !!v || 'Contraseña es requerida',
       ],
       username: '',
       emailRules: [
-        (v) => !!v || 'Usuario is required'
+        (v) => !!v || 'Usuario es requerida'
       ],
     }
   },
