@@ -34,12 +34,15 @@
                     elevation="2"
                     color="#26c6da"
                   >
-                    <div
+                    <v-img
                       class="white--text pt-5"
-                      height="200px"
+                      height="33px"
+                      src="../assets/sap.png"
+                      position="left top"
+                      contain
                     >
-                      <v-card-title>PORTAL GOVI</v-card-title>
-                    </div>
+                    </v-img>
+                    <v-card-title>PORTAL GOVI</v-card-title>
 
                     <v-card-subtitle class="pb-0">
                       Inicio de sessión
