@@ -87,6 +87,12 @@
 
             </v-sheet>
           </v-col>
+          <v-overlay :value="overlay">
+            <v-progress-circular
+              indeterminate
+              size="64"
+            ></v-progress-circular>
+          </v-overlay>
         </v-row>
       </v-container>
     </v-content>
@@ -99,6 +105,7 @@ export default {
   data () {
     return {
       valid: false,
+      overlay: false,
       e1: false,
       password: '',
       passwordRules: [
@@ -113,12 +120,15 @@ export default {
   methods: {
     submit () {
       if (this.$refs.form.validate()) {
+        this.overlay = true
         this.$store.dispatch("login", { UserName: this.username, Password: this.password })
           .then(res => {
             if (res) {
               localStorage.setItem('jwt', escape(JSON.stringify({ email: this.email, jwt: this.password })))
               localStorage.setItem('user', this.username)
               localStorage.setItem('pass', this.password)
+              this.overlay = false
+
               this.$router.push('/')
             }
             this.loadTable = false

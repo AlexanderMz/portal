@@ -66,9 +66,9 @@
         justify="center"
         cols="12"
       >
+        <!-- v-if="sd_aldia.length" -->
         <v-data-table
           dense
-          v-if="sd_aldia.length"
           v-model="selected"
           :headers="headers"
           :items="sd_aldia"
@@ -89,13 +89,23 @@
             <span> {{item.saldoDiario | currency}} </span>
           </template>
         </v-data-table>
-        <v-skeleton-loader
+        <!-- <v-skeleton-loader
           v-if="!sd_aldia.length"
           class="mx-auto"
           type="table"
-        ></v-skeleton-loader>
+        ></v-skeleton-loader> -->
       </v-col>
     </v-row>
+    <v-overlay
+      style="text-align: center"
+      :value="overlay"
+    >
+      <p>Calculando saldo diario</p>
+      <v-progress-circular
+        indeterminate
+        size="64"
+      ></v-progress-circular>
+    </v-overlay>
   </v-container>
 </template>
 
@@ -109,7 +119,7 @@ export default {
       modal: false,
       date: new Date().toISOString().substr(0, 10),
       selected: [],
-      loadTable: false,
+      overlay: false,
       headers: [
         { text: 'Empresa', value: 'empresa' },
         { text: 'Cuenta', value: 'cuenta' },
@@ -121,12 +131,12 @@ export default {
   },
   methods: {
     cargarDatos () {
-      this.loadTable = true
       this.$refs.dialog.save(this.date)
+      this.overlay = true
       this.$store.dispatch("getDatos", this.date.replaceAll('-', ''))
-        .then(res => {
-          this.loadTable = false
-        })
+        .then(() => this.overlay = false)
+        .catch(() => this.overlay = false)
+        .finally(() => this.overlay = false)
     },
   },
   computed: {

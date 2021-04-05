@@ -116,7 +116,7 @@
           <template #activator>
             <v-list-item-icon>
               <v-icon>
-                account_balance
+                inventory
               </v-icon>
             </v-list-item-icon>
             <v-list-item-content>
@@ -154,7 +154,7 @@
           class="text-center"
           cols="12"
         >
-          <strong>Leo Lazcano | @ilbeV3.0 | </strong>{{ new Date().getFullYear() }}
+          <strong>@mm v5.0 | 2021 | 04 | </strong>{{ new Date().getFullYear() }}
         </v-col>
       </v-footer>
     </v-navigation-drawer>

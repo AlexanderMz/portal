@@ -126,8 +126,11 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-overlay :value="overlay">
-      Generando ajuste <br>
+    <v-overlay
+      style="text-align: center"
+      :value="overlay"
+    >
+      <p>Generando ajuste</p>
       <v-progress-circular
         indeterminate
         size="64"

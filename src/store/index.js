@@ -146,10 +146,13 @@ const Informes = {
   actions: {
     getDatos: ({ commit }, fecha) => {
       commit('SET_SD', [])
-      axiosInstance.get(`/api/dataapp/sdaldia?fecha=${fecha}`)
-        .then(res => {
-          commit('SET_SD', res.data)
-        })
+      return new Promise((resolve, reject) => {
+        axiosInstance.get(`/api/dataapp/sdaldia?fecha=${fecha}`)
+          .then(res => {
+            commit('SET_SD', res.data)
+            resolve()
+          }).catch(() => reject())
+      })
     }
   }
 }
