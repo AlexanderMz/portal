@@ -189,7 +189,7 @@ export default {
         })
     },
     getSucursalText (item) {
-      return `${item.bplId} - ${item.bplFrName}`
+      return `${item.bplName} - ${item.bplFrName}`
     },
     getHeader (sheet) {
       const XLSX = xlsx;
