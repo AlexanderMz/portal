@@ -425,7 +425,8 @@ export default {
             this.cancelProcess()
           }
         }).catch(err => {
-          console.log(err)
+          this.overlay = false
+          alert(err)
         })
     },
     cancelProcess () {

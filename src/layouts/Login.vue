@@ -22,7 +22,7 @@
               >
                 <v-col
                   cols="12"
-                  md="6"
+                  md="3"
                   class="pa-0"
                 >
                 </v-col>
@@ -82,6 +82,12 @@
                       </div>
                     </v-card-text>
                   </v-card>
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="3"
+                  class="pa-0"
+                >
                 </v-col>
               </v-row>
 
