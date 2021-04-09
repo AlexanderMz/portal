@@ -7,7 +7,7 @@ import excel from 'vue-excel-export'
 import axios from 'axios'
 
 //let url = ''
-let url = 'https://localhost:44393'
+let url = 'https://localhost:5001'
 //let url = 'http://localhost:8082'
 
 Vue.use(excel)

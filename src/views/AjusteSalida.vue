@@ -181,7 +181,7 @@ export default {
         .catch(err => {
           this.overlay = false
           this.response = err.data
-          alert(err)
+          alert(err.data.error.message.value)
           console.error(err)
         })
         .finally(() => {

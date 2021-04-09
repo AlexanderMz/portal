@@ -91,14 +91,36 @@
             id="tabledetalle"
           >
             <template v-slot:top>
-              <v-btn
-                rounded
-                icon
-                @click="selectedToFile = []"
-              >
-                <v-icon>delete</v-icon>
-              </v-btn>
-              {{selectedToFile.length}} seleccionadas | Total: {{getTotal | currency}}
+              <v-row no-gutters>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="8"
+                >
+                  <v-btn
+                    rounded
+                    icon
+                    title="Eliminar todos"
+                    @click="selectedToFile = []"
+                  >
+                    <v-icon>delete</v-icon>
+                  </v-btn>
+                  {{selectedToFile.length}} seleccionadas | Total: {{getTotal | currency}}
+                </v-col>
+                <v-col
+                  cols="6"
+                  md="4"
+                  align-self="end"
+                >
+                  <v-checkbox
+                    dense
+                    style="margin-top: 0px"
+                    v-model="isGenerate"
+                    :label="`Generar archivos: ${isGenerate ? 'Si': 'No'}`"
+                  ></v-checkbox>
+                </v-col>
+
+              </v-row>
               <v-dialog
                 v-model="dialogDelete"
                 max-width="600px"
@@ -142,7 +164,7 @@
     </div>
     <!-- Dialog -->
     <v-dialog
-      v-model="alertuno"
+      v-model="showdialog"
       persistent
       width="700"
     >
@@ -191,17 +213,35 @@
           <v-btn
             text
             color="primary"
-            @click="alertuno = false"
+            @click="showdialog = false"
           >Cerrar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-overlay :value="overlay">
+    <v-overlay
+      style="text-align: center"
+      :value="overlay"
+    >
+      <p>Generando dispersion de pagos</p>
       <v-progress-circular
         indeterminate
         size="64"
       ></v-progress-circular>
+    </v-overlay>
+    <v-overlay
+      style="text-align: center"
+      :z-index="zIndex"
+      :value="showResult"
+    >
+      <p>{{Respuesta}}</p>
+      <v-btn
+        depressed
+        color="primary"
+        @click="showResult = false"
+      >
+        Aceptar
+      </v-btn>
     </v-overlay>
   </v-container>
 </template>
@@ -212,6 +252,7 @@ export default {
   name: 'Dispersion',
   data: () => ({
     archivos: [],
+    Respuesta: '',
     dialog: false,
     dialogDelete: false,
     editedIndex: -1,
@@ -222,6 +263,8 @@ export default {
     loadRest: false,
     loadTable: false,
     overlay: false,
+    isGenerate: false,
+    zIndex: 0,
     headers: [
       { text: 'Documento', value: 'docNum' },
       { text: 'Total', value: 'docTotal', align: 'right' },
@@ -246,7 +289,8 @@ export default {
       { text: 'DocDate', value: 'docDate' },
       { text: 'DocEntry', value: 'docEntry' }
     ],
-    alertuno: false
+    showdialog: false,
+    showResult: false
   }),
   watch: {
     dialog (val) {
@@ -291,16 +335,24 @@ export default {
       this.overlay = true
       let data = {
         transferencias: this.selectedToFile,
+        g: this.isGenerate ? 1 : 0
       }
       this.$store.dispatch("generarTxtUnoxUno", data)
         .then(res => {
           if (res != null) {
-            this.archivos = res
-            this.overlay = false
-            this.alertuno = true
+            if (!Array.isArray(res)) {
+              this.overlay = false
+              this.showResult = true
+              this.Respuesta = res
+            } else {
+              this.archivos = res
+              this.overlay = false
+              this.showdialog = true
+            }
             this.cancelProcess()
           }
         }).catch(err => {
+          this.overlay = false
           console.log(err)
         })
     },

@@ -112,21 +112,25 @@ const Dispersion = {
     generarTxtUnoxUno: ({ commit }, data) => {
       let user = localStorage.getItem('user')
       let pass = localStorage.getItem('pass')
-      let postUrl = `/api/dataapp/transferenciasbyone?u=${user}&p=${pass}`
+      let postUrl = `/api/dataapp/transferenciasbyone?u=${user}&p=${pass}&g=${data.g}`
       return new Promise((resolve, reject) => {
-        fetch(postUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data.transferencias)
-        }).then(res => {
-          res.json().then(json => {
-            resolve(json)
-          })
-        }).catch(err => {
-          reject(err)
-        })
+        axiosInstance.post(postUrl, data.transferencias)
+          .then(res => resolve(res.data))
+          .catch(err => reject(err))
+
+        // fetch(postUrl, {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   body: JSON.stringify(data.transferencias)
+        // }).then(res => {
+        //   res.json().then(json => {
+        //     resolve(json)
+        //   })
+        // }).catch(err => {
+        //   reject(err)
+        // })
       })
     }
   },
