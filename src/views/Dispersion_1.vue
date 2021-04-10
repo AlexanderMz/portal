@@ -263,7 +263,7 @@ export default {
     loadRest: false,
     loadTable: false,
     overlay: false,
-    isGenerate: false,
+    isGenerate: true,
     zIndex: 0,
     headers: [
       { text: 'Documento', value: 'docNum' },
