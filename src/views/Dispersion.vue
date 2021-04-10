@@ -216,7 +216,7 @@
       width="400"
     >
       <v-card>
-        <v-card-title class="headline grey lighten-2">
+        <v-card-title class="headline">
           Resultado
         </v-card-title>
         <v-card-text>
@@ -229,15 +229,22 @@
           >{{archivo.filename}}</v-btn>
 
         </v-card-text>
+        <v-card-actions>
+          <v-btn
+            text
+            color="primary"
+            @click="alertlote = false"
+          >Cerrar</v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog
+    <!-- <v-dialog
       v-model="alertuno"
       persistent
       width="700"
     >
       <v-card>
-        <v-card-title class="headline grey lighten-2">
+        <v-card-title class="headline">
           Resultado
         </v-card-title>
         <v-card-text>
@@ -285,7 +292,7 @@
           >Cerrar</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
 
     <v-overlay :value="overlay">
       <v-progress-circular
