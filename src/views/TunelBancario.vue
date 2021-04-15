@@ -10,7 +10,7 @@
         depressed
         color="primary"
         @click="enviarTunel"
-        :disabled="!selectedToFile.length"
+        :disabled="!selectedTxt.length"
       >
         Enviar a túnel bancario
       </v-btn>
@@ -22,7 +22,7 @@
           cols="6"
         >
           <v-file-input
-            label="Buscar archivo"
+            label="Seleccionar archivos"
             accept="text/txt"
             outlined
             multiple
@@ -31,29 +31,88 @@
             v-model="selectedFile"
           ></v-file-input>
         </v-col>
+        <v-col
+          class="d-flex"
+          cols="6"
+          v-if="selectedTxt.length > 0"
+        >
+          Archivos seleccionados:
+          {{selectedTxt.length}}
+        </v-col>
       </v-row>
-      <v-row justify="center">
-        <v-expansion-panels accordion>
-          <v-expansion-panel
-            v-for="(item,i) in response"
-            :key="i"
+      <v-row>
+        <v-col class="d-flex">
+          <v-expansion-panels
+            accordion
+            focusable
           >
-            <v-expansion-panel-header>{{item.name}}</v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-data-table
-                :headers="responseColumns"
-                :items="item.filas"
-                hide-actions
-                class="elevation-1"
-                item-key="referencia"
-                loading="true"
-              >
-              </v-data-table>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
+            <v-expansion-panel
+              v-for="(item,i) in getRegistros"
+              :key="i"
+            >
+              <v-expansion-panel-header>
+                <v-row no-gutters>
+                  <v-col cols="1">
+                    <v-checkbox
+                      hide-details
+                      class="shrink mr-2 mt-0"
+                      dense
+                      style="margin-top: 0px"
+                      v-model="selectedTxt"
+                      :value="item.name"
+                      @click.stop=""
+                    ></v-checkbox>
+                  </v-col>
+                  <v-col cols="9">
+                    {{item.name}}
+                  </v-col>
+                  <v-col cols="2">
+                    {{item.totalImporte | currency}}
+                  </v-col>
+                </v-row>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+
+                <v-data-table
+                  dense
+                  :headers="responseColumns"
+                  :items="item.filas"
+                  hide-default-footer
+                  class="elevation-1"
+                  item-key="referencia"
+                  loading="true"
+                >
+                </v-data-table>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </v-col>
       </v-row>
     </div>
+    <v-overlay
+      style="text-align: center"
+      :value="overlay"
+    >
+      <p></p>
+      <v-progress-circular
+        indeterminate
+        size="64"
+      ></v-progress-circular>
+    </v-overlay>
+    <v-overlay
+      style="text-align: center"
+      :z-index="zIndex"
+      :value="showResult"
+    >
+      <p>{{Respuesta}}</p>
+      <v-btn
+        depressed
+        color="primary"
+        @click="showResult = false"
+      >
+        Aceptar
+      </v-btn>
+    </v-overlay>
   </v-container>
 </template>
 
@@ -61,47 +120,37 @@
 export default {
   name: 'AjusteEntrada',
   data: () => ({
-    rows: [],
-    columns: [],
-    selectedSucursal: null,
     selectedFile: undefined,
-    selectedFile2: undefined,
     motivo: '',
     overlay: false,
-    response: [],
+    selectedTxt: [],
     showAlert: false,
+    showResult: false,
+    Respuesta: '',
     responseColumns: [
       { text: 'Referencia', value: 'referencia' },
       { text: 'Instrucción', value: 'instruccionPago' },
       { text: 'Cuenta Origen', value: 'cuentaOrigen' },
       { text: 'Cuenta Destino', value: 'cuentaDestino' },
-      { text: 'Importe', value: 'importe', align: 'right' },
-      { text: 'Fecha Aplicación', value: 'fechaAplicacion' },
+      { text: 'Importe', value: 'importe', align: 'end' },
+      { text: 'Fecha Aplicación', value: 'fechaAplicacion', align: 'end' },
     ],
   }),
   methods: {
-    EnviarSap () {
+    enviarTunel () {
       this.overlay = true
-      const info = {
-        Ajustes: this.rows,
-        Sucursal: this.selectedSucursal,
-        Motivo: this.motivo,
-        Tipo: 'entrada'
-      }
-      this.$store.dispatch("postAjuste", info)
+      this.$store.dispatch("postTunel", this.selectedTxt)
         .then(res => {
           if (res) {
             this.overlay = false
-            this.rows = []
+            this.showResult = true
+            this.Respuesta = res
             this.selectedFile = undefined
-            this.response = res.data
-            this.showAlert = true
           }
         })
         .catch(err => {
           this.overlay = false
-          this.response = err.data
-          alert(this.response)
+          alert(err)
           console.error(err)
         })
         .finally(() => {
@@ -109,7 +158,34 @@ export default {
         })
     },
     onFileChange (event) {
-
+      if (!this.selectedFile) return
+      this.selectedTxt = []
+      this.overlay = true
+      var formData = new FormData()
+      this.selectedFile.forEach(element => {
+        formData.append('files', element)
+      });
+      this.$store.dispatch("postUpload", formData)
+        .then(res => {
+          if (res) {
+            this.overlay = false
+            this.selectedFile = undefined
+          }
+        })
+        .catch(err => {
+          this.overlay = false
+          alert(err)
+          console.error(err)
+        })
+        .finally(() => {
+          this.selectedTxt = []
+          this.overlay = false
+        })
+    }
+  },
+  computed: {
+    getRegistros () {
+      return this.$store.state.tunel.resultado
     }
   }
 }

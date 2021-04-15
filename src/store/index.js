@@ -141,7 +141,7 @@ const Dispersion = {
 const Informes = {
   state: () => ({
     sdaldia: [],
-    foliosGenerados,
+    foliosGenerados: [],
   }),
   mutations: {
     SET_SD: (state, datos) => {
@@ -249,11 +249,52 @@ const AjustesModule = {
     },
   }
 }
+/**
+ * Tunel
+ */
+const TunelBancario = {
+  state: () => ({
+    resultado: []
+  }),
+  mutations: {
+    SET_RESULTADOS: (state, datos) => {
+      state.resultado = datos
+    }
+  },
+  actions: {
+    postUpload: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        try {
+          axiosInstance.post(`/api/dataapp/uploadtxt`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
+            .then(res => { commit('SET_RESULTADOS', res.data); resolve(res) })
+            .catch(err => reject(err))
+        } catch (error) {
+          console.log(error)
+        }
+      })
+
+    },
+    postTunel: ({ commit }, info) => {
+      return new Promise((resolve, reject) => {
+        try {
+          axiosInstance.post(`/api/dataapp/tunel`, info)
+            .then(res => resolve(res))
+            .catch(err => reject(err))
+        } catch (error) {
+          console.log(error)
+          reject(error)
+        }
+      })
+    },
+  }
+}
+
 export default new Vuex.Store({
   modules: {
     dispersion: Dispersion,
     informes: Informes,
     login: LoginModule,
-    ajustes: AjustesModule
+    ajustes: AjustesModule,
+    tunel: TunelBancario
   }
 })
