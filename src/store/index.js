@@ -141,10 +141,15 @@ const Dispersion = {
 const Informes = {
   state: () => ({
     sdaldia: [],
+    foliosGenerados,
   }),
   mutations: {
     SET_SD: (state, datos) => {
       state.sdaldia = datos
+    },
+
+    SET_FOLIOSGENERADOS: (state, datos) => {
+      state.foliosGenerados = datos
     }
   },
   actions: {
@@ -157,6 +162,9 @@ const Informes = {
             resolve()
           }).catch(() => reject())
       })
+    },
+    getFoliosGenerador: ({ commit }, fecha) => {
+
     }
   }
 }

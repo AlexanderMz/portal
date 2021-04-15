@@ -5,7 +5,6 @@
     </div>
   </v-container>
 </template>
-</template>
 
 <script>
 export default {
