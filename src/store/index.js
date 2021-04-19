@@ -254,11 +254,15 @@ const AjustesModule = {
  */
 const TunelBancario = {
   state: () => ({
-    resultado: []
+    resultado: [],
+    datosInforme: []
   }),
   mutations: {
     SET_RESULTADOS: (state, datos) => {
       state.resultado = datos
+    },
+    SET_INFORME: (state, datos) => {
+      state.datosInforme = datos
     }
   },
   actions: {
@@ -286,6 +290,18 @@ const TunelBancario = {
         }
       })
     },
+    getInforme: ({ commit }, fechas) => {
+      return new Promise((resolve, reject) => {
+        try {
+          axiosInstance.post(`/api/dataapp/informe`, fechas)
+            .then(res => { commit('SET_INFORME', res.data); resolve(res) })
+            .catch(err => reject(err))
+        } catch (error) {
+          console.log(error)
+          reject(error)
+        }
+      })
+    }
   }
 }
 
