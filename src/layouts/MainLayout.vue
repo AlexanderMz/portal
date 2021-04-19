@@ -104,6 +104,17 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item to="/informetunel">
+              <v-list-item-icon>
+                <v-icon>
+                </v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  Informe Tunel bancario
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list-item-group>
         </v-list-group>
       </v-list>

@@ -93,6 +93,7 @@
         </v-dialog>
       </v-col>
     </v-row>
+
     <v-row>
       <v-col class="d-flex">
         <v-expansion-panels
@@ -115,7 +116,7 @@
                   {{item.confirmacion}}
                 </v-col>
                 <v-col cols="2">
-                  {{item.docEntry}}
+                  {{item.sucursal}}
                 </v-col>
               </v-row>
             </v-expansion-panel-header>
