@@ -33,7 +33,15 @@
         </v-col>
         <v-col
           class="d-flex"
-          cols="6"
+          cols="3"
+          v-if="getRegistros.length > 0"
+        >
+          Archivos cargados:
+          {{getRegistros.length}}
+        </v-col>
+        <v-col
+          class="d-flex"
+          cols="3"
           v-if="selectedTxt.length > 0"
         >
           Archivos seleccionados:
@@ -144,7 +152,7 @@ export default {
           if (res) {
             this.overlay = false
             this.showResult = true
-            this.Respuesta = res
+            this.Respuesta = res.data
             this.selectedFile = undefined
           }
         })
