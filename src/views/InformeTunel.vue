@@ -4,7 +4,7 @@
       <v-toolbar-title>Informe tunel bancario</v-toolbar-title>
     </v-toolbar>
     <v-row>
-      <v-col
+      <!-- <v-col
         cols="6"
         sm="6"
         md="4"
@@ -47,7 +47,7 @@
             </v-btn>
           </v-date-picker>
         </v-dialog>
-      </v-col>
+      </v-col> -->
       <v-col
         cols="6"
         sm="6"
@@ -93,7 +93,28 @@
         </v-dialog>
       </v-col>
     </v-row>
-
+    <v-row justify="space-around">
+      <v-col
+        v-for="rounded in [50, 60, 80, 79]"
+        :key="rounded"
+        cols="12"
+        md="4"
+      >
+        <v-sheet
+          class="pa-12"
+          color="grey lighten-3"
+        >
+          <div></div>
+          <v-sheet
+            rounded
+            class="mx-auto"
+            height="100"
+            width="100"
+          ></v-sheet>
+          <div></div>
+        </v-sheet>
+      </v-col>
+    </v-row>
     <v-row>
       <v-col class="d-flex">
         <v-expansion-panels
@@ -182,7 +203,7 @@ export default {
     cargarDatos () {
       this.$refs.dialog1.save(this.dateFin)
       this.overlay = true
-      this.$store.dispatch("getInforme", { FechaIni: this.dateIni, FechaFin: this.dateFin })
+      this.$store.dispatch("getInforme", { FechaFin: this.dateFin })
         .then(() => this.overlay = false)
         .catch(() => this.overlay = false)
         .finally(() => this.overlay = false)
@@ -190,7 +211,10 @@ export default {
   },
   computed: {
     getRegistros () {
-      return this.$store.state.tunel.datosInforme
+      return this.$store.state.tunel.datosInforme.detalle
+    },
+    getData () {
+      return this.$store.state.tunel.datosInforme.generados
     }
   }
 }

@@ -290,10 +290,10 @@ const TunelBancario = {
         }
       })
     },
-    getInforme: ({ commit }, fechas) => {
+    getInforme: ({ commit }, fecha) => {
       return new Promise((resolve, reject) => {
         try {
-          axiosInstance.post(`/api/dataapp/informe`, fechas)
+          axiosInstance.post(`/api/dataapp/informe`, fecha)
             .then(res => { commit('SET_INFORME', res.data); resolve(res) })
             .catch(err => reject(err))
         } catch (error) {
