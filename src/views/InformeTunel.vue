@@ -95,18 +95,26 @@
     </v-row>
     <v-row justify="space-around">
       <v-col
-        v-for="rounded in [50, 60, 80, 79]"
-        :key="rounded"
+        v-for="rounded in [{t: 'Generados', v: 60}, {t: 'Enviados', v: 59}, {t: 'Aceptados', v: 59}, {t: 'Rechazados', v: 1}]"
+        :key="rounded.t"
         cols="12"
         md="3"
       >
         <v-sheet
           rounded
           class="mx-auto"
-          height="100"
-          width="100"
         >
-          {{rouded}}
+          <v-list>
+            <v-list-item two-line>
+              <v-list-item-avatar>
+                {{rounded.v}}
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>Folios</v-list-item-title>
+                <v-list-item-subtitle>{{rounded.t}} </v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
         </v-sheet>
       </v-col>
     </v-row>
