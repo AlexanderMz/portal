@@ -98,20 +98,15 @@
         v-for="rounded in [50, 60, 80, 79]"
         :key="rounded"
         cols="12"
-        md="4"
+        md="3"
       >
         <v-sheet
-          class="pa-12"
-          color="grey lighten-3"
+          rounded
+          class="mx-auto"
+          height="100"
+          width="100"
         >
-          <div></div>
-          <v-sheet
-            rounded
-            class="mx-auto"
-            height="100"
-            width="100"
-          ></v-sheet>
-          <div></div>
+          {{rouded}}
         </v-sheet>
       </v-col>
     </v-row>
