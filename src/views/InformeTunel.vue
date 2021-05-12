@@ -95,8 +95,8 @@
     </v-row>
     <v-row justify="space-around">
       <v-col
-        v-for="rounded in [{t: 'Generados', v: 60}, {t: 'Enviados', v: 59}, {t: 'Aceptados', v: 59}, {t: 'Rechazados', v: 1}]"
-        :key="rounded.t"
+        v-for="rounded in getStatistics"
+        :key="rounded.title"
         cols="12"
         md="3"
       >
@@ -107,11 +107,11 @@
           <v-list>
             <v-list-item two-line>
               <v-list-item-avatar>
-                {{rounded.v}}
+                {{rounded.total}}
               </v-list-item-avatar>
               <v-list-item-content>
-                <v-list-item-title>Folios</v-list-item-title>
-                <v-list-item-subtitle>{{rounded.t}} </v-list-item-subtitle>
+                <v-list-item-title>{{rounded.title.split(" ")[0]}}</v-list-item-title>
+                <v-list-item-subtitle>{{rounded.title}} </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -205,8 +205,9 @@ export default {
     },
     cargarDatos () {
       this.$refs.dialog1.save(this.dateFin)
+      const [year, month, day] = this.dateFin.split('-')
       this.overlay = true
-      this.$store.dispatch("getInforme", { FechaFin: this.dateFin })
+      this.$store.dispatch("getInforme", { FechaFin: this.dateFin, FechaIni: `${day}${month}${year}` })
         .then(() => this.overlay = false)
         .catch(() => this.overlay = false)
         .finally(() => this.overlay = false)
@@ -214,10 +215,10 @@ export default {
   },
   computed: {
     getRegistros () {
-      return this.$store.state.tunel.datosInforme.detalle
+      return this.$store.state.tunel.datosInforme.rows
     },
-    getData () {
-      return this.$store.state.tunel.datosInforme.generados
+    getStatistics () {
+      return this.$store.state.tunel.datosInforme.statistics
     }
   }
 }
