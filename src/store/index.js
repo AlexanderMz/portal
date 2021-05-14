@@ -255,8 +255,18 @@ const AjustesModule = {
 const TunelBancario = {
   state: () => ({
     resultado: [],
-    datosInforme: []
+    datosInforme: {
+      diferencias: [],
+      rows: [],
+      statistics: []
+    }
   }),
+  getters: {
+    doneRows: state => state.datosInforme,
+    lenDif: state => state.datosInforme.diferencias.length,
+    lenRows: state => state.datosInforme.rows.length,
+    lenStats: state => state.datosInforme.statistics.length,
+  },
   mutations: {
     SET_RESULTADOS: (state, datos) => {
       state.resultado = datos

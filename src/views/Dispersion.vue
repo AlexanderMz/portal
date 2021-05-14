@@ -238,61 +238,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- <v-dialog
-      v-model="alertuno"
-      persistent
-      width="700"
-    >
-      <v-card>
-        <v-card-title class="headline">
-          Resultado
-        </v-card-title>
-        <v-card-text>
-          <v-list
-            subheader
-            two-line
-          >
-            <v-subheader inset>Archivos</v-subheader>
-
-            <v-list-item
-              v-for="(file, index) in archivos"
-              :key="index"
-            >
-              <v-list-item-avatar>
-                <v-icon
-                  class="grey lighten-1"
-                  dark
-                >
-                  attachment
-                </v-icon>
-              </v-list-item-avatar>
-
-              <v-list-item-content>
-                <v-list-item-title v-text="file"></v-list-item-title>
-              </v-list-item-content>
-
-              <v-list-item-action>
-                <v-btn
-                  icon
-                  :href="'ftp://192.168.1.34/' + file"
-                  target="_blank"
-                >
-                  <v-icon color="grey lighten-1">information</v-icon>
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
-
-        </v-card-text>
-        <v-card-actions>
-          <v-btn
-            text
-            color="primary"
-            @click="alertuno = false"
-          >Cerrar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
 
     <v-overlay :value="overlay">
       <v-progress-circular

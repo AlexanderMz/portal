@@ -15,7 +15,7 @@
         </v-icon>
       </export-excel>
     </v-toolbar>
-    <v-row>
+    <v-row dense>
       <v-col
         cols="12"
         sm="6"
@@ -61,7 +61,7 @@
         </v-dialog>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row dense>
       <v-col
         justify="center"
         cols="12"

@@ -3,7 +3,7 @@
     <v-toolbar dense>
       <v-toolbar-title>Informe tunel bancario</v-toolbar-title>
     </v-toolbar>
-    <v-row>
+    <v-row dense>
       <!-- <v-col
         cols="6"
         sm="6"
@@ -78,7 +78,7 @@
             <v-btn
               text
               color="primary"
-              @click="modal = false"
+              @click="modal1 = false"
             >
               Cancel
             </v-btn>
@@ -92,8 +92,23 @@
           </v-date-picker>
         </v-dialog>
       </v-col>
+      <v-col
+        cols="6"
+        md="6"
+      >
+        <v-btn
+          depressed
+          color="primary"
+          style="margin-right: 10px"
+          @click="showResult = true"
+          :disabled="!$store.getters.lenDif > 0"
+        >Ver errores</v-btn>
+      </v-col>
     </v-row>
-    <v-row justify="space-around">
+    <v-row
+      dense
+      justify="space-around"
+    >
       <v-col
         v-for="rounded in getStatistics"
         :key="rounded.title"
@@ -118,12 +133,13 @@
         </v-sheet>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col class="d-flex">
-        <v-expansion-panels
-          accordion
-          focusable
-        >
+    <v-row dense>
+      <v-col
+        class="text-center"
+        cols="12"
+        md="12"
+      >
+        <v-expansion-panels accordion>
           <v-expansion-panel
             v-for="(item,i) in getRegistros"
             :key="i"
@@ -145,7 +161,6 @@
               </v-row>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-
               <v-data-table
                 dense
                 :headers="responseColumns"
@@ -171,6 +186,37 @@
         size="64"
       ></v-progress-circular>
     </v-overlay>
+    <v-overlay
+      style="text-align: center"
+      :z-index="10"
+      :value="showResult"
+    >
+      <v-toolbar dense>
+        <v-toolbar-title>Folios no procesados</v-toolbar-title>
+      </v-toolbar>
+      <v-row>
+        <v-col cols="12">
+          <v-data-table
+            dense
+            :headers="responseColumns"
+            :items="getDiferencias"
+            hide-default-footer
+            class="elevation-1"
+            item-key="docEntry"
+            loading="true"
+          >
+          </v-data-table>
+        </v-col>
+      </v-row>
+      <br>
+      <v-btn
+        depressed
+        color="primary"
+        @click="showResult = false"
+      >
+        Aceptar
+      </v-btn>
+    </v-overlay>
   </v-container>
 </template>
 
@@ -186,7 +232,9 @@ export default {
       dateFin: new Date().toISOString().substr(0, 10),
       selected: [],
       overlay: false,
+      showResult: false,
       responseColumns: [
+        { text: '#', value: 'id' },
         { text: 'Operacion', value: 'operacion' },
         { text: 'Descripcion', value: 'descripcion' },
         { text: 'Cuenta Origen', value: 'cuentaOrigen' },
@@ -215,10 +263,13 @@ export default {
   },
   computed: {
     getRegistros () {
-      return this.$store.state.tunel.datosInforme.rows
+      return this.$store.getters.doneRows.rows
     },
     getStatistics () {
-      return this.$store.state.tunel.datosInforme.statistics
+      return this.$store.getters.doneRows.statistics
+    },
+    getDiferencias () {
+      return this.$store.getters.doneRows.diferencias
     }
   }
 }

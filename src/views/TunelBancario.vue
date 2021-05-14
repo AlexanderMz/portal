@@ -16,7 +16,7 @@
       </v-btn>
     </v-toolbar>
     <div>
-      <v-row>
+      <v-row dense>
         <v-col
           class="d-flex"
           cols="6"
@@ -48,7 +48,7 @@
           {{selectedTxt.length}}
         </v-col>
       </v-row>
-      <v-row>
+      <v-row dense>
         <v-col class="d-flex">
           <v-expansion-panels
             accordion
@@ -109,7 +109,7 @@
     </v-overlay>
     <v-overlay
       style="text-align: center"
-      :z-index="zIndex"
+      :z-index="10"
       :value="showResult"
     >
       <p>{{Respuesta}}</p>
