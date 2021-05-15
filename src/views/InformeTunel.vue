@@ -170,6 +170,9 @@
                 item-key="id"
                 loading="true"
               >
+                <template v-slot:[`item.importe`]="{ item }">
+                  <span> {{item.importe | currency}} </span>
+                </template>
               </v-data-table>
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -198,13 +201,16 @@
         <v-col cols="12">
           <v-data-table
             dense
-            :headers="responseColumns"
+            :headers="responseColumns2"
             :items="getDiferencias"
             hide-default-footer
             class="elevation-1"
             item-key="docEntry"
             loading="true"
           >
+            <template v-slot:[`item.importe`]="{ item }">
+              <span> {{item.importe | currency}} </span>
+            </template>
           </v-data-table>
         </v-col>
       </v-row>
@@ -244,6 +250,18 @@ export default {
         { text: 'Fecha Ejecucion', value: 'fechaEjecucion', align: 'end' },
         { text: 'Titular', value: 'titulardelaCuenta' },
         { text: 'Confirmacion', value: 'confirmacion' },
+      ],
+      responseColumns2: [
+        { text: '#', value: 'id' },
+        { text: 'Folio', value: 'folio' },
+        { text: 'Sucursal', value: 'sucursal' },
+        { text: 'Descripcion', value: 'descripcion' },
+        { text: 'Cuenta Origen', value: 'cuentaOrigen' },
+        { text: 'Cuenta Destino', value: 'cuentaDestino' },
+        { text: 'Referencia', value: 'referencia' },
+        { text: 'Importe', value: 'importe', align: 'end' },
+        { text: 'Fecha Ejecucion', value: 'fechaEjecucion', align: 'end' },
+        { text: 'Titular', value: 'titulardelaCuenta' },
       ],
     }
   },

@@ -165,7 +165,7 @@
           class="text-center"
           cols="12"
         >
-          <strong>@mm v5.0 | 2021 | 04 | </strong>{{ new Date().getFullYear() }}
+          <strong>@mm v5.0 | {{ new Date().getFullYear() }} | 04 </strong>
         </v-col>
       </v-footer>
     </v-navigation-drawer>
