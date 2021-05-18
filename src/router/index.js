@@ -54,6 +54,12 @@ const routes = [
         desc: 'Informe Tunel Bancario'
       },
       {
+        path: '/informes/reportetransfers',
+        name: 'InformeTransfer',
+        component: () => import('../views/InformeTransfer.vue'),
+        desc: 'Informe Transferencias'
+      },
+      {
         path: '/inventario/ajustesalida',
         name: 'AjusteSalidaInventario',
         component: () => import('../views/AjusteSalida.vue'),

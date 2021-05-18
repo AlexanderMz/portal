@@ -194,8 +194,13 @@
       :z-index="10"
       :value="showResult"
     >
-      <v-toolbar dense>
+      <v-toolbar
+        dense
+        color="primary"
+      >
+        <v-spacer></v-spacer>
         <v-toolbar-title>Folios no procesados</v-toolbar-title>
+        <v-spacer></v-spacer>
       </v-toolbar>
       <v-row>
         <v-col cols="12">
@@ -220,7 +225,7 @@
         color="primary"
         @click="showResult = false"
       >
-        Aceptar
+        Cerrar
       </v-btn>
     </v-overlay>
   </v-container>

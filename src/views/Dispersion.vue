@@ -249,7 +249,7 @@
 </template>
 
 <script>
-//const setClass = new Set()
+import { mapActions } from 'vuex'
 export default {
   name: 'Dispersion',
   data: () => ({
@@ -304,6 +304,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions("dispersion", ['getSucursales', 'getSociedades', 'getCuentas', 'getTransfers', 'generarTxtxLote', 'limpiar']),
     getSociedadText (item) {
       return `${item.code} - ${item.u_CompnyName}`
     },
@@ -318,21 +319,21 @@ export default {
     },
     cargarDatos (sociedad) {
       this.loadSucural = true
-      this.$store.dispatch("getSucursales", sociedad.u_DB)
+      this.getSucursales(sociedad.u_DB)
         .then(res => {
           this.loadSucural = false
         })
     },
     cargarDatos2 (sucursal) {
       this.loadRest = true
-      this.$store.dispatch("getCuentas", { sociedad: this.selectedSociedad.u_DB, sucursal: sucursal.bplName })
+      this.getCuentas({ sociedad: this.selectedSociedad.u_DB, sucursal: sucursal.bplName })
         .then(res => {
           this.loadRest = false
         })
     },
     cargarDatos3 (cuenta) {
       this.loadTable = true
-      this.$store.dispatch("getTransfers", { sociedad: this.selectedSociedad.u_DB, sucursal: this.selectedSucursal.bplName, cuenta, operacion: this.operacion })
+      this.getTransfers({ sociedad: this.selectedSociedad.u_DB, sucursal: this.selectedSucursal.bplName, cuenta, operacion: this.operacion })
         .then(res => {
           this.loadTable = false
         })
@@ -368,7 +369,7 @@ export default {
         sucursal: this.selectedSucursal.bplName,
         operacion: this.operacion
       }
-      this.$store.dispatch("generarTxtxLote", data)
+      this.generarTxtxLote(data)
         .then(res => {
           if (res != null) {
             this.archivo = res
@@ -384,11 +385,7 @@ export default {
     cancelProcess () {
       this.search = ''
       this.selectedToFile = []
-      //this.operacion = null
-      //this.selectedSucursal = null
-      //this.$store.commit("SET_SUCURSALES", [])
-      this.$store.commit("SET_TRANSFERS", [])
-      //this.$store.commit("SET_CUENTAS", [])
+      this.limpiar()
     }
   },
   computed: {
@@ -412,8 +409,8 @@ export default {
     }
   },
   mounted () {
-    this.$store.commit("SET_TRANSFERS", [])
-    this.$store.dispatch("getSociedades")
+    this.limpiar()
+    this.getSociedades()
   }
 }
 </script>

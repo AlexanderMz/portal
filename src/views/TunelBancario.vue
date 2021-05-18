@@ -125,6 +125,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 export default {
   name: 'AjusteEntrada',
   data: () => ({
@@ -145,9 +146,10 @@ export default {
     ],
   }),
   methods: {
+    ...mapActions("tunel", ['postTunel', 'postUpload']),
     enviarTunel () {
       this.overlay = true
-      this.$store.dispatch("postTunel", this.selectedTxt)
+      this.postTunel(this.selectedTxt)
         .then(res => {
           if (res) {
             this.overlay = false
@@ -173,7 +175,7 @@ export default {
       this.selectedFile.forEach(element => {
         formData.append('files', element)
       });
-      this.$store.dispatch("postUpload", formData)
+      this.postUpload(formData)
         .then(res => {
           if (res) {
             this.overlay = false

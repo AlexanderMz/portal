@@ -247,6 +247,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 //const setClass = new Set()
 export default {
   name: 'Dispersion',
@@ -301,9 +302,10 @@ export default {
     },
   },
   methods: {
+    ...mapActions("dispersion", ['getAllTransfers', 'generarTxtUnoxUno', 'limpiar']),
     cargarDatos3 () {
       this.loadTable = true
-      this.$store.dispatch("getAllTransfers")
+      this.getAllTransfers()
         .then(res => {
           this.loadTable = false
         })
@@ -337,7 +339,7 @@ export default {
         transferencias: this.selectedToFile,
         g: this.isGenerate ? 1 : 0
       }
-      this.$store.dispatch("generarTxtUnoxUno", data)
+      this.generarTxtUnoxUno(data)
         .then(res => {
           if (res != null) {
             if (!Array.isArray(res)) {
@@ -359,8 +361,8 @@ export default {
     cancelProcess () {
       this.search = ''
       this.selectedToFile = []
-      this.$store.commit("SET_TRANSFERS", [])
-      this.$store.dispatch("getAllTransfers")
+      this.limpiar()
+      this.getAllTransfers()
     }
   },
   computed: {
@@ -378,8 +380,8 @@ export default {
     }
   },
   mounted () {
-    this.$store.commit("SET_TRANSFERS", [])
-    this.$store.dispatch("getAllTransfers")
+    this.limpiar()
+    this.getAllTransfers()
   }
 }
 </script>

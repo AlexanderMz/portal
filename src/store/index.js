@@ -58,6 +58,7 @@ const Dispersion = {
     }
   },
   actions: {
+    limpiar: ({ commit }) => commit('SET_TRANSFERS', []),
     getSociedades: ({ commit }) => {
       axiosInstance.get(`/api/dataapp/sociedades`)
         .then(res => {
@@ -179,7 +180,7 @@ const Informes = {
     getInfoTransfers: ({ commit }, fecha) => {
       commit('SET_INFOTRANSFERS', [])
       return new Promise((resolve, reject) => {
-        axiosInstance.get(`/api/dataapp/infotransfers?fecha=${fecha}`)
+        axiosInstance.post(`/api/dataapp/infotransfers`, fecha)
           .then(res => {
             commit('SET_INFOTRANSFERS', res.data)
             resolve()
@@ -189,7 +190,7 @@ const Informes = {
     getDetailsTransfers: ({ commit }, data) => {
       commit('SET_DETAILSTRANSFERS', [])
       return new Promise((resolve, reject) => {
-        axiosInstance.get(`/api/dataapp/detalltransfers?data=${data}`)
+        axiosInstance.post(`/api/dataapp/detailstransfers?sucursal=${data.sucursal}`, data.fechas)
           .then(res => {
             commit('SET_DETAILSTRANSFERS', res.data)
             resolve()
@@ -285,6 +286,7 @@ const AjustesModule = {
  * Tunel
  */
 const TunelBancario = {
+  namespaced: true,
   state: () => ({
     resultado: [],
     datosInforme: {
