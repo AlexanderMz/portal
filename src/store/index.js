@@ -5,9 +5,35 @@ import { axiosInstance } from '../main'
 Vue.use(Vuex)
 
 /**
+ * Config
+ */
+const Config = {
+  namespaced: true,
+  state: () => ({
+    menus: []
+  }),
+  getters: {
+    doneMenu: state => state.menus,
+  },
+  mutations: {
+    SET_MENUS: (state, datos) => {
+      state.menus = datos
+    }
+  },
+  actions: {
+    getMenu: ({ commit }) => {
+      axiosInstance.get(`/api/config/menu`)
+        .then(res => {
+          commit('SET_MENUS', res.data)
+        })
+    }
+  }
+}
+/**
  * Dispercion
  * */
 const Dispersion = {
+  namespaced: true,
   state: () => ({
     sociedades: [],
     sucursales: [],
@@ -139,6 +165,7 @@ const Dispersion = {
  * Informes
  * */
 const Informes = {
+  namespaced: true,
   state: () => ({
     sdaldia: [],
     foliosGenerados: [],
@@ -172,6 +199,7 @@ const Informes = {
  * Login
  */
 const LoginModule = {
+  namespaced: true,
   state: () => ({
     isLogin: null
   }),
@@ -216,6 +244,7 @@ const LoginModule = {
  * Ajustes
  */
 const AjustesModule = {
+  namespaced: true,
   state: () => ({
     cedis: []
   }),
@@ -321,6 +350,7 @@ export default new Vuex.Store({
     informes: Informes,
     login: LoginModule,
     ajustes: AjustesModule,
-    tunel: TunelBancario
+    tunel: TunelBancario,
+    config: Config
   }
 })
