@@ -106,6 +106,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 export default {
   name: "login",
   data () {
@@ -124,10 +125,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions("login", ['login']),
     submit () {
       if (this.$refs.form.validate()) {
         this.overlay = true
-        this.$store.dispatch("login", { UserName: this.username, Password: this.password })
+        this.login({ UserName: this.username, Password: this.password })
           .then(res => {
             if (res) {
               localStorage.setItem('jwt', escape(JSON.stringify({ email: this.email, jwt: this.password })))

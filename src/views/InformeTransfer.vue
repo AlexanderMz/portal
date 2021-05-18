@@ -198,10 +198,12 @@ export default {
       headers: [
         { text: 'Empresa', value: 'empresa' },
         { text: 'Sucursal', value: 'sucursal' },
+        { text: 'NombreCuenta', value: 'nombreCuenta' },
         { text: '# Tranferencias', value: 'transferencias' },
         { text: 'Ver', value: 'actions' },
       ],
       detailsHeaders: [
+        { text: 'NombreCuenta', value: 'nombreCuenta' },
         { text: "Proveedor", value: "numProv" },
         { text: "Beneficiario", value: "beneficiario" },
         { text: "Tranferencia", value: "transfer" },

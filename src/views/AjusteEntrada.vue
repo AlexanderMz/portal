@@ -141,6 +141,7 @@
 
 <script>
 import xlsx from "xlsx";
+import { mapActions } from 'vuex'
 
 export default {
   name: 'AjusteEntrada',
@@ -161,6 +162,7 @@ export default {
     ],
   }),
   methods: {
+    ...mapActions("ajustes", ['postAjuste', 'getCedis']),
     EnviarSap () {
       this.overlay = true
       const info = {
@@ -169,7 +171,7 @@ export default {
         Motivo: this.motivo,
         Tipo: 'entrada'
       }
-      this.$store.dispatch("postAjuste", info)
+      this.postAjuste(info)
         .then(res => {
           if (res) {
             this.overlay = false
@@ -268,7 +270,7 @@ export default {
     }
   },
   mounted () {
-    this.$store.dispatch("getCedis")
+    this.getCedis()
   }
 }
 </script>

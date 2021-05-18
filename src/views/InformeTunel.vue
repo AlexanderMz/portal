@@ -4,50 +4,6 @@
       <v-toolbar-title>Informe tunel bancario</v-toolbar-title>
     </v-toolbar>
     <v-row dense>
-      <!-- <v-col
-        cols="6"
-        sm="6"
-        md="4"
-      >
-        <v-dialog
-          ref="dialog"
-          v-model="modal"
-          :return-value.sync="dateIni"
-          persistent
-          width="290px"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              v-model="dateIni"
-              label="Fecha Inicial"
-              prepend-icon="event"
-              readonly
-              v-bind="attrs"
-              v-on="on"
-            ></v-text-field>
-          </template>
-          <v-date-picker
-            v-model="dateIni"
-            scrollable
-          >
-            <v-spacer></v-spacer>
-            <v-btn
-              text
-              color="primary"
-              @click="modal = false"
-            >
-              Cancel
-            </v-btn>
-            <v-btn
-              text
-              color="primary"
-              @click="setDateIni"
-            >
-              OK
-            </v-btn>
-          </v-date-picker>
-        </v-dialog>
-      </v-col> -->
       <v-col
         cols="6"
         sm="6"
@@ -101,7 +57,7 @@
           color="primary"
           style="margin-right: 10px"
           @click="showResult = true"
-          :disabled="!$store.getters.lenDif > 0"
+          :disabled="!lenDif > 0"
         >Ver errores</v-btn>
       </v-col>
     </v-row>
@@ -232,6 +188,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   data () {
@@ -271,6 +228,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions("tunel", ['getInforme']),
     setDateIni () {
       this.$refs.dialog.save(this.dateIni)
     },
@@ -278,21 +236,22 @@ export default {
       this.$refs.dialog1.save(this.dateFin)
       const [year, month, day] = this.dateFin.split('-')
       this.overlay = true
-      this.$store.dispatch("getInforme", { FechaFin: this.dateFin, FechaIni: `${day}${month}${year}` })
+      this.getInforme({ FechaFin: this.dateFin, FechaIni: `${day}${month}${year}` })
         .then(() => this.overlay = false)
         .catch(() => this.overlay = false)
         .finally(() => this.overlay = false)
     },
   },
   computed: {
+    ...mapGetters("tunel", ['doneRows', 'lenDif']),
     getRegistros () {
-      return this.$store.getters.doneRows.rows
+      return this.doneRows.rows
     },
     getStatistics () {
-      return this.$store.getters.doneRows.statistics
+      return this.doneRows.statistics
     },
     getDiferencias () {
-      return this.$store.getters.doneRows.diferencias
+      return this.doneRows.diferencias
     }
   }
 }
