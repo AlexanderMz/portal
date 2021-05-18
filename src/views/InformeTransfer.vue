@@ -66,7 +66,6 @@
         justify="center"
         cols="12"
       >
-        <!-- v-if="sd_aldia.length" -->
         <v-data-table
           dense
           v-model="selected"
@@ -89,11 +88,6 @@
             <span> {{item.saldoDiario | currency}} </span>
           </template>
         </v-data-table>
-        <!-- <v-skeleton-loader
-          v-if="!sd_aldia.length"
-          class="mx-auto"
-          type="table"
-        ></v-skeleton-loader> -->
       </v-col>
     </v-row>
     <v-overlay
@@ -110,8 +104,7 @@
 </template>
 
 <script>
-import excel from 'vue-excel-export'
-
+import { mapActions } from 'vuex'
 export default {
   data () {
     return {
@@ -130,10 +123,11 @@ export default {
     }
   },
   methods: {
-    cargarDatos () {
+    ...mapActions("informes", { getHeader: 'getInfoTransfers', getDetails: 'getDetailsTransfers' }),
+    loadData () {
       this.$refs.dialog.save(this.date)
       this.overlay = true
-      this.$store.dispatch("getDatos", this.date.replaceAll('-', ''))
+      this.getInfo(this.date.replaceAll('-', ''))
         .then(() => this.overlay = false)
         .catch(() => this.overlay = false)
         .finally(() => this.overlay = false)

@@ -125,10 +125,6 @@ const Dispersion = {
           body: JSON.stringify(data.transferencias)
         }).then(res => {
           let filename = res.headers.get('filename')
-          // res.blob().then(val => {
-          //   const sUrl = window.URL.createObjectURL(val)
-          //   //download(val, filename, 'application/pdf')
-          // })
           resolve({ url: '', filename })
         }).catch(err => {
           reject(err)
@@ -143,20 +139,6 @@ const Dispersion = {
         axiosInstance.post(postUrl, data.transferencias)
           .then(res => resolve(res.data))
           .catch(err => reject(err))
-
-        // fetch(postUrl, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   },
-        //   body: JSON.stringify(data.transferencias)
-        // }).then(res => {
-        //   res.json().then(json => {
-        //     resolve(json)
-        //   })
-        // }).catch(err => {
-        //   reject(err)
-        // })
       })
     }
   },
@@ -169,14 +151,18 @@ const Informes = {
   state: () => ({
     sdaldia: [],
     foliosGenerados: [],
+    infoTransfers: [],
+    detallTransfers: [],
   }),
   mutations: {
     SET_SD: (state, datos) => {
       state.sdaldia = datos
     },
-
-    SET_FOLIOSGENERADOS: (state, datos) => {
-      state.foliosGenerados = datos
+    SET_INFOTRANSFERS: (state, datos) => {
+      state.infoTransfers = datos
+    },
+    SET_DETAILSTRANSFERS: (state, datos) => {
+      state.detallTransfers = datos
     }
   },
   actions: {
@@ -190,8 +176,25 @@ const Informes = {
           }).catch(() => reject())
       })
     },
-    getFoliosGenerador: ({ commit }, fecha) => {
-
+    getInfoTransfers: ({ commit }, fecha) => {
+      commit('SET_INFOTRANSFERS', [])
+      return new Promise((resolve, reject) => {
+        axiosInstance.get(`/api/dataapp/infotransfers?fecha=${fecha}`)
+          .then(res => {
+            commit('SET_INFOTRANSFERS', res.data)
+            resolve()
+          }).catch(() => reject())
+      })
+    },
+    getDetailsTransfers: ({ commit }, data) => {
+      commit('SET_DETAILSTRANSFERS', [])
+      return new Promise((resolve, reject) => {
+        axiosInstance.get(`/api/dataapp/detalltransfers?data=${data}`)
+          .then(res => {
+            commit('SET_DETAILSTRANSFERS', res.data)
+            resolve()
+          }).catch(() => reject())
+      })
     }
   }
 }

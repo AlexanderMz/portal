@@ -18,49 +18,49 @@ const routes = [
         desc: 'Inicio '
       },
       {
-        path: '/dispersion',
+        path: '/bancos/dispersion',
         name: 'Dispersion',
         component: () => import('../views/Dispersion.vue'),
         desc: 'Dispersion '
       },
       {
-        path: '/dispersion_1',
+        path: '/bancos/dispersion_1',
         name: 'Dispersion 1 a 1',
         component: () => import('../views/Dispersion_1.vue'),
         desc: 'Dispersion 1 a 1'
       },
       {
-        path: '/informes',
+        path: '/informes/informebancos',
         name: 'Informes',
-        component: () => import('../views/Informes.vue'),
+        component: () => import('../views/InformesBancos.vue'),
         desc: 'Informes'
       },
       {
-        path: '/generados',
+        path: '/informes/generados',
         name: 'FoliosGenerados',
         component: () => import('../views/FoliosGenerados.vue'),
         desc: 'Folios Generados'
       },
       {
-        path: '/tunel',
+        path: '/bancos/tunel',
         name: 'TunelBancario',
         component: () => import('../views/TunelBancario.vue'),
         desc: 'Tunel Bancario'
       },
       {
-        path: '/informetunel',
+        path: '/informes/informetunel',
         name: 'InformeTunel',
         component: () => import('../views/InformeTunel.vue'),
         desc: 'Informe Tunel Bancario'
       },
       {
-        path: '/ajustesalida',
+        path: '/inventario/ajustesalida',
         name: 'AjusteSalidaInventario',
         component: () => import('../views/AjusteSalida.vue'),
         desc: 'Ajuste de salida de inventario'
       },
       {
-        path: '/ajusteentrada',
+        path: '/inventario/ajusteentrada',
         name: 'AjusteEntradaInventario',
         component: () => import('../views/AjusteEntrada.vue'),
         desc: 'Ajuste de entrada de inventario'
