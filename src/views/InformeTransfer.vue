@@ -93,6 +93,18 @@
           </v-date-picker>
         </v-dialog>
       </v-col>
+      <v-col
+        cols="12"
+        sm="6"
+        md="4"
+      >
+        <v-btn
+          depressed
+          color="primary"
+          style="margin-right: 10px"
+          @click="loadData"
+        >Generar</v-btn>
+      </v-col>
     </v-row>
     <v-row dense>
       <v-col
@@ -105,7 +117,11 @@
           :headers="headers"
           :items="infoTransfers"
           :search="search"
-          :items-per-page="15"
+          :height="tableHeight"
+          :fixed-header="true"
+          hide-default-footer
+          disable-pagination
+          disable-sort
           item-key="cuenta"
           class="elevation-1"
           ref="table"
@@ -117,6 +133,9 @@
               label="Filtrar resultados"
               class="mx-4"
             ></v-text-field>
+          </template>
+          <template v-slot:[`item.importeTotal`]="{ item }">
+            <span> {{item.importeTotal | currency}} </span>
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon
@@ -148,11 +167,24 @@
             dense
             :headers="detailsHeaders"
             :items="detailsTransfers"
-            :items-per-page="10"
+            :search="searchDetails"
+            :height="tableHeight"
+            :fixed-header="true"
+            hide-default-footer
+            disable-pagination
+            disable-sort
             class="elevation-1"
             item-key="docEntry"
             loading="true"
           >
+            <template v-slot:top>
+              <v-text-field
+                @keydown.esc="searchDetails=''"
+                v-model="searchDetails"
+                label="Filtrar resultados"
+                class="mx-4"
+              ></v-text-field>
+            </template>
             <template v-slot:[`item.importe`]="{ item }">
               <span> {{item.importe | currency}} </span>
             </template>
@@ -163,7 +195,7 @@
       <v-btn
         depressed
         color="primary"
-        @click="showResult = false"
+        @click="showResult = false; searchDetails = ''"
       >
         Cerrar
       </v-btn>
@@ -172,7 +204,7 @@
       style="text-align: center"
       :value="overlay"
     >
-      <p>Generando informe</p>
+      <p>{{loadingText}}</p>
       <v-progress-circular
         indeterminate
         size="64"
@@ -187,7 +219,9 @@ export default {
   data () {
     return {
       search: '',
+      searchDetails: '',
       title: '',
+      loadingText: '',
       modalStart: false,
       modalEnd: false,
       dateStart: new Date().toISOString().substr(0, 10),
@@ -200,6 +234,7 @@ export default {
         { text: 'Sucursal', value: 'sucursal' },
         { text: 'NombreCuenta', value: 'nombreCuenta' },
         { text: '# Tranferencias', value: 'transferencias' },
+        { text: 'Importe Total', value: 'importeTotal' },
         { text: 'Ver', value: 'actions' },
       ],
       detailsHeaders: [
@@ -223,6 +258,7 @@ export default {
     },
     loadData () {
       this.$refs.dialogEnd.save(this.dateEnd)
+      this.loadingText = 'Cargando registros de transferencias'
       this.overlay = true
       this.getHeader({ FechaIni: this.dateStart.replaceAll('-', ''), FechaFin: this.dateEnd.replaceAll('-', '') })
         .then(() => this.overlay = false)
@@ -230,9 +266,10 @@ export default {
         .finally(() => this.overlay = false)
     },
     loadDetails (item) {
-      this.title = item.sucursal
+      this.title = item.empresa
+      this.loadingText = `Cargando detalles de ${this.title}`
       this.overlay = true
-      this.getDetails({ fechas: { FechaIni: this.dateStart.replaceAll('-', ''), FechaFin: this.dateEnd.replaceAll('-', '') }, sucursal: item.sucursal })
+      this.getDetails({ fechas: { FechaIni: this.dateStart.replaceAll('-', ''), FechaFin: this.dateEnd.replaceAll('-', '') }, empresa: item.empresa })
         .then(() => {
           this.overlay = false
           this.showResult = true
@@ -242,6 +279,9 @@ export default {
     }
   },
   computed: {
+    tableHeight () {
+      return window.innerHeight - 300;
+    },
     infoTransfers () {
       return this.$store.state.informes.infoTransfers
     },

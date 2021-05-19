@@ -190,7 +190,7 @@ const Informes = {
     getDetailsTransfers: ({ commit }, data) => {
       commit('SET_DETAILSTRANSFERS', [])
       return new Promise((resolve, reject) => {
-        axiosInstance.post(`/api/dataapp/detailstransfers?sucursal=${data.sucursal}`, data.fechas)
+        axiosInstance.post(`/api/dataapp/detailstransfers?empresa=${data.empresa}`, data.fechas)
           .then(res => {
             commit('SET_DETAILSTRANSFERS', res.data)
             resolve()
