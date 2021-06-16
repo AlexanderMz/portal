@@ -122,6 +122,8 @@
                 :headers="responseColumns"
                 :items="item.detalle"
                 hide-default-footer
+                disable-pagination
+                disable-sort
                 class="elevation-1"
                 item-key="id"
                 loading="true"
@@ -164,7 +166,10 @@
             dense
             :headers="responseColumns2"
             :items="getDiferencias"
+            :height="tableHeight"
             hide-default-footer
+            disable-pagination
+            disable-sort
             class="elevation-1"
             item-key="docEntry"
             loading="true"
@@ -249,6 +254,9 @@ export default {
     },
     getStatistics () {
       return this.doneRows.statistics
+    },
+    tableHeight () {
+      return window.innerHeight - 300;
     },
     getDiferencias () {
       return this.doneRows.diferencias
