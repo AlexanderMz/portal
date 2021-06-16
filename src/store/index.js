@@ -55,6 +55,10 @@ const Dispersion = {
     SET_TRANSFERS: (state, datos) => {
       state.transferencias = []
       state.transferencias = datos
+    },
+    SET_SERVICES: (state, datos) => {
+      state.services = []
+      state.services = datos
     }
   },
   actions: {
@@ -113,6 +117,18 @@ const Dispersion = {
           })
       })
     },
+    getAllServices: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        axiosInstance.get(`/api/dataapp/servicios`)
+          .then(res => {
+            commit('SET_SERVICES', res.data)
+            resolve(true)
+          })
+          .catch(err => {
+            reject(err.response.data)
+          })
+      })
+    },
     generarTxtxLote: ({ commit }, data) => {
       let user = localStorage.getItem('user')
       let pass = localStorage.getItem('pass')
@@ -138,6 +154,16 @@ const Dispersion = {
       let postUrl = `/api/dataapp/transferenciasbyone?u=${user}&p=${pass}&g=${data.g}`
       return new Promise((resolve, reject) => {
         axiosInstance.post(postUrl, data.transferencias)
+          .then(res => resolve(res.data))
+          .catch(err => reject(err))
+      })
+    },
+    generarTxtServices: ({ commit }, data) => {
+      let user = localStorage.getItem('user')
+      let pass = localStorage.getItem('pass')
+      let postUrl = `/api/dataapp/services?u=${user}&p=${pass}&g=${data.g}`
+      return new Promise((resolve, reject) => {
+        axiosInstance.post(postUrl, data.services)
           .then(res => resolve(res.data))
           .catch(err => reject(err))
       })
