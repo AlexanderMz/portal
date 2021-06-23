@@ -24,6 +24,12 @@ const routes = [
         desc: 'Dispersion '
       },
       {
+        path: '/bancos/dispersionservicios',
+        name: 'DispersionServicio',
+        component: () => import('../views/DispersionServicio.vue'),
+        desc: 'Dispersion de servicios'
+      },
+      {
         path: '/bancos/dispersion_1',
         name: 'Dispersion 1 a 1',
         component: () => import('../views/Dispersion_1.vue'),

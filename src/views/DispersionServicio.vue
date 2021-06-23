@@ -4,7 +4,7 @@
       dense
       id="p"
     >
-      <v-toolbar-title>Dispersion de pagos</v-toolbar-title>
+      <v-toolbar-title>Dispersion de servicios</v-toolbar-title>
       <v-spacer> </v-spacer>
       <v-btn
         depressed
@@ -310,9 +310,12 @@ export default {
         })
     },
     handlerEvent (e) {
-      this.selectedToFile.push(this.$refs.table._data.internalCurrentItems[0])
-      this.selectedToFile = [...new Set(this.selectedToFile)]
-      this.search = ''
+      if (this.$refs.table._data.internalCurrentItems.length > 0) {
+        this.selectedToFile.push(this.$refs.table._data.internalCurrentItems[0])
+        this.selectedToFile = [...new Set(this.selectedToFile)]
+        this.search = ''
+      } else
+        alert('Tranferencia no encontrada, intente de nuevo.')
     },
     addItem (item) {
       this.selectedToFile.push(item)

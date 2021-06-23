@@ -38,7 +38,8 @@ const Dispersion = {
     sociedades: [],
     sucursales: [],
     cuentas: [],
-    transferencias: []
+    transferencias: [],
+    services: []
   }),
   mutations: {
     SET_SOCIEDADES: (state, datos) => {
@@ -161,7 +162,7 @@ const Dispersion = {
     generarTxtServices: ({ commit }, data) => {
       let user = localStorage.getItem('user')
       let pass = localStorage.getItem('pass')
-      let postUrl = `/api/dataapp/services?u=${user}&p=${pass}&g=${data.g}`
+      let postUrl = `/api/dataapp/servicios?u=${user}&p=${pass}&g=${data.g}`
       return new Promise((resolve, reject) => {
         axiosInstance.post(postUrl, data.services)
           .then(res => resolve(res.data))
