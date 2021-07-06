@@ -361,6 +361,30 @@ const TunelBancario = {
         }
       })
     },
+    postUploadServicio: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        try {
+          axiosInstance.post(`/api/dataapp/uploadtxtservicio`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
+            .then(res => { commit('SET_RESULTADOS', res.data); resolve(res) })
+            .catch(err => reject(err))
+        } catch (error) {
+          console.log(error)
+        }
+      })
+
+    },
+    postTunelServicio: ({ commit }, info) => {
+      return new Promise((resolve, reject) => {
+        try {
+          axiosInstance.post(`/api/dataapp/tunelservicio`, info)
+            .then(res => resolve(res))
+            .catch(err => reject(err))
+        } catch (error) {
+          console.log(error)
+          reject(error)
+        }
+      })
+    },
     getInforme: ({ commit }, fecha) => {
       return new Promise((resolve, reject) => {
         try {

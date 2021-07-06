@@ -69,7 +69,7 @@ export default {
       this.items.push({
         name: route.name,
         path: route.path,
-        desc: route.desc
+        desc: route.meta.desc
       })
     })
   },

@@ -15,67 +15,73 @@ const routes = [
         path: '/',
         name: 'Home',
         component: () => import('../views/Home.vue'),
-        desc: 'Inicio '
+        meta: { desc: 'Inicio ' }
       },
       {
         path: '/bancos/dispersion',
         name: 'Dispersion',
         component: () => import('../views/Dispersion.vue'),
-        desc: 'Dispersion '
+        meta: { desc: 'Dispersion ' }
       },
       {
         path: '/bancos/dispersionservicios',
         name: 'DispersionServicio',
         component: () => import('../views/DispersionServicio.vue'),
-        desc: 'Dispersion de servicios'
+        meta: { desc: 'Dispersion de servicios' }
       },
       {
         path: '/bancos/dispersion_1',
         name: 'Dispersion 1 a 1',
         component: () => import('../views/Dispersion_1.vue'),
-        desc: 'Dispersion 1 a 1'
+        meta: { desc: 'Dispersion 1 a 1' }
       },
       {
         path: '/informes/informebancos',
         name: 'Informes',
         component: () => import('../views/InformesBancos.vue'),
-        desc: 'Informes'
+        meta: { desc: 'Informes' }
       },
       {
         path: '/informes/generados',
         name: 'FoliosGenerados',
         component: () => import('../views/FoliosGenerados.vue'),
-        desc: 'Folios Generados'
+        meta: { desc: 'Folios Generados' }
       },
       {
         path: '/bancos/tunel',
         name: 'TunelBancario',
         component: () => import('../views/TunelBancario.vue'),
-        desc: 'Tunel Bancario'
+        meta: { desc: 'Tunel Bancario' }
+      },
+      {
+        path: '/bancos/tunelservicio',
+        name: 'TunelBancarioServicio',
+        component: () => import('../views/TunelBancarioServicio.vue'),
+        meta: { desc: 'Tunel Bancario Servicio' }
       },
       {
         path: '/informes/informetunel',
         name: 'InformeTunel',
         component: () => import('../views/InformeTunel.vue'),
-        desc: 'Informe Tunel Bancario'
+        meta: { desc: 'Informe Tunel Bancario' }
       },
       {
         path: '/informes/reportetransfers',
         name: 'InformeTransfer',
         component: () => import('../views/InformeTransfer.vue'),
-        desc: 'Informe Transferencias'
+        meta: { desc: 'Informe Transferencias' }
       },
       {
         path: '/inventario/ajustesalida',
         name: 'AjusteSalidaInventario',
         component: () => import('../views/AjusteSalida.vue'),
-        desc: 'Ajuste de salida de inventario'
+        meta: { desc: 'Ajuste de salida de inventario' }
       },
       {
         path: '/inventario/ajusteentrada',
         name: 'AjusteEntradaInventario',
         component: () => import('../views/AjusteEntrada.vue'),
-        desc: 'Ajuste de entrada de inventario'
+        meta: { desc: 'Ajuste de entrada de inventario' }
       }]
   },
   {
@@ -103,6 +109,8 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
+
+  document.title = to.meta.desc
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (localStorage.getItem('jwt') == null) {
       localStorage.setItem('nextUrl', to.fullPath)

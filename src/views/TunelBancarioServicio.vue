@@ -4,7 +4,7 @@
       dense
       id="p"
     >
-      <v-toolbar-title>Validación de Folios para Pago</v-toolbar-title>
+      <v-toolbar-title>Validación de Folios para Pago de servicios</v-toolbar-title>
       <v-spacer> </v-spacer>
       <v-btn
         depressed
@@ -127,7 +127,7 @@
 <script>
 import { mapActions } from 'vuex'
 export default {
-  name: 'TunelBancario',
+  name: 'TunelBancarioServicio',
   data: () => ({
     selectedFile: undefined,
     motivo: '',
@@ -137,19 +137,18 @@ export default {
     showResult: false,
     Respuesta: '',
     responseColumns: [
-      { text: 'Referencia', value: 'referencia' },
-      { text: 'Instrucción', value: 'instruccionPago' },
-      { text: 'Cuenta Origen', value: 'cuentaOrigen' },
-      { text: 'Cuenta Destino', value: 'cuentaDestino' },
+      { text: 'No. de emisora', value: 'referencia' },
+      { text: 'Cuenta cargo', value: 'cuentaOrigen' },
+      { text: 'Cuenta abono', value: 'cuentaDestino' },
       { text: 'Importe', value: 'importe', align: 'end' },
-      { text: 'Fecha Aplicación', value: 'fechaAplicacion', align: 'end' },
+      { text: 'Fecha', value: 'fechaAplicacion', align: 'end' },
     ],
   }),
   methods: {
-    ...mapActions("tunel", ['postTunel', 'postUpload']),
+    ...mapActions("tunel", ['postTunelServicio', 'postUploadServicio']),
     enviarTunel () {
       this.overlay = true
-      this.postTunel(this.selectedTxt)
+      this.postTunelServicio(this.selectedTxt)
         .then(res => {
           if (res) {
             this.overlay = false
@@ -175,7 +174,7 @@ export default {
       this.selectedFile.forEach(element => {
         formData.append('files', element)
       });
-      this.postUpload(formData)
+      this.postUploadServicio(formData)
         .then(res => {
           if (res) {
             this.overlay = false
