@@ -72,7 +72,7 @@
                     ></v-checkbox>
                   </v-col>
                   <v-col cols="9">
-                    {{item.name}}
+                    {{item.name}} - {{item.nombre}}
                   </v-col>
                   <v-col cols="2">
                     {{item.totalImporte | currency}}
@@ -139,7 +139,7 @@ export default {
     responseColumns: [
       { text: 'No. de emisora', value: 'referencia' },
       { text: 'Cuenta cargo', value: 'cuentaOrigen' },
-      { text: 'Cuenta abono', value: 'cuentaDestino' },
+      { text: 'Referencia', value: 'referencia1' },
       { text: 'Importe', value: 'importe', align: 'end' },
       { text: 'Fecha', value: 'fechaAplicacion', align: 'end' },
     ],
