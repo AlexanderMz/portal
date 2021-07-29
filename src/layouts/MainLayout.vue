@@ -91,6 +91,19 @@
       <v-toolbar-title>Portal GOVI</v-toolbar-title>
       <v-spacer></v-spacer>
 
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            @click="darkMode"
+            icon
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon>{{$vuetify.theme.isDark ? 'light_mode' : 'dark_mode'}}</v-icon>
+          </v-btn>
+        </template>
+        <span>{{$vuetify.theme.isDark ? 'Claro': 'Oscuro'}}</span>
+      </v-tooltip>
       <v-btn
         @click="salir"
         icon
