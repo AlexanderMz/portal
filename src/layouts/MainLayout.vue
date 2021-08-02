@@ -134,7 +134,12 @@ export default {
     salir () {
       localStorage.removeItem('jwt')
       this.$router.push({ path: '/login' })
-    }
+    },
+    darkMode () {
+      this.$vuetify.theme.isDark = !this.$vuetify.theme.isDark
+      this.dark = this.$vuetify.theme.isDark
+      localStorage.setItem("dark", this.$vuetify.theme.isDark ? true : false)
+    },
   },
   computed: {
     ...mapGetters("config", ["doneMenu"])

@@ -22,7 +22,8 @@ const Config = {
   },
   actions: {
     getMenu: ({ commit }) => {
-      axiosInstance.get(`/api/config/menu`)
+      let user = localStorage.getItem('user')
+      axiosInstance.get(`/api/config/menu?u=${user}`)
         .then(res => {
           commit('SET_MENUS', res.data)
         })
@@ -209,8 +210,11 @@ const Informes = {
       return new Promise((resolve, reject) => {
         axiosInstance.post(`/api/dataapp/infotransfers`, fecha)
           .then(res => {
-            commit('SET_INFOTRANSFERS', res.data)
-            resolve()
+            if (res.data.length > 0) {
+              commit('SET_INFOTRANSFERS', res.data)
+              resolve()
+            } else
+              reject()
           }).catch(() => reject())
       })
     },

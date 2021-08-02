@@ -3,9 +3,13 @@
     <v-toolbar dense>
       <v-toolbar-title>Acceso directo</v-toolbar-title>
     </v-toolbar>
-    <v-row>
+    <v-row
+      v-for="(menu, index) in doneMenu"
+      :key="index"
+    >
+      <v-subheader>{{menu.Tag}}</v-subheader>
       <v-col
-        v-for="(item, i) in items"
+        v-for="(item, i) in menu.SubMenu"
         :key="i"
         cols="12"
         sm="6"
@@ -17,7 +21,7 @@
             color="#26c6da"
             dark
             max-width="400"
-            :to="item.path"
+            :to="item.Path"
           >
             <v-card-title>
               <v-icon
@@ -26,7 +30,7 @@
               >
                 link
               </v-icon>
-              <span class="title font-weight-light">{{item.desc}}</span>
+              <span class="title font-weight-light">{{item.Tag}}</span>
             </v-card-title>
 
             <v-card-text class="headline font-weight-bold">
@@ -44,7 +48,7 @@
                 absolute
                 color="#036358"
               >
-                <span class="subtitle-2">{{item.desc}}</span>
+                <span class="subtitle-2">{{item.Tag}}</span>
               </v-overlay>
             </v-fade-transition>
           </v-card>
@@ -55,6 +59,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Home',
@@ -64,14 +69,8 @@ export default {
       oItems: []
     }
   },
-  created () {
-    this.$router.options.routes[0].children.filter(x => x.name != 'Home' && x.name != 'About').forEach(route => {
-      this.items.push({
-        name: route.name,
-        path: route.path,
-        desc: route.meta.desc
-      })
-    })
+  computed: {
+    ...mapGetters("config", ["doneMenu"])
   },
 }
 </script>

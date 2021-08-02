@@ -44,8 +44,7 @@
               <v-banner
                 sticky
                 icon="search"
-                elevation="5"
-                class="black"
+                flat
               >
                 <v-text-field
                   v-model="search"

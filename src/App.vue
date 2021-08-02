@@ -8,5 +8,8 @@
 
 export default {
   name: 'App',
+  mounted () {
+    this.$vuetify.theme.isDark = (localStorage.getItem('dark') == 'true')
+  },
 };
 </script>
