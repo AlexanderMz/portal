@@ -98,6 +98,7 @@
             :headers="headers"
             :items="transferencias"
             :search="search"
+            :custom-filter="customFilter"
             hide-default-footer
             disable-pagination
             disable-sort
@@ -388,6 +389,9 @@ export default {
       this.search = ''
       this.selectedToFile = []
       this.limpiar()
+    },
+    customFilter (docNum, search, filter) {
+      return filter.docNum.toString().indexOf(search) !== -1
     }
   },
   computed: {

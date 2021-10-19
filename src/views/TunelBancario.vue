@@ -1,9 +1,6 @@
 <template>
   <v-container>
-    <v-toolbar
-      dense
-      id="p"
-    >
+    <v-toolbar dense id="p">
       <v-toolbar-title>Validación de Folios para Pago</v-toolbar-title>
       <v-spacer> </v-spacer>
       <v-btn
@@ -17,10 +14,7 @@
     </v-toolbar>
     <div>
       <v-row dense>
-        <v-col
-          class="d-flex"
-          cols="6"
-        >
+        <v-col class="d-flex" cols="6">
           <v-file-input
             label="Seleccionar archivos"
             accept="text/txt"
@@ -31,33 +25,19 @@
             v-model="selectedFile"
           ></v-file-input>
         </v-col>
-        <v-col
-          class="d-flex"
-          cols="3"
-          v-if="getRegistros.length > 0"
-        >
+        <v-col class="d-flex" cols="3" v-if="getRegistros.length > 0">
           Archivos cargados:
-          {{getRegistros.length}}
+          {{ getRegistros.length }}
         </v-col>
-        <v-col
-          class="d-flex"
-          cols="3"
-          v-if="selectedTxt.length > 0"
-        >
+        <v-col class="d-flex" cols="3" v-if="selectedTxt.length > 0">
           Archivos seleccionados:
-          {{selectedTxt.length}}
+          {{ selectedTxt.length }}
         </v-col>
       </v-row>
       <v-row dense>
         <v-col class="d-flex">
-          <v-expansion-panels
-            accordion
-            focusable
-          >
-            <v-expansion-panel
-              v-for="(item,i) in getRegistros"
-              :key="i"
-            >
+          <v-expansion-panels accordion focusable>
+            <v-expansion-panel v-for="(item, i) in getRegistros" :key="i">
               <v-expansion-panel-header>
                 <v-row no-gutters>
                   <v-col cols="1">
@@ -72,15 +52,14 @@
                     ></v-checkbox>
                   </v-col>
                   <v-col cols="9">
-                    {{item.name}}
+                    {{ item.name }}
                   </v-col>
                   <v-col cols="2">
-                    {{item.totalImporte | currency}}
+                    {{ item.totalImporte | currency }}
                   </v-col>
                 </v-row>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-
                 <v-data-table
                   dense
                   :headers="responseColumns"
@@ -97,27 +76,13 @@
         </v-col>
       </v-row>
     </div>
-    <v-overlay
-      style="text-align: center"
-      :value="overlay"
-    >
+    <v-overlay style="text-align: center" :value="overlay">
       <p></p>
-      <v-progress-circular
-        indeterminate
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
-    <v-overlay
-      style="text-align: center"
-      :z-index="10"
-      :value="showResult"
-    >
-      <p>{{Respuesta}}</p>
-      <v-btn
-        depressed
-        color="primary"
-        @click="showResult = false"
-      >
+    <v-overlay style="text-align: center" :z-index="10" :value="showResult">
+      <p>{{ Respuesta }}</p>
+      <v-btn depressed color="primary" @click="showResult = false">
         Aceptar
       </v-btn>
     </v-overlay>
@@ -125,81 +90,81 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions } from "vuex";
 export default {
-  name: 'TunelBancario',
+  name: "TunelBancario",
   data: () => ({
     selectedFile: undefined,
-    motivo: '',
+    motivo: "",
     overlay: false,
     selectedTxt: [],
     showAlert: false,
     showResult: false,
-    Respuesta: '',
+    Respuesta: "",
     responseColumns: [
-      { text: 'Referencia', value: 'referencia' },
-      { text: 'Instrucción', value: 'instruccionPago' },
-      { text: 'Cuenta Origen', value: 'cuentaOrigen' },
-      { text: 'Cuenta Destino', value: 'cuentaDestino' },
-      { text: 'Importe', value: 'importe', align: 'end' },
-      { text: 'Fecha Aplicación', value: 'fechaAplicacion', align: 'end' },
+      { text: "Referencia", value: "referencia" },
+      { text: "Instrucción", value: "instruccionPago" },
+      { text: "Cuenta Origen", value: "cuentaOrigen" },
+      { text: "Cuenta Destino", value: "cuentaDestino" },
+      { text: "Importe", value: "importe", align: "end" },
+      { text: "Fecha Aplicación", value: "fechaAplicacion", align: "end" },
     ],
   }),
   methods: {
-    ...mapActions("tunel", ['postTunel', 'postUpload']),
-    enviarTunel () {
-      this.overlay = true
+    ...mapActions("tunel", ["postTunel", "postUpload"]),
+    enviarTunel() {
+      this.overlay = true;
       this.postTunel(this.selectedTxt)
-        .then(res => {
+        .then((res) => {
           if (res) {
-            this.overlay = false
-            this.showResult = true
-            this.Respuesta = res.data
-            this.selectedFile = undefined
+            this.overlay = false;
+            this.showResult = true;
+            this.Respuesta = res.data;
+            this.selectedFile = undefined;
+            this.$store.commit("tunel/SET_RESULTADOS", []);
           }
         })
-        .catch(err => {
-          this.overlay = false
-          alert(err)
-          console.error(err)
+        .catch((err) => {
+          this.overlay = false;
+          alert(err);
+          console.error(err);
         })
         .finally(() => {
-          this.overlay = false
-        })
+          this.overlay = false;
+        });
     },
-    onFileChange (event) {
-      if (!this.selectedFile) return
-      this.selectedTxt = []
-      this.overlay = true
-      var formData = new FormData()
-      this.selectedFile.forEach(element => {
-        formData.append('files', element)
+    onFileChange(event) {
+      if (!this.selectedFile) return;
+      this.selectedTxt = [];
+      this.overlay = true;
+      var formData = new FormData();
+      this.selectedFile.forEach((element) => {
+        formData.append("files", element);
       });
       this.postUpload(formData)
-        .then(res => {
+        .then((res) => {
           if (res) {
-            this.overlay = false
-            this.selectedFile = undefined
+            this.overlay = false;
+            this.selectedFile = undefined;
           }
         })
-        .catch(err => {
-          this.overlay = false
-          alert(err)
-          console.error(err)
+        .catch((err) => {
+          this.overlay = false;
+          alert(err);
+          console.error(err);
         })
         .finally(() => {
-          this.selectedTxt = []
-          this.overlay = false
-        })
-    }
+          this.selectedTxt = [];
+          this.overlay = false;
+        });
+    },
   },
   computed: {
-    getRegistros () {
-      return this.$store.state.tunel.resultado
-    }
-  }
-}
+    getRegistros() {
+      return this.$store.state.tunel.resultado;
+    },
+  },
+};
 </script>
 
-<style>
-</style>
+<style></style>
