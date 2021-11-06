@@ -65,6 +65,7 @@
                   :headers="responseColumns"
                   :items="item.filas"
                   hide-default-footer
+                  disable-pagination
                   class="elevation-1"
                   item-key="referencia"
                   loading="true"
