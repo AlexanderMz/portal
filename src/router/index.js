@@ -82,7 +82,14 @@ const routes = [
         name: 'AjusteEntradaInventario',
         component: () => import('../views/AjusteEntrada.vue'),
         meta: { desc: 'Ajuste de entrada de inventario' }
-      }]
+      },
+      {
+        path: '/creditocobranza/notadebito',
+        name: 'NotaDebito',
+        component: () => import('../views/NotaDebito.vue'),
+        meta: { desc: 'Nota debito' }
+      },
+    ]
   },
   {
     path: '/login',

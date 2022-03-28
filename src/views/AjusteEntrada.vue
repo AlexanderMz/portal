@@ -116,13 +116,11 @@
 <script>
 import xlsx from "xlsx";
 import { mapActions } from "vuex";
-import { mixin } from '../mixin';
+import { mixin } from "../mixin";
 
 export default {
   name: "AjusteEntrada",
   data: () => ({
-    //rows: [],
-    //columns: [],
     selectedSucursal: null,
     selectedFile: undefined,
     selectedFile2: undefined,
@@ -170,46 +168,12 @@ export default {
     getSucursalText(item) {
       return `${item.bplName} - ${item.bplFrName}`;
     },
-    // getHeader(sheet) {
-    //   const XLSX = xlsx;
-    //   const headers = [];
-    //   const range = XLSX.utils.decode_range(sheet["!ref"]); // worksheet['!ref'] Is the valid range of the worksheet
-    //   let C;
-    //   /* Get cell value start in the first row */
-    //   const R = range.s.r; //Line / / column C
-    //   let i = 0;
-    //   for (C = range.s.c; C <= range.e.c; ++C) {
-    //     var cell =
-    //       sheet[
-    //         XLSX.utils.encode_cell({ c: C, r: R })
-    //       ]; /* Get the cell value based on the address  find the cell in the first row */
-    //     var hdr = "UNKNOWN" + C; // replace with your desired default
-    //     // XLSX.utils.format_cell Generate cell text value
-    //     if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
-    //     if (hdr.indexOf("UNKNOWN") > -1) {
-    //       if (!i) {
-    //         hdr = "__EMPTY";
-    //       } else {
-    //         hdr = "__EMPTY_" + i;
-    //       }
-    //       i++;
-    //     }
-    //     headers.push(hdr);
-    //   }
-    //   return headers;
-    // },
-    // setTable(headers, excellist) {
-    //   const tableTitleData = []; // Store table header data
-    //   headers.forEach((_, i) => {
-    //     tableTitleData.push({
-    //       text: _.toUpperCase(),
-    //       value: _.toUpperCase(),
-    //     });
-    //   });
-    //   this.columns = tableTitleData;
-    //   this.rows = excellist;
-    // },
+    onFileChange2(event) {},
     onFileChange(event) {
+      if (!this.selectedFile) {
+        this.rows = [];
+        return;
+      }
       if (!/\.(xls|xlsx)$/.test(this.selectedFile.name.toLowerCase())) {
         return alert(
           "The upload format is incorrect. Please upload xls or xlsx format"

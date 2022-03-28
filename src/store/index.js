@@ -403,6 +403,32 @@ const TunelBancario = {
     }
   }
 }
+/**
+ * Notas
+ */
+const Notas = {
+  namespaced: true,
+  actions: {
+    postNotaDebito: ({ commit }, info) => {
+      return new Promise((resolve, reject) => {
+        try {
+          let user = localStorage.getItem('user')
+          let pass = localStorage.getItem('pass')
+          info.Login = {
+            UserName: user,
+            Password: pass
+          }
+          axiosInstance.post(`/api/dataapp/notadebito`, info)
+            .then(res => resolve(res))
+            .catch(err => reject(err.response))
+        } catch (error) {
+          console.log(error)
+          reject(error)
+        }
+      })
+    },
+  }
+}
 
 export default new Vuex.Store({
   modules: {
@@ -411,6 +437,7 @@ export default new Vuex.Store({
     login: LoginModule,
     ajustes: AjustesModule,
     tunel: TunelBancario,
-    config: Config
+    config: Config,
+    notas: Notas
   }
 })

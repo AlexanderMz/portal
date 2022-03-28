@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-toolbar dense>
-      <v-toolbar-title>Ajustes de salida de inventario</v-toolbar-title>
+      <v-toolbar-title>Nota debito</v-toolbar-title>
       <v-spacer> </v-spacer>
       <v-btn
         depressed
@@ -23,32 +23,6 @@
             @change="onFileChange"
             v-model="selectedFile"
           ></v-file-input>
-        </v-col>
-        <v-col class="d-flex" cols="6">
-          <v-file-input
-            label="Buscar comprobante"
-            outlined
-            dense
-            v-model="selectedFile2"
-          ></v-file-input>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col class="d-flex" cols="6">
-          <v-select
-            label="Cedis"
-            dense
-            outfilled
-            :items="cedis"
-            v-model="selectedSucursal"
-            :item-text="getSucursalText"
-            return-object
-            item-value="bplId"
-          ></v-select>
-        </v-col>
-        <v-col class="d-flex" cols="6">
-          <v-text-field dense label="Motivo ajuste" v-model="motivo">
-          </v-text-field>
         </v-col>
       </v-row>
 
@@ -74,13 +48,12 @@
     <v-dialog v-model="showAlert" persistent width="600">
       <v-card>
         <v-card-title class="headline">
-          Documento Generado en SAP: {{ response.DocNum }} -
-          {{ response.DocTotal | currency }}
+          Documentos Generados en SAP | Total: {{ response.length }}
         </v-card-title>
         <v-card-text>
           <v-data-table
             dense
-            :items="response.DocumentLines"
+            :items="response"
             :headers="responseColumns"
             hide-default-footer
             disable-pagination
@@ -106,7 +79,7 @@
       </v-card>
     </v-dialog>
     <v-overlay style="text-align: center" :value="overlay">
-      <p>Generando ajuste</p>
+      <p>Generando documentos</p>
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
   </v-container>
@@ -118,33 +91,29 @@ import { mapActions } from "vuex";
 import { mixin } from "../mixin";
 
 export default {
-  name: "AjusteSalida",
+  name: "AjusteEntrada",
   data: () => ({
     selectedSucursal: null,
     selectedFile: undefined,
-    selectedFile2: undefined,
-    motivo: "",
     overlay: false,
     response: [],
     showAlert: false,
     responseColumns: [
-      { text: "Producto", value: "ItemCode" },
-      { text: "Descripción", value: "ItemDescription" },
-      { text: "Ajuste", value: "Quantity", align: "right" },
+      { text: "DocEntry", value: "docEntry" },
+      { text: "CardCode", value: "cliente" },
+      { text: "Cantidad", value: "cantidad", align: "right" },
+      { text: "Precio", value: "precio", align: "right" },
     ],
   }),
   mixins: [mixin],
   methods: {
-    ...mapActions("ajustes", ["postAjuste", "getCedis"]),
+    ...mapActions("notas", ["postNotaDebito"]),
     EnviarSap() {
       this.overlay = true;
       const info = {
-        Ajustes: this.rows,
-        Sucursal: this.selectedSucursal,
-        Motivo: this.motivo,
-        Tipo: "salida",
+        Notas: this.rows,
       };
-      this.postAjuste(info)
+      this.postNotaDebito(info)
         .then((res) => {
           if (res) {
             this.overlay = false;
@@ -157,15 +126,12 @@ export default {
         .catch((err) => {
           this.overlay = false;
           this.response = err.data;
-          alert(err.data.error.message.value);
+          alert(this.response);
           console.error(err);
         })
         .finally(() => {
           this.overlay = false;
         });
-    },
-    getSucursalText(item) {
-      return `${item.bplName} - ${item.bplFrName}`;
     },
     onFileChange(event) {
       if (!this.selectedFile) {
@@ -187,15 +153,7 @@ export default {
           });
           const wsname = workbook.SheetNames[0]; // Take the first sheet，wb.SheetNames[0] :Take the name of the first sheet in the sheets
           const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); // Generate JSON table content，wb.Sheets[Sheet名]    Get the data of the first sheet
-          ws.forEach((element) => {
-            element["PRODUCTO"] =
-              typeof element["PRODUCTO"] === "string"
-                ? element["PRODUCTO"]
-                : "" + element["PRODUCTO"] + "";
-            if (!element.hasOwnProperty("DESCRIPCION")) {
-              element["DESCRIPCION"] = "";
-            }
-          });
+
           const a = workbook.Sheets[workbook.SheetNames[0]];
           const headers = this.getHeader(a);
           this.setTable(headers, ws);
@@ -205,14 +163,6 @@ export default {
       };
       fileReader.readAsBinaryString(this.selectedFile);
     },
-  },
-  computed: {
-    cedis() {
-      return this.$store.state.ajustes.cedis;
-    },
-  },
-  mounted() {
-    this.getCedis();
   },
 };
 </script>
