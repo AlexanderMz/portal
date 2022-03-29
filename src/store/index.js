@@ -253,7 +253,7 @@ const LoginModule = {
             localStorage.setItem('routeid', res.headers['routeid'])
             resolve(true)
           }).catch(err => {
-            reject(false)
+            reject(err.response)
           })
       })
     },
