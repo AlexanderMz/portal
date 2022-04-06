@@ -169,8 +169,22 @@ const Dispersion = {
           .then(res => resolve(res.data))
           .catch(err => reject(err))
       })
+    },
+    postPagosFiliales: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        try {
+          let user = localStorage.getItem('user')
+          let pass = localStorage.getItem('pass')
+          axiosInstance.post(`/api/dataapp/pagofiliales?u=${user}&p=${pass}&sociedad=${data.sociedad}&sucursal=${data.sucursal}&proveedor=${data.proveedor}`, data.info)
+            .then(res => resolve(res))
+            .catch(err => reject(err.response))
+        } catch (error) {
+          console.log(error)
+          reject(error)
+        }
+      })
     }
-  },
+  }
 }
 /**
  * Informes

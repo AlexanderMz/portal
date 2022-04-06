@@ -1,12 +1,12 @@
 <template>
   <v-container>
     <v-toolbar dense>
-      <v-toolbar-title>Nota debito</v-toolbar-title>
+      <v-toolbar-title>Pago filiales</v-toolbar-title>
       <v-spacer> </v-spacer>
       <v-btn
         depressed
         color="primary"
-        :disabled="!selectedFile"
+        :disabled="!rows.length"
         style="margin-right: 10px"
         @click="EnviarSap"
       >
@@ -14,6 +14,37 @@
       </v-btn>
     </v-toolbar>
     <div>
+      <v-row>
+        <v-col class="d-flex" cols="6" md="6">
+          <v-select
+            label="Seleccione la Sociedad o Empresa"
+            dense
+            outfilled
+            :items="sociedades"
+            v-model="selectedSociedad"
+            :item-text="getSociedadText"
+            item-value="u_CompnyName"
+            return-object
+            @input="cargarDatos"
+          ></v-select>
+        </v-col>
+        <v-col class="d-flex" cols="3">
+          <v-select
+            label="Surcural"
+            dense
+            outfilled
+            :items="sucursales"
+            v-model="selectedSucursal"
+            :item-text="getSucursalText"
+            return-object
+            item-value="bplName"
+          ></v-select>
+        </v-col>
+        <v-col class="d-flex" cols="3">
+          <v-text-field dense label="Proveedor" v-model="proveedor">
+          </v-text-field>
+        </v-col>
+      </v-row>
       <v-row>
         <v-col class="d-flex" cols="6">
           <v-file-input
@@ -40,6 +71,9 @@
             style="max-height: 500px"
             height="500px"
           >
+            <template v-slot:top>
+              Total de la tranferencia: {{ getTotal | currency }}
+            </template>
           </v-data-table>
         </v-col>
       </v-row>
@@ -48,23 +82,9 @@
     <v-dialog v-model="showAlert" persistent width="600">
       <v-card>
         <v-card-title class="headline">
-          Documentos Generados en SAP | Total: {{ response.length }}
+          Documento SAP {{ response.DocNum }} | Total:
+          {{ response.TransferSum | currency }}
         </v-card-title>
-        <v-card-text>
-          <v-data-table
-            dense
-            :items="response"
-            :headers="responseColumns"
-            hide-default-footer
-            disable-pagination
-            fixed-header
-            disable-sort
-            class="elevation-1"
-            style="max-height: 300px"
-            height="300px"
-          >
-          </v-data-table>
-        </v-card-text>
         <v-card-actions>
           <v-btn
             text
@@ -80,19 +100,7 @@
     </v-dialog>
     <v-overlay style="text-align: center" :value="overlay">
       <p>Generando documentos</p>
-      <v-progress-linear
-        v-model="value"
-        :active="overlay"
-        :query="true"
-        height="25"
-      >
-        <template v-slot:default="{ value }">
-          <strong
-            >Procesando {{ (value * rows.length) / 100 }} /
-            {{ rows.length }}</strong
-          >
-        </template>
-      </v-progress-linear>
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
   </v-container>
 </template>
@@ -101,10 +109,9 @@
 import xlsx from "xlsx";
 import { mapActions } from "vuex";
 import { mixin } from "../mixin";
-import { match } from "assert";
 
 export default {
-  name: "AjusteEntrada",
+  name: "PagoFiliales",
   data: () => ({
     selectedSucursal: null,
     selectedFile: undefined,
@@ -113,35 +120,51 @@ export default {
     value: 0,
     query: false,
     showAlert: false,
-    responseColumns: [
-      { text: "DocEntry", value: "docEntry" },
-      { text: "CardCode", value: "cliente" },
-      { text: "Cantidad", value: "cantidad", align: "right" },
-      { text: "Precio", value: "precio", align: "right" },
-    ],
+    loadSucural: false,
+    selectedSociedad: null,
+    selectedSucursal: null,
+    proveedor: "",
   }),
   mixins: [mixin],
   methods: {
-    ...mapActions("notas", ["postNotaDebito"]),
+    ...mapActions("dispersion", [
+      "getSociedades",
+      "getSucursales",
+      "postPagosFiliales",
+    ]),
+    getSociedadText(item) {
+      return `${item.code} - ${item.u_CompnyName}`;
+    },
+    getSucursalText(item) {
+      return `${item.bplName} - ${item.bplFrName}`;
+    },
+    cargarDatos(sociedad) {
+      this.loadSucural = true;
+      this.getSucursales(sociedad.u_DB).then((res) => {
+        this.loadSucural = false;
+      });
+    },
     async EnviarSap() {
-      this.overlay = true;
-      this.query = true;
-      this.value = 0;
-      for (const element of this.rows) {
-        this.value += 100 / this.rows.length;
+      try {
+        this.overlay = true;
         const info = {
-          Notas: [element],
+          info: this.rows,
+          sociedad: this.selectedSociedad.u_DB,
+          sucursal: this.selectedSucursal.bplName,
+          proveedor: this.proveedor,
         };
-        const res = await this.postNotaDebito(info);
+        const res = await this.postPagosFiliales(info);
         if (res) {
-          this.response.push(res.data[0]);
+          this.response = res.data;
         }
+        this.overlay = false;
+        this.rows = [];
+        this.selectedFile = undefined;
+        this.showAlert = true;
+      } catch (error) {
+        this.overlay = false;
+        alert(error.data.error.message.value);
       }
-
-      this.overlay = false;
-      this.rows = [];
-      this.selectedFile = undefined;
-      this.showAlert = true;
     },
     onFileChange(event) {
       if (!this.selectedFile) {
@@ -173,6 +196,20 @@ export default {
       };
       fileReader.readAsBinaryString(this.selectedFile);
     },
+  },
+  computed: {
+    sociedades() {
+      return this.$store.state.dispersion.sociedades;
+    },
+    sucursales() {
+      return this.$store.state.dispersion.sucursales;
+    },
+    getTotal() {
+      return this.rows.reduce((a, b) => a + (b["TOTAL"] || 0), 0);
+    },
+  },
+  mounted() {
+    this.getSociedades();
   },
 };
 </script>

@@ -89,6 +89,12 @@ const routes = [
         component: () => import('../views/NotaDebito.vue'),
         meta: { desc: 'Nota debito' }
       },
+      {
+        path: '/bancos/pagofilieales',
+        name: 'PagoFiliales',
+        component: () => import('../views/PagoFiliales.vue'),
+        meta: { desc: 'Pago de filiales' }
+      },
     ]
   },
   {
