@@ -196,6 +196,11 @@ const Informes = {
     foliosGenerados: [],
     infoTransfers: [],
     detallTransfers: [],
+    rows: [],
+    cols: [],
+    parameters: [],
+    loadingInfo: false,
+    title: ''
   }),
   mutations: {
     SET_SD: (state, datos) => {
@@ -206,6 +211,21 @@ const Informes = {
     },
     SET_DETAILSTRANSFERS: (state, datos) => {
       state.detallTransfers = datos
+    },
+    SET_ROWS: (state, datos) => {
+      state.rows = datos
+    },
+    SET_COLS: (state, datos) => {
+      state.cols = datos
+    },
+    SET_PROPS: (state, datos) => {
+      state.parameters = datos
+    },
+    SET_CARGANDO: (state, datos) => {
+      state.loadingInfo = datos
+    },
+    SET_TITLE: (state, datos) => {
+      state.title = datos
     }
   },
   actions: {
@@ -241,6 +261,31 @@ const Informes = {
             resolve()
           }).catch(() => reject())
       })
+    },
+    getInforme: async ({ commit }, params) => {
+      commit('SET_ROWS', [])
+      try {
+        commit('SET_CARGANDO', true)
+        const req = await axiosInstance.get(`/api/dataapp/informe?informe=${params.id}`)
+        const data = await req.data
+        commit('SET_ROWS', data.rows)
+        commit('SET_CARGANDO', false)
+      } catch (error) {
+        commit('SET_CARGANDO', false)
+        console.log(error)
+      }
+    },
+    getParametros: async ({ commit }, id) => {
+      commit('SET_COLS', [])
+      commit('SET_PROPS', [])
+      try {
+        const req = await axiosInstance.get(`/api/dataapp/parametros?informe=${id}`)
+        const data = await req.data
+        commit('SET_COLS', JSON.parse(data.cols))
+        commit('SET_PROPS', JSON.parse(data.props))
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 }

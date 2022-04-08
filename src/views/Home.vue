@@ -17,7 +17,15 @@
         class="pa-1"
       >
         <v-hover v-slot="{ hover }">
-          <v-card color="#26c6da" dark max-width="400" :to="item.Path">
+          <v-card
+            color="#26c6da"
+            dark
+            max-width="400"
+            :to="{
+              path: item.Path,
+              props: { title: item.Tag },
+            }"
+          >
             <v-card-title>
               <v-icon large left>
                 link

@@ -95,6 +95,18 @@ const routes = [
         component: () => import('../views/PagoFiliales.vue'),
         meta: { desc: 'Pago de filiales' }
       },
+      // {
+      //   path: '/informes/comisiones2',
+      //   name: 'comisiones',
+      //   component: () => import('../views/Informes.vue'),
+      //   meta: { desc: 'Comisiones fijas' }
+      // }, ,
+      // Always leave this as last one,
+      // but you can also remove it
+      {
+        path: '*',
+        component: () => import('../views/Informes.vue'),
+      }
     ]
   },
   {
@@ -106,12 +118,6 @@ const routes = [
     name: 'About',
     component: () => import('../views/About.vue'),
     desc: 'About'
-  },
-  // Always leave this as last one,
-  // but you can also remove it
-  {
-    path: '*',
-    component: () => import('../views/Error404.vue')
   }
 ]
 
