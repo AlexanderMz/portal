@@ -47,7 +47,7 @@
               v-for="sub in menu.SubMenu"
               :key="sub.Id"
               exact-path
-              link="false"
+              :link="false"
               :to="sub.Path"
               @click="navegar(sub)"
             >
@@ -113,7 +113,7 @@ export default {
     ...mapActions("config", ["getMenu"]),
     salir() {
       localStorage.removeItem("jwt");
-      this.$router.push({ path: "/login" });
+      this.$router.push({ name: "login" });
     },
     darkMode() {
       this.$vuetify.theme.isDark = !this.$vuetify.theme.isDark;

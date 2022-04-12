@@ -119,11 +119,14 @@ export default {
     },
   },
   mounted() {
+    this.$store.dispatch("informes/limpiar");
     this.id = this.$route.fullPath.split("/").pop();
     this.getParametros(this.id);
   },
   watch: {
     $route(to, from) {
+      this.$store.dispatch("informes/limpiar");
+
       this.id = this.$route.fullPath.split("/").pop();
       this.getParametros(this.id);
     },

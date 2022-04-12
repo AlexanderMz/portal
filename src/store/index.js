@@ -229,6 +229,12 @@ const Informes = {
     }
   },
   actions: {
+    limpiar: ({ commit }) => {
+      commit('SET_COLS', [])
+      commit('SET_PROPS', [])
+      commit('SET_ROWS', [])
+    },
+
     getDatos: ({ commit }, fecha) => {
       commit('SET_SD', [])
       return new Promise((resolve, reject) => {

@@ -110,6 +110,7 @@ const routes = [
     ]
   },
   {
+    name: 'login',
     path: '/login',
     component: () => import('../layouts/Login.vue')
   },
@@ -130,22 +131,27 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
 
   document.title = to.meta.desc
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (localStorage.getItem('jwt') == null) {
-      localStorage.setItem('nextUrl', to.fullPath)
-      next({ path: '/login' })
+  if (to.path == '/login') {
+    next()
+    return false
+  } else {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      if (localStorage.getItem('jwt') == null) {
+        localStorage.setItem('nextUrl', to.fullPath)
+        next({ name: 'login' })
+      } else {
+        next()
+      }
+    } else if (to.matched.some(record => record.meta.guest)) {
+      if (localStorage.getItem('jwt') == null) {
+        next({ path: '/' })
+      }
+      else {
+        next()
+      }
     } else {
       next()
     }
-  } else if (to.matched.some(record => record.meta.guest)) {
-    if (localStorage.getItem('jwt') == null) {
-      next({ path: '/' })
-    }
-    else {
-      next()
-    }
-  } else {
-    next()
   }
 })
 
