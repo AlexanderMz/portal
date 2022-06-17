@@ -287,8 +287,8 @@ const Informes = {
       try {
         const req = await axiosInstance.get(`/api/dataapp/parametros?informe=${id}`)
         const data = await req.data
-        commit('SET_COLS', JSON.parse(data.cols))
-        commit('SET_PROPS', JSON.parse(data.props))
+        commit('SET_COLS', data.cols)
+        commit('SET_PROPS', data.props)
       } catch (error) {
         console.log(error)
       }

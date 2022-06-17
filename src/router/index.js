@@ -36,6 +36,12 @@ const routes = [
         meta: { desc: 'Dispersion 1 a 1' }
       },
       {
+        path: '/bancos/dispersion_state',
+        name: 'ActualizarDispersion',
+        component: () => import('../views/Dispersion_state.vue'),
+        meta: { desc: 'Actualizar Dispersión' }
+      },
+      {
         path: '/informes/informebancos',
         name: 'Informes',
         component: () => import('../views/InformesBancos.vue'),
