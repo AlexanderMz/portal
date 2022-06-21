@@ -6,13 +6,88 @@
       <v-btn
         depressed
         color="primary"
-        @click="generaUnoxUno"
+        @click="generarHandlerEvent"
         :disabled="!selectedToFile.length"
       >
         Generar
       </v-btn>
     </v-toolbar>
     <div>
+      <v-row dense>
+        <v-col cols="12" sm="3" md="3">
+          <v-dialog
+            ref="dialogStart"
+            v-model="modalStart"
+            :return-value.sync="dateStart"
+            persistent
+            width="290px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="dateStart"
+                label="Fecha inicial"
+                prepend-icon="event"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="dateStart" scrollable>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="modalStart = false">
+                Cancel
+              </v-btn>
+              <v-btn text color="primary" @click="saveDateStart">
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
+        </v-col>
+        <v-col cols="12" sm="3" md="3">
+          <v-dialog
+            ref="dialogEnd"
+            v-model="modalEnd"
+            :return-value.sync="dateEnd"
+            persistent
+            width="290px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="dateEnd"
+                label="Fecha final"
+                prepend-icon="event"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="dateEnd" scrollable>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="modalEnd = false">
+                Cancel
+              </v-btn>
+              <v-btn text color="primary" @click="saveDateEnd">
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-select
+            label="Seleccione la Sociedad o Empresa"
+            dense
+            outfilled
+            :items="sociedades"
+            v-model="selectedSociedad"
+            :item-text="getSociedadText"
+            item-value="u_CompnyName"
+            return-object
+            @input="cargarDatos3"
+            :disabled="selectedToFile.length > 0"
+            full-width
+          ></v-select>
+        </v-col>
+      </v-row>
       <!-- Tablas -->
       <v-row>
         <v-col cols="4" md="4" class="">
@@ -117,6 +192,9 @@
                 {{ item.cardName | textcrop(18) }}
               </span>
             </template>
+            <template v-slot:[`item.u_dispersion`]="{ item }">
+              <v-switch disabled v-model="item.u_dispersion"></v-switch>
+            </template>
           </v-data-table>
         </v-col>
       </v-row>
@@ -185,6 +263,7 @@ export default {
     dialogDelete: false,
     editedIndex: -1,
     dispersion: "no",
+    selectedSociedad: null,
     search: "",
     selected: [],
     selectedToFile: [],
@@ -193,6 +272,10 @@ export default {
     loadTable: false,
     overlay: false,
     isGenerate: true,
+    modalStart: false,
+    modalEnd: false,
+    dateStart: new Date().toISOString().substr(0, 10),
+    dateEnd: new Date().toISOString().substr(0, 10),
     zIndex: 0,
     headers: [
       { text: "Documento", value: "docNum" },
@@ -201,6 +284,7 @@ export default {
     ],
     headers2: [
       { text: "Borrar", value: "actions" },
+      { text: "Dispersion", value: "u_dispersion" },
       { text: "DocNum", value: "docNum" },
       { text: "DocTotal", value: "docTotal" },
       { text: "CardName", value: "cardName" },
@@ -231,27 +315,44 @@ export default {
   },
   methods: {
     ...mapActions("dispersion", [
-      "getAllTransfers",
-      "generarTxtUnoxUno",
+      "getAllTransfersDispersion",
+      "updateDispersion",
       "limpiar",
+      "getSociedades",
     ]),
+    getSociedadText(item) {
+      return `${item.code} - ${item.u_CompnyName}`;
+    },
+    saveDateStart() {
+      this.$refs.dialogStart.save(this.dateStart);
+    },
+    saveDateEnd() {
+      this.$refs.dialogEnd.save(this.dateEnd);
+    },
     cargarDatos3() {
       this.loadTable = true;
-      this.getAllTransfers().then((res) => {
+      this.getAllTransfersDispersion({
+        sociedad: this.selectedSociedad.u_DB,
+        fecha1: this.dateStart.replaceAll("-", ""),
+        fecha2: this.dateEnd.replaceAll("-", ""),
+      }).then((res) => {
         this.loadTable = false;
       });
     },
     handlerEvent(e) {
       if (this.$refs.table._data.internalCurrentItems.length > 0) {
-        this.selectedToFile.push(
-          this.$refs.table._data.internalCurrentItems[0]
-        );
+        let item = this.$refs.table._data.internalCurrentItems[0];
+        let newItem = Object.assign({}, item);
+        newItem.u_dispersion = !newItem.u_dispersion;
+        this.selectedToFile.push(newItem);
         this.selectedToFile = [...new Set(this.selectedToFile)];
         this.search = "";
       } else alert("Tranferencia no encontrada, intente de nuevo.");
     },
     addItem(item) {
-      this.selectedToFile.push(item);
+      let newItem = Object.assign({}, item);
+      newItem.u_dispersion = !newItem.u_dispersion;
+      this.selectedToFile.push(newItem);
       this.selectedToFile = [...new Set(this.selectedToFile)];
     },
     deleteItem(item) {
@@ -268,26 +369,22 @@ export default {
         this.editedIndex = -1;
       });
     },
-    generaUnoxUno() {
+    generarHandlerEvent() {
       this.overlay = true;
       let data = {
-        transferencias: this.selectedToFile,
-        g: this.isGenerate ? 1 : 0,
+        transferencias: this.selectedToFile.map((t) => {
+          return {
+            docNum: t.docNum,
+            u_dispersion: t.u_dispersion,
+          };
+        }),
+        sociedad: this.selectedSociedad.u_DB,
       };
-      this.generarTxtUnoxUno(data)
+      this.updateDispersion(data)
         .then((res) => {
-          if (res != null) {
-            if (!Array.isArray(res)) {
-              this.overlay = false;
-              this.showResult = true;
-              this.Respuesta = res;
-            } else {
-              this.archivos = res;
-              this.overlay = false;
-              this.showdialog = true;
-            }
-            this.cancelProcess();
-          }
+          this.overlay = false;
+          alert("Actualización realizada");
+          this.cancelProcess();
         })
         .catch((err) => {
           this.overlay = false;
@@ -298,16 +395,19 @@ export default {
       this.search = "";
       this.selectedToFile = [];
       this.limpiar();
-      this.getAllTransfers();
     },
   },
   computed: {
     tableHeight() {
       return window.innerHeight - 0;
     },
+    sociedades() {
+      return this.$store.state.dispersion.sociedades;
+    },
     transferencias() {
-      const t = this.$store.state.dispersion.transferencias;
-      return t.filter((t) => t.u_Dispersion === this.dispersion);
+      const t = this.$store.state.dispersion.transferenciasDispersion;
+      return t;
+      //return t.filter((t) => t.u_dispersion === this.dispersion);
     },
     getValuesFromSet() {
       return this.selectedToFile.entries().next().value;
@@ -318,7 +418,7 @@ export default {
   },
   mounted() {
     this.limpiar();
-    this.getAllTransfers();
+    this.getSociedades();
   },
 };
 </script>

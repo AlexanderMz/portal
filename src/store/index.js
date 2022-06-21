@@ -40,6 +40,7 @@ const Dispersion = {
     sucursales: [],
     cuentas: [],
     transferencias: [],
+    transferenciasDispersion: [],
     services: []
   }),
   mutations: {
@@ -58,13 +59,20 @@ const Dispersion = {
       state.transferencias = []
       state.transferencias = datos
     },
+    SET_TRANSFERSDISPERSION: (state, datos) => {
+      state.transferenciasDispersion = []
+      state.transferenciasDispersion = datos
+    },
     SET_SERVICES: (state, datos) => {
       state.services = []
       state.services = datos
     }
   },
   actions: {
-    limpiar: ({ commit }) => commit('SET_TRANSFERS', []),
+    limpiar: ({ commit }) => {
+      commit('SET_TRANSFERS', [])
+      commit('SET_TRANSFERSDISPERSION', [])
+    },
     getSociedades: ({ commit }) => {
       axiosInstance.get(`/api/dataapp/sociedades`)
         .then(res => {
@@ -119,6 +127,18 @@ const Dispersion = {
           })
       })
     },
+    getAllTransfersDispersion: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        axiosInstance.get(`/api/dataapp/transferenciasDispersion?sociedad=${data.sociedad}&fecha1=${data.fecha1}&fecha2=${data.fecha2}`)
+          .then(res => {
+            commit('SET_TRANSFERSDISPERSION', res.data)
+            resolve(true)
+          })
+          .catch(err => {
+            reject(err.response.data)
+          })
+      })
+    },
     getAllServices: ({ commit }, data) => {
       return new Promise((resolve, reject) => {
         axiosInstance.get(`/api/dataapp/servicios`)
@@ -129,6 +149,16 @@ const Dispersion = {
           .catch(err => {
             reject(err.response.data)
           })
+      })
+    },
+    updateDispersion: ({ commit }, data) => {
+      let user = localStorage.getItem('user')
+      let pass = localStorage.getItem('pass')
+      let postUrl = `/api/dataapp/updateDispersion?sociedad=${data.sociedad}&u=${user}&p=${pass}`
+      return new Promise((resolve, reject) => {
+        axiosInstance.post(postUrl, data.transferencias)
+          .then(res => resolve(res.data))
+          .catch(err => reject(err))
       })
     },
     generarTxtxLote: ({ commit }, data) => {
