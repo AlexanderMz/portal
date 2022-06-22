@@ -9,7 +9,7 @@
         @click="generarHandlerEvent"
         :disabled="!selectedToFile.length"
       >
-        Generar
+        Actualizar
       </v-btn>
     </v-toolbar>
     <div>
@@ -126,6 +126,9 @@
             <template v-slot:[`item.docTotal`]="{ item }">
               <span> {{ item.docTotal | currency }} </span>
             </template>
+            <template v-slot:[`item.u_dispersion`]="{ item }">
+              <v-switch disabled v-model="item.u_dispersion"></v-switch>
+            </template>
           </v-data-table>
           <v-skeleton-loader
             v-if="loadTable"
@@ -193,7 +196,7 @@
               </span>
             </template>
             <template v-slot:[`item.u_dispersion`]="{ item }">
-              <v-switch disabled v-model="item.u_dispersion"></v-switch>
+              <v-switch v-model="item.u_dispersion"></v-switch>
             </template>
           </v-data-table>
         </v-col>
@@ -279,6 +282,7 @@ export default {
     zIndex: 0,
     headers: [
       { text: "Documento", value: "docNum" },
+      { text: "Dispersion", value: "u_dispersion" },
       { text: "Total", value: "docTotal", align: "right" },
       { text: "Add", value: "actions" },
     ],
@@ -343,16 +347,16 @@ export default {
       if (this.$refs.table._data.internalCurrentItems.length > 0) {
         let item = this.$refs.table._data.internalCurrentItems[0];
         let newItem = Object.assign({}, item);
-        newItem.u_dispersion = !newItem.u_dispersion;
-        this.selectedToFile.push(newItem);
+        item.u_dispersion = !item.u_dispersion;
+        this.selectedToFile.push(item);
         this.selectedToFile = [...new Set(this.selectedToFile)];
         this.search = "";
       } else alert("Tranferencia no encontrada, intente de nuevo.");
     },
     addItem(item) {
       let newItem = Object.assign({}, item);
-      newItem.u_dispersion = !newItem.u_dispersion;
-      this.selectedToFile.push(newItem);
+      item.u_dispersion = !item.u_dispersion;
+      this.selectedToFile.push(item);
       this.selectedToFile = [...new Set(this.selectedToFile)];
     },
     deleteItem(item) {
@@ -375,7 +379,7 @@ export default {
         transferencias: this.selectedToFile.map((t) => {
           return {
             docNum: t.docNum,
-            u_dispersion: t.u_dispersion,
+            u_dispersion: t.u_dispersion ? "si" : "no",
           };
         }),
         sociedad: this.selectedSociedad.u_DB,
