@@ -162,7 +162,29 @@ export default {
   },
   computed: {
     getRegistros() {
-      return this.$store.state.tunel.resultado;
+      /** @type Array */
+      const registros = this.$store.state.tunel.resultado;
+      return registros.sort((a, b) => {
+        let folio1 = a.name
+          .split("-")
+          .pop()
+          .split(".")
+          .shift()
+          .replace("FOLIO", "");
+        let folio2 = b.name
+          .split("-")
+          .pop()
+          .split(".")
+          .shift()
+          .replace("FOLIO", "");
+        if (folio1 > folio2) {
+          return 1;
+        }
+        if (folio1 < folio2) {
+          return -1;
+        }
+        return 0;
+      });
     },
   },
 };

@@ -226,7 +226,7 @@
               <v-list-item-action>
                 <v-btn
                   icon
-                  :href="'ftp://192.168.1.34/' + file"
+                  :href="'ftp://192.168.1.206/' + file"
                   target="_blank"
                 >
                   <v-icon color="grey lighten-1">information</v-icon>
