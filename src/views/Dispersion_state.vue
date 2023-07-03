@@ -378,7 +378,7 @@ export default {
       let data = {
         transferencias: this.selectedToFile.map((t) => {
           return {
-            docNum: t.docNum,
+            docNum: t.docEntry,
             u_dispersion: t.u_dispersion ? "si" : "no",
           };
         }),

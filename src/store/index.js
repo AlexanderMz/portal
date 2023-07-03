@@ -515,10 +515,28 @@ const Notas = {
           }
           axiosInstance.post(`/api/dataapp/notadebito`, info)
             .then(res => resolve(res))
-            .catch(err => reject(err.response))
+            .catch(err => {
+              let res = {
+                data: [{
+                  docEntry: 0,
+                  cliente: err.data,
+                  cantidad: 0,
+                  precio: 0
+                }]
+              }
+              resolve(res)
+            })
         } catch (error) {
           console.log(error)
-          reject(error)
+          let res = {
+            data: [{
+              docEntry: 0,
+              cliente: error,
+              cantidad: 0,
+              precio: 0
+            }]
+          }
+          resolve(res)
         }
       })
     },
