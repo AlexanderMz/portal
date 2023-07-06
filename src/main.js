@@ -7,7 +7,7 @@ import excel from 'vue-excel-export'
 import axios from 'axios'
 
 let url = ''
-url = 'http://192.168.1.206:8087'
+//url = 'http://192.168.1.206:8087'
 //const url = 'https://localhost:5001'
 //const url = 'https://localhost:44393'
 

@@ -347,7 +347,7 @@ export default {
     },
     prepareData() {
       const onlydata = this.selectedToFile.map((item) => {
-        ({
+        const {
           cardCode,
           bplId,
           bplName,
@@ -357,7 +357,7 @@ export default {
           comments,
           docEntry,
           saldoPendiente,
-        } = item);
+        } = item;
         return {
           cardCode,
           bplId,
@@ -372,7 +372,7 @@ export default {
       });
       let temp = [];
       onlydata.forEach((e) => {
-        ({
+        const {
           cardCode,
           bplId,
           bplName,
@@ -381,7 +381,7 @@ export default {
           journalRemarks,
           comments,
           ...data
-        } = e);
+        } = e;
         let d = temp.find(
           (o) =>
             e.cardCode == o.cardCode &&
