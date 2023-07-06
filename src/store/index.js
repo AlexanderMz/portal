@@ -40,6 +40,7 @@ const Dispersion = {
     sucursales: [],
     cuentas: [],
     transferencias: [],
+    pasivos: [],
     transferenciasDispersion: [],
     services: []
   }),
@@ -58,6 +59,10 @@ const Dispersion = {
     SET_TRANSFERS: (state, datos) => {
       state.transferencias = []
       state.transferencias = datos
+    },
+    SET_PASIVOS: (state, datos) => {
+      state.pasivos = []
+      state.pasivos = datos
     },
     SET_TRANSFERSDISPERSION: (state, datos) => {
       state.transferenciasDispersion = []
@@ -113,6 +118,32 @@ const Dispersion = {
           .catch(err => {
             reject(err.response.data)
           })
+      })
+    },
+    getPasivos: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        axiosInstance.get(`/api/dataapp/pasivos?sociedad=${data.sociedad}&sucursal=${data.sucursal}&cuenta=${data.cuenta}`)
+          .then(res => {
+            commit('SET_PASIVOS', res.data)
+            resolve(true)
+          })
+          .catch(err => {
+            reject(err.response.data)
+          })
+      })
+    },
+    postPasivos: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        try {
+          let user = localStorage.getItem('user')
+          let pass = localStorage.getItem('pass')
+          axiosInstance.post(`/api/dataapp/pasivos?u=${user}&p=${pass}&sociedad=${data.sociedad}`, data.info)
+            .then(res => resolve(res))
+            .catch(err => reject(err.response))
+        } catch (error) {
+          console.log(error)
+          reject(error)
+        }
       })
     },
     getAllTransfers: ({ commit }, data) => {

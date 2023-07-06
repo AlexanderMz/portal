@@ -101,6 +101,12 @@ const routes = [
         component: () => import('../views/PagoFiliales.vue'),
         meta: { desc: 'Pago de filiales' }
       },
+      {
+        path: '/bancos/pagosefectuados',
+        name: 'PagosAfectados',
+        component: () => import('../views/PagosEfectuados.vue'),
+        meta: { desc: 'Pagos Efectuados' }
+      },
       // {
       //   path: '/informes/comisiones2',
       //   name: 'comisiones',

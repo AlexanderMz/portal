@@ -6,8 +6,8 @@ import vuetify from './plugins/vuetify';
 import excel from 'vue-excel-export'
 import axios from 'axios'
 
-const url = ''
-//const url = 'http://192.168.1.34:8087'
+let url = ''
+url = 'http://192.168.1.206:8087'
 //const url = 'https://localhost:5001'
 //const url = 'https://localhost:44393'
 
