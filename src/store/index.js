@@ -138,7 +138,7 @@ const Dispersion = {
           let user = localStorage.getItem('user')
           let pass = localStorage.getItem('pass')
           axiosInstance.post(`/api/dataapp/pasivos?u=${user}&p=${pass}&sociedad=${data.sociedad}`, data.info)
-            .then(res => resolve(res))
+            .then(res => resolve(res.data))
             .catch(err => reject(err.response))
         } catch (error) {
           console.log(error)

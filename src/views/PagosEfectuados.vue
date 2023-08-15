@@ -170,14 +170,7 @@
           Resultado
         </v-card-title>
         <v-card-text>
-          <v-btn
-            text
-            color="primary"
-            :href="'ftp://192.168.1.206/' + archivo.filename"
-            target="_blank"
-            @click="alertlote = false"
-            >{{ archivo.filename }}</v-btn
-          >
+          <v-btn @click="alertlote = false">{{ archivo }}</v-btn>
         </v-card-text>
         <v-card-actions>
           <v-btn text color="primary" @click="alertlote = false">Cerrar</v-btn>
@@ -290,7 +283,7 @@ export default {
     cargarDatos3(cuenta) {
       this.loadTable = true;
       this.getPasivos({
-        sociedad: "SBODEMOGOVI", // this.selectedSociedad.u_DB,
+        sociedad: this.selectedSociedad.u_DB,
         sucursal: this.selectedSucursal?.bplName || "",
         cuenta,
       }).then((res) => {
@@ -326,12 +319,16 @@ export default {
     },
     generaLote() {
       this.overlay = true;
-      let data = this.prepareData();
+      let data = {
+        sociedad: this.selectedSociedad.u_DB,
+        info: this.prepareData(),
+      };
       this.postPasivos(data)
         .then((res) => {
           if (res != null) {
             this.archivo = res;
             this.overlay = false;
+            this.alertlote = true;
             this.cancelProcess();
           }
         })
@@ -403,7 +400,6 @@ export default {
             transferAccount,
             journalRemarks,
             remarks: comments,
-            transferDate: new Date().toLocaleDateString().replaceAll("/", "-"),
             paymentInvoices: [data],
           });
         }
