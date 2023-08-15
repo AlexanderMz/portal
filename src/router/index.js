@@ -107,6 +107,12 @@ const routes = [
         component: () => import('../views/PagosEfectuados.vue'),
         meta: { desc: 'Pagos Efectuados' }
       },
+      {
+        path: '/task/cancelacionuuid',
+        name: 'PagosAfectados',
+        component: () => import('../views/CancelacionUUID.vue'),
+        meta: { desc: 'Pagos Efectuados' }
+      },
       // {
       //   path: '/informes/comisiones2',
       //   name: 'comisiones',

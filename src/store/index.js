@@ -287,6 +287,9 @@ const Informes = {
     },
     SET_TITLE: (state, datos) => {
       state.title = datos
+    },
+    SET_UUIDSTATE: (state, datos) => {
+      state.title = datos
     }
   },
   actions: {
@@ -294,6 +297,7 @@ const Informes = {
       commit('SET_COLS', [])
       commit('SET_PROPS', [])
       commit('SET_ROWS', [])
+      commit('SET_UUIDSTATE', [])
     },
 
     getDatos: ({ commit }, fecha) => {
@@ -353,7 +357,20 @@ const Informes = {
       } catch (error) {
         console.log(error)
       }
-    }
+    },
+    getUUIDStatus: async ({ commit }) => {
+      commit('SET_UUIDSTATE', [])
+      try {
+        commit('SET_CARGANDO', true)
+        const req = await axiosInstance.get(`/api/Cancelacion`)
+        const data = await req.data
+        commit('SET_UUIDSTATE', data.rows)
+        commit('SET_CARGANDO', false)
+      } catch (error) {
+        commit('SET_CARGANDO', false)
+        console.log(error)
+      }
+    },
   }
 }
 /**
@@ -573,6 +590,45 @@ const Notas = {
     },
   }
 }
+/**
+ * Cancelacion
+ */
+const Cancelacion = {
+  namespaced: true,
+  actions: {
+    postCancelacion: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        try {
+          axiosInstance.post(`/api/Cancelacion`, data)
+            .then(res => resolve(res))
+            .catch(err => {
+              let res = {
+                data: [{
+                  docEntry: 0,
+                  cliente: err.data,
+                  cantidad: 0,
+                  precio: 0
+                }]
+              }
+              resolve(res)
+            })
+        } catch (error) {
+          console.log(error)
+          let res = {
+            data: [{
+              docEntry: 0,
+              cliente: error,
+              cantidad: 0,
+              precio: 0
+            }]
+          }
+          resolve(res)
+        }
+      })
+    },
+  }
+}
+
 
 export default new Vuex.Store({
   modules: {
@@ -582,6 +638,7 @@ export default new Vuex.Store({
     ajustes: AjustesModule,
     tunel: TunelBancario,
     config: Config,
-    notas: Notas
+    notas: Notas,
+    cancelacion: Cancelacion,
   }
 })
