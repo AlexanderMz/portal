@@ -42,6 +42,7 @@ export const mixin = {
           value: _.toUpperCase(),
         });
       });
+      console.log(tableTitleData);
       this.columns = tableTitleData;
       this.rows = excellist;
     },

@@ -10,12 +10,15 @@
         style="margin-right: 10px"
         @click="EnviarSap"
       >
-        Enviar a SAP
+        Enviar
       </v-btn>
     </v-toolbar>
     <div>
       <v-row>
-        <v-col class="d-flex" cols="10">
+        <v-col
+          class="d-flex"
+          cols="10"
+        >
           <v-file-input
             label="Buscar archivo"
             outlined
@@ -27,7 +30,10 @@
       </v-row>
 
       <v-row>
-        <v-col cols="12" md="12">
+        <v-col
+          cols="12"
+          md="12"
+        >
           <v-data-table
             dense
             :items="rows"
@@ -45,7 +51,11 @@
       </v-row>
     </div>
     <!--  -->
-    <v-dialog v-model="showAlert" persistent width="600">
+    <v-dialog
+      v-model="showAlert"
+      persistent
+      width="600"
+    >
       <v-card>
         <v-card-title class="headline">
           Documento Generado en SAP: {{ response.DocNum }} -
@@ -74,21 +84,26 @@
               showAlert = false;
               response = [];
             "
-            >Cerrar</v-btn
-          >
+          >Cerrar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-overlay style="text-align: center" :value="overlay">
-      <p>Generando ajuste</p>
-      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    <v-overlay
+      style="text-align: center"
+      :value="overlay"
+    >
+      <p>Procesando archivo...</p>
+      <v-progress-circular
+        indeterminate
+        size="64"
+      ></v-progress-circular>
     </v-overlay>
   </v-container>
 </template>
 
 <script>
-import xlsx from "xlsx";
 import { mapActions } from "vuex";
+import xlsx from "xlsx";
 import { mixin } from "../mixin";
 
 export default {
@@ -103,14 +118,16 @@ export default {
     showAlert: false,
     responseColumns: [
       { text: "RFC Emisor", value: "ItemCode" },
-      { text: "Descripción", value: "ItemDescription" },
-      { text: "Ajuste", value: "Quantity", align: "right" },
+      { text: "RFC Receptor", value: "ItemDescription" },
+      { text: "UUID", value: "Quantity" },
+      { text: "Total", value: "Quantity", align: "right" },
+      { text: "Motivo", value: "Quantity", align: "right" },
     ],
   }),
   mixins: [mixin],
   methods: {
     ...mapActions("cancelacion", ["postCancelacion"]),
-    EnviarSap() {
+    EnviarSap () {
       this.overlay = true;
       const info = {
         Ajustes: this.rows,
@@ -138,11 +155,11 @@ export default {
           this.overlay = false;
         });
     },
-    getSucursalText(item) {
+    getSucursalText (item) {
       return `${item.bplName} - ${item.bplFrName}`;
     },
-    onFileChange2(event) {},
-    onFileChange(event) {
+    onFileChange2 (event) { },
+    onFileChange (event) {
       if (!this.selectedFile) {
         this.rows = [];
         return;
@@ -161,16 +178,7 @@ export default {
             type: "binary",
           });
           const wsname = workbook.SheetNames[0]; // Take the first sheet，wb.SheetNames[0] :Take the name of the first sheet in the sheets
-          const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); // Generate JSON table content，wb.Sheets[Sheet名]    Get the data of the first sheet
-          ws.forEach((element) => {
-            element["PRODUCTO"] =
-              typeof element["PRODUCTO"] === "string"
-                ? element["PRODUCTO"]
-                : "" + element["PRODUCTO"] + "";
-            if (!element.hasOwnProperty("DESCRIPCION")) {
-              element["DESCRIPCION"] = "";
-            }
-          });
+          const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); // Generate JSON table content，wb.Sheets[Sheet名]    Get the data of the first sheet          
           const a = workbook.Sheets[workbook.SheetNames[0]];
           const headers = this.getHeader(a);
           this.setTable(headers, ws);
@@ -180,14 +188,6 @@ export default {
       };
       fileReader.readAsBinaryString(this.selectedFile);
     },
-  },
-  computed: {
-    cedis() {
-      return this.$store.state.ajustes.cedis;
-    },
-  },
-  mounted() {
-    this.getCedis();
   },
 };
 </script>
