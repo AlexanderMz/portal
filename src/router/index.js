@@ -78,6 +78,14 @@ const routes = [
         meta: { desc: 'Informe Transferencias' }
       },
       {
+        path: '/informe/uuidstatus',
+        name: 'InformeTransfer',
+        component: () => import('../views/InformesUUIDStatus.vue'),
+        meta: {
+          desc: 'UUID´s Estatus de Cancelacion'
+        }
+      },
+      {
         path: '/inventario/ajustesalida',
         name: 'AjusteSalidaInventario',
         component: () => import('../views/AjusteSalida.vue'),
@@ -109,9 +117,9 @@ const routes = [
       },
       {
         path: '/task/cancelacionuuid',
-        name: 'PagosAfectados',
+        name: 'CancelacionUUID',
         component: () => import('../views/CancelacionUUID.vue'),
-        meta: { desc: 'Pagos Efectuados' }
+        meta: { desc: 'Cancelacion Masiva' }
       },
       // {
       //   path: '/informes/comisiones2',

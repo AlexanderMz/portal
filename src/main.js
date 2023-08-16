@@ -7,9 +7,9 @@ import excel from 'vue-excel-export'
 import axios from 'axios'
 
 let url = ''
-url = 'http://192.168.1.206:8087'
-//const url = 'https://localhost:5001'
-//const url = 'https://localhost:44393'
+//url = 'http://192.168.1.206:8087'
+//url = 'https://localhost:5001'
+//url = 'https://localhost:44393'
 
 Vue.use(excel)
 Vue.config.productionTip = false

@@ -15,10 +15,7 @@
     </v-toolbar>
     <div>
       <v-row>
-        <v-col
-          class="d-flex"
-          cols="10"
-        >
+        <v-col class="d-flex" cols="10">
           <v-file-input
             label="Buscar archivo"
             outlined
@@ -30,10 +27,7 @@
       </v-row>
 
       <v-row>
-        <v-col
-          cols="12"
-          md="12"
-        >
+        <v-col cols="12" md="12">
           <v-data-table
             dense
             :items="rows"
@@ -51,11 +45,7 @@
       </v-row>
     </div>
     <!--  -->
-    <v-dialog
-      v-model="showAlert"
-      persistent
-      width="600"
-    >
+    <v-dialog v-model="showAlert" persistent width="600">
       <v-card>
         <v-card-title class="headline">
           Documento Generado en SAP: {{ response.DocNum }} -
@@ -84,19 +74,14 @@
               showAlert = false;
               response = [];
             "
-          >Cerrar</v-btn>
+            >Cerrar</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-overlay
-      style="text-align: center"
-      :value="overlay"
-    >
+    <v-overlay style="text-align: center" :value="overlay">
       <p>Procesando archivo...</p>
-      <v-progress-circular
-        indeterminate
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
   </v-container>
 </template>
@@ -109,10 +94,7 @@ import { mixin } from "../mixin";
 export default {
   name: "CancelacionUUID",
   data: () => ({
-    selectedSucursal: null,
     selectedFile: undefined,
-    selectedFile2: undefined,
-    motivo: "",
     overlay: false,
     response: [],
     showAlert: false,
@@ -127,15 +109,9 @@ export default {
   mixins: [mixin],
   methods: {
     ...mapActions("cancelacion", ["postCancelacion"]),
-    EnviarSap () {
+    EnviarSap() {
       this.overlay = true;
-      const info = {
-        Ajustes: this.rows,
-        Sucursal: this.selectedSucursal,
-        Motivo: this.motivo,
-        Tipo: "entrada",
-      };
-      this.postCancelacion(info)
+      this.postCancelacion(this.rows)
         .then((res) => {
           if (res) {
             this.overlay = false;
@@ -155,11 +131,7 @@ export default {
           this.overlay = false;
         });
     },
-    getSucursalText (item) {
-      return `${item.bplName} - ${item.bplFrName}`;
-    },
-    onFileChange2 (event) { },
-    onFileChange (event) {
+    onFileChange(event) {
       if (!this.selectedFile) {
         this.rows = [];
         return;
@@ -178,7 +150,7 @@ export default {
             type: "binary",
           });
           const wsname = workbook.SheetNames[0]; // Take the first sheet，wb.SheetNames[0] :Take the name of the first sheet in the sheets
-          const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); // Generate JSON table content，wb.Sheets[Sheet名]    Get the data of the first sheet          
+          const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); // Generate JSON table content，wb.Sheets[Sheet名]    Get the data of the first sheet
           const a = workbook.Sheets[workbook.SheetNames[0]];
           const headers = this.getHeader(a);
           this.setTable(headers, ws);

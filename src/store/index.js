@@ -259,6 +259,7 @@ const Informes = {
     detallTransfers: [],
     rows: [],
     cols: [],
+    uuidlist: [],
     parameters: [],
     loadingInfo: false,
     title: ''
@@ -289,7 +290,7 @@ const Informes = {
       state.title = datos
     },
     SET_UUIDSTATE: (state, datos) => {
-      state.title = datos
+      state.uuidlist = datos
     }
   },
   actions: {
@@ -364,7 +365,7 @@ const Informes = {
         commit('SET_CARGANDO', true)
         const req = await axiosInstance.get(`/api/Cancelacion`)
         const data = await req.data
-        commit('SET_UUIDSTATE', data.rows)
+        commit('SET_UUIDSTATE', data)
         commit('SET_CARGANDO', false)
       } catch (error) {
         commit('SET_CARGANDO', false)

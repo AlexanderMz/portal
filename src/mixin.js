@@ -6,7 +6,7 @@ export const mixin = {
     columns: [],
   }),
   methods: {
-    getHeader(sheet) {
+    getHeader (sheet) {
       const XLSX = xlsx;
       const headers = [];
       const range = XLSX.utils.decode_range(sheet["!ref"]); // worksheet['!ref'] Is the valid range of the worksheet
@@ -17,7 +17,7 @@ export const mixin = {
       for (C = range.s.c; C <= range.e.c; ++C) {
         var cell =
           sheet[
-            XLSX.utils.encode_cell({ c: C, r: R })
+          XLSX.utils.encode_cell({ c: C, r: R })
           ]; /* Get the cell value based on the address  find the cell in the first row */
         var hdr = "UNKNOWN" + C; // replace with your desired default
         // XLSX.utils.format_cell Generate cell text value
@@ -34,7 +34,7 @@ export const mixin = {
       }
       return headers;
     },
-    setTable(headers, excellist) {
+    setTable (headers, excellist) {
       const tableTitleData = []; // Store table header data
       headers.forEach((_, i) => {
         tableTitleData.push({
@@ -42,7 +42,6 @@ export const mixin = {
           value: _.toUpperCase(),
         });
       });
-      console.log(tableTitleData);
       this.columns = tableTitleData;
       this.rows = excellist;
     },
