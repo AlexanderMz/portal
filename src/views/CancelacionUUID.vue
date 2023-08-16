@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-toolbar dense>
-      <v-toolbar-title>Ajustes de entrada de inventario</v-toolbar-title>
+      <v-toolbar-title>Cancelación Masiva UUID</v-toolbar-title>
       <v-spacer> </v-spacer>
       <v-btn
         depressed
@@ -45,27 +45,11 @@
       </v-row>
     </div>
     <!--  -->
-    <v-dialog v-model="showAlert" persistent width="600">
+    <v-dialog v-model="showAlert" persistent>
       <v-card>
         <v-card-title class="headline">
-          Documento Generado en SAP: {{ response.DocNum }} -
-          {{ response.DocTotal | currency }}
+          Proceso terminado con exito
         </v-card-title>
-        <v-card-text>
-          <v-data-table
-            dense
-            :items="response.DocumentLines"
-            :headers="responseColumns"
-            hide-default-footer
-            disable-pagination
-            fixed-header
-            disable-sort
-            class="elevation-1"
-            style="max-height: 300px"
-            height="300px"
-          >
-          </v-data-table>
-        </v-card-text>
         <v-card-actions>
           <v-btn
             text
@@ -98,13 +82,6 @@ export default {
     overlay: false,
     response: [],
     showAlert: false,
-    responseColumns: [
-      { text: "RFC Emisor", value: "ItemCode" },
-      { text: "RFC Receptor", value: "ItemDescription" },
-      { text: "UUID", value: "Quantity" },
-      { text: "Total", value: "Quantity", align: "right" },
-      { text: "Motivo", value: "Quantity", align: "right" },
-    ],
   }),
   mixins: [mixin],
   methods: {

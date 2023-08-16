@@ -79,7 +79,7 @@ const routes = [
       },
       {
         path: '/informe/uuidstatus',
-        name: 'InformeTransfer',
+        name: 'InformesUUIDStatus',
         component: () => import('../views/InformesUUIDStatus.vue'),
         meta: {
           desc: 'UUID´s Estatus de Cancelacion'

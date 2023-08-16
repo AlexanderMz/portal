@@ -597,9 +597,17 @@ const Notas = {
 const Cancelacion = {
   namespaced: true,
   actions: {
+    /**
+     * 
+     * @param {*} param0 
+     * @param {Array} data 
+     * @returns 
+     */
     postCancelacion: ({ commit }, data) => {
       return new Promise((resolve, reject) => {
         try {
+          let user = localStorage.getItem('user')
+          data.forEach(val => val["Usuario"] = user)
           axiosInstance.post(`/api/Cancelacion`, data)
             .then(res => resolve(res))
             .catch(err => {
