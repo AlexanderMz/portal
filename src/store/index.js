@@ -372,6 +372,16 @@ const Informes = {
         console.log(error)
       }
     },
+    getCuadroInversion: async ({ commit }, fechas) => {
+      try {
+        const req = await axiosInstance.get(`/api/dataapp/cuadroinversion?inputFechas=${fechas}`)
+        const data = await req.data
+        return data
+      } catch (error) {
+        console.log(error)
+        return []
+      }
+    }
   }
 }
 /**

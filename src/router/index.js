@@ -121,12 +121,12 @@ const routes = [
         component: () => import('../views/CancelacionUUID.vue'),
         meta: { desc: 'Cancelacion Masiva' }
       },
-      // {
-      //   path: '/informes/comisiones2',
-      //   name: 'comisiones',
-      //   component: () => import('../views/Informes.vue'),
-      //   meta: { desc: 'Comisiones fijas' }
-      // }, ,
+      {
+        path: '/informe/cuadroinversion',
+        name: 'CuadroInversion',
+        component: () => import('../views/InformeCuadroInversion.vue'),
+        meta: { desc: 'Cuadro de Inversión' }
+      }, ,
       // Always leave this as last one,
       // but you can also remove it
       {
