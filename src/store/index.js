@@ -359,11 +359,11 @@ const Informes = {
         console.log(error)
       }
     },
-    getUUIDStatus: async ({ commit }) => {
+    getUUIDStatus: async ({ commit }, date) => {
       commit('SET_UUIDSTATE', [])
       try {
         commit('SET_CARGANDO', true)
-        const req = await axiosInstance.get(`/api/Cancelacion`)
+        const req = await axiosInstance.get(`/api/Cancelacion?fecha=${date}`)
         const data = await req.data
         commit('SET_UUIDSTATE', data)
         commit('SET_CARGANDO', false)
@@ -642,6 +642,25 @@ const Cancelacion = {
             }]
           }
           resolve(res)
+        }
+      })
+    },
+    /**
+     * 
+     * @param {*} param0 
+     * @param {Array} data 
+     * @returns 
+     */
+    putCancelacion: ({ commit }) => {
+      return new Promise((resolve, reject) => {
+        try {          
+          axiosInstance.put(`/api/Cancelacion`)
+            .then(res => resolve(res))
+            .catch(err => {              
+              reject(res)
+            })
+        } catch (error) {
+          console.log(error)          
         }
       })
     },
