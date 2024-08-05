@@ -56,7 +56,7 @@
       </v-col>
     </v-row>
     <v-overlay style="text-align: center" :value="overlay">
-      <p>Calculando saldo diario</p>
+      <p>Procesando...</p>
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
   </v-container>
