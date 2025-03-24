@@ -11,6 +11,7 @@
       >
         Preaplicación
       </v-btn>
+      
       <v-btn
         depressed
         color="primary"
@@ -21,23 +22,22 @@
       </v-btn>
     </v-toolbar>
     <div>
+      <v-row>
+        <v-col class="d-flex" cols="2" md="2">
+          <v-checkbox label="Manual" v-model="value" value="value"></v-checkbox>
+        </v-col>
+        <v-col cols="3">
+            <v-text-field
+              v-model="fecha"
+              label="Fecha"
+              prepend-icon="event"
+              type="date"
+            ></v-text-field>
+          </v-col>
+      </v-row>
       <!-- Sociedad & Sucursal -->
       <v-row>
-        <v-col class="d-flex" cols="6">
-          <v-select
-            label="Tipo de operación"
-            dense
-            outfilled
-            v-model="operacion"
-            :items="[
-              { d: '02', n: 'TERCEROS ' },
-              { d: '04', n: 'SPEI' },
-            ]"
-            :item-text="getOperacionText"
-            item-value="d"
-          ></v-select>
-        </v-col>
-        <v-col class="d-flex" cols="6" md="6">
+        <v-col class="d-flex" cols="3" md="3">
           <v-select
             label="Seleccione la Sociedad o Empresa"
             dense
@@ -51,10 +51,7 @@
             :disabled="selectedToFile.length > 0"
           ></v-select>
         </v-col>
-      </v-row>
-      <!-- Operacion & Cuenta -->
-      <v-row>
-        <v-col class="d-flex" cols="6">
+        <v-col class="d-flex" cols="3" md="3">
           <v-select
             label="Surcural"
             dense
@@ -68,18 +65,31 @@
             :disabled="selectedToFile.length > 0"
           ></v-select>
         </v-col>
-        <v-col class="d-flex" cols="6">
+        <v-col class="d-flex" cols="3" md="3">
           <v-select
-            label="Cuenta origen"
+            label="Cuenta Bancaria"
             dense
             outfilled
             :items="cuentas"
-            :disabled="!operacion || selectedToFile.length > 0"
             :item-text="getCuentaText"
             item-value="glAccount"
             @input="cargarDatos3"
           ></v-select>
         </v-col>
+        <v-col class="d-flex" cols="3" md="3">
+          <v-select
+            label="Cliente"
+            dense
+            outfilled
+            :items="cuentas"
+            :item-text="getCuentaText"
+            item-value="glAccount"
+            @input="cargarDatos3"
+          ></v-select>
+        </v-col>
+      </v-row>
+      <!-- Operacion & Cuenta -->
+      <v-row>
       </v-row>
       <!-- Tablas -->
       <v-row>
@@ -326,12 +336,38 @@ export default {
     getCuentaText(item) {
       return `${item.glAccount} - ${item.acctName}`;
     },
-    cargarDatos3() {
+    cargarDatos(sociedad) {
+      this.loadSucural = true;
+      this.getSucursales(sociedad.u_DB).then((res) => {
+        this.loadSucural = false;
+      });
+    },
+    cargarDatos2(sucursal) {
+      this.loadRest = true;
+      this.getCuentas({
+        sociedad: this.selectedSociedad.u_DB,
+        sucursal: sucursal.bplName,
+      }).then((res) => {
+        this.loadRest = false;
+      });
+    },
+    cargarDatos3(cuenta) {
       this.loadTable = true;
-      this.getAllTransfers().then((res) => {
+      this.getTransfers({
+        sociedad: this.selectedSociedad.u_DB,
+        sucursal: this.selectedSucursal.bplName,
+        cuenta,
+        operacion: this.operacion,
+      }).then((res) => {
         this.loadTable = false;
       });
     },
+    // cargarDatos3() {
+    //   this.loadTable = true;
+    //   this.getAllTransfers().then((res) => {
+    //     this.loadTable = false;
+    //   });
+    // },
     handlerEvent(e) {
       if (this.$refs.table._data.internalCurrentItems.length > 0) {
         this.selectedToFile.push(
@@ -417,7 +453,7 @@ export default {
   },
   mounted() {
     this.limpiar();
-    this.getAllTransfers();
+    //this.getAllTransfers();
     this.getSociedades();
   },
 };
