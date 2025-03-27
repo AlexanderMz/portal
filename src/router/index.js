@@ -100,13 +100,20 @@ const routes = [
       {
         path: "/creditocobranza/notadebito",
         name: "NotaDebito",
-        component: () => import("../views/NotaDebito.vue"),
+        component: () => import("../views/Credito/NotaDebito.vue"),
         meta: { desc: "Nota debito" },
       },
       {
         path: "/creditocobranza/pagos",
         name: "Pagos",
-        component: () => import("../views/Pagos.vue"),
+        component: () => import("../views/Credito/Pagos.vue"),
+        meta: { desc: "Pagos FA/NC" },
+      },
+      {
+        path: "/creditocobranza/autorizacion-de-preaplicaciones",
+        name: "Pagos",
+        component: () =>
+          import("../views/Credito/AutorizacionPreaplicaciones.vue"),
         meta: { desc: "Pagos FA/NC" },
       },
       {

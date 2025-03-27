@@ -98,10 +98,9 @@
 </template>
 
 <script>
-import xlsx from "xlsx";
 import { mapActions } from "vuex";
-import { mixin } from "../mixin";
-import { match } from "assert";
+import xlsx from "xlsx";
+import { mixin } from "../../mixin";
 
 export default {
   name: "AjusteEntrada",
@@ -177,4 +176,4 @@ export default {
 };
 </script>
 
-<style></style>
+<style></style>../../mixin
