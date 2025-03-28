@@ -1,17 +1,29 @@
 <template>
   <v-container>
     <v-toolbar dense id="p">
-      <v-toolbar-title>Aplicación de pagos | Facturas con descuentos</v-toolbar-title>
+      <v-toolbar-title
+        >Aplicación de pagos | Facturas con descuentos</v-toolbar-title
+      >
       <v-spacer> </v-spacer>
       <v-row justify="end">
         <v-col>
-          <v-btn depressed color="primary" @click="generaUnoxUno" :disabled="!selectedToFile.length">
+          <v-btn
+            depressed
+            color="primary"
+            @click="generaUnoxUno"
+            :disabled="!selectedToFile.length"
+          >
             Preaplicación
           </v-btn>
-
         </v-col>
         <v-col>
-          <v-btn class="col" depressed color="primary" @click="generaUnoxUno" :disabled="!selectedToFile.length">
+          <v-btn
+            class="col"
+            depressed
+            color="primary"
+            @click="generaUnoxUno"
+            :disabled="!selectedToFile.length"
+          >
             Generar Operación
           </v-btn>
         </v-col>
@@ -20,47 +32,111 @@
     <div>
       <v-row no-gutters>
         <v-col class="d-flex" cols="2" md="2">
-          <v-checkbox dense label="Manual" v-model="value" value="value"></v-checkbox>
+          <v-checkbox
+            dense
+            label="Manual"
+            v-model="value"
+            value="value"
+          ></v-checkbox>
         </v-col>
         <v-col cols="3">
-          <v-text-field v-model="fecha" label="Fecha" prepend-icon="event" type="date" disabled></v-text-field>
+          <v-text-field
+            v-model="fecha"
+            label="Fecha"
+            prepend-icon="event"
+            type="date"
+            disabled
+          ></v-text-field>
         </v-col>
       </v-row>
       <!-- Sociedad & Sucursal -->
       <v-row>
         <v-col class="d-flex" cols="3" md="3">
-          <v-select label="Seleccione la Sociedad o Empresa" dense solo :items="sociedades" v-model="selectedSociedad"
-            :item-text="getSociedadText" item-value="u_CompnyName" return-object @input="cargarDatos"
-            :disabled="selectedToFile.length > 0"></v-select>
+          <v-select
+            label="Sociedad o Empresa"
+            dense
+            solo
+            :items="sociedades"
+            v-model="selectedSociedad"
+            :item-text="getSociedadText"
+            item-value="u_CompnyName"
+            return-object
+            @input="cargarDatos"
+            :disabled="selectedToFile.length > 0"
+          ></v-select>
         </v-col>
         <v-col class="d-flex" cols="3" md="3">
-          <v-select label="Surcural" dense solo :items="sucursales" v-model="selectedSucursal"
-            :item-text="getSucursalText" return-object item-value="bplName" @input="cargarDatos2"
-            :disabled="selectedToFile.length > 0"></v-select>
+          <v-select
+            label="Surcural"
+            dense
+            solo
+            :items="sucursales"
+            v-model="selectedSucursal"
+            :item-text="getSucursalText"
+            return-object
+            item-value="bplName"
+            @input="cargarDatos2"
+            :disabled="selectedToFile.length > 0"
+          ></v-select>
         </v-col>
         <v-col class="d-flex" cols="3" md="3">
-          <v-select label="Cuenta Bancaria" dense solo :items="cuentas" :item-text="getCuentaText"
-            item-value="glAccount" @input="cargarDatos3"></v-select>
+          <v-select
+            label="Cuenta Bancaria"
+            dense
+            solo
+            :items="cuentas"
+            :item-text="getCuentaText"
+            item-value="glAccount"
+            @input="cargarDatos3"
+          ></v-select>
         </v-col>
         <v-col class="d-flex" cols="3" md="3">
-          <v-select label="Cliente" dense solo :items="cuentas" :item-text="getCuentaText" item-value="glAccount"
-            @input="cargarDatos3"></v-select>
+          <v-select
+            label="Cliente"
+            dense
+            solo
+            :items="cuentas"
+            :item-text="getCuentaText"
+            item-value="glAccount"
+            @input="cargarDatos3"
+          ></v-select>
         </v-col>
       </v-row>
       <!-- Descuentos -->
       <v-row align="start">
         <v-col cols="4">
-          <v-select label="Pago edo. Cta" dense solo :items="cuentas" :item-text="getCuentaText" item-value="glAccount"
-            @input="cargarDatos3"></v-select>
+          <v-select
+            label="Pago edo. Cta"
+            dense
+            solo
+            :items="cuentas"
+            :item-text="getCuentaText"
+            item-value="glAccount"
+            @input="cargarDatos3"
+          ></v-select>
         </v-col>
         <v-col cols="3">
-          <v-select dense solo :items="items" v-model="value" label="Tipo de descuento 1" append></v-select>
+          <v-select
+            dense
+            solo
+            :items="items"
+            v-model="value"
+            label="Tipo de descuento 1"
+            append
+          ></v-select>
         </v-col>
         <v-col cols="1">
           <v-text-field name="name" label="%" id="id"></v-text-field>
         </v-col>
         <v-col cols="3">
-          <v-select dense solo :items="items" v-model="value" label="Tipo de descuento 2" append></v-select>
+          <v-select
+            dense
+            solo
+            :items="items"
+            v-model="value"
+            label="Tipo de descuento 2"
+            append
+          ></v-select>
         </v-col>
         <v-col cols="1">
           <v-text-field name="name" label="%" id="id"></v-text-field>
@@ -68,17 +144,36 @@
       </v-row>
       <v-row align="start">
         <v-col class="d-flex" cols="4" md="4">
-          <v-file-input label="Adjuntar template" outlined dense @change="onFileChange"
-            v-model="selectedFile"></v-file-input>
+          <v-file-input
+            label="Adjuntar template"
+            outlined
+            dense
+            @change="onFileChange"
+            v-model="selectedFile"
+          ></v-file-input>
         </v-col>
         <v-col cols="3">
-          <v-select dense solo :items="items" v-model="value" label="Tipo de descuento 3" append></v-select>
+          <v-select
+            dense
+            solo
+            :items="items"
+            v-model="value"
+            label="Tipo de descuento 3"
+            append
+          ></v-select>
         </v-col>
         <v-col cols="1">
           <v-text-field name="name" label="%" id="id"></v-text-field>
         </v-col>
         <v-col cols="3">
-          <v-select dense solo :items="items" v-model="value" label="Tipo de descuento 4" append></v-select>
+          <v-select
+            dense
+            solo
+            :items="items"
+            v-model="value"
+            label="Tipo de descuento 4"
+            append
+          ></v-select>
         </v-col>
         <v-col cols="1">
           <v-text-field name="name" label="%" id="id"></v-text-field>
@@ -87,13 +182,31 @@
       <!-- Tablas -->
       <v-row>
         <v-col cols="4" md="4">
-          <v-data-table dense v-if="!loadTable" v-model="selected" :headers="headers" :items="transferencias"
-            :search="search" hide-default-footer disable-pagination disable-sort fixed-header item-key="name"
-            class="elevation-1" ref="table" :height="tableHeight" id="tablemain">
+          <v-data-table
+            dense
+            v-if="!loadTable"
+            v-model="selected"
+            :headers="headers"
+            :items="transferencias"
+            :search="search"
+            hide-default-footer
+            disable-pagination
+            disable-sort
+            fixed-header
+            item-key="name"
+            class="elevation-1"
+            ref="table"
+            :height="tableHeight"
+            id="tablemain"
+          >
             <template v-slot:top>
               <v-banner sticky icon="search" flat>
-                <v-text-field v-model="search" label="Buscar transferencia" class="mx-4"
-                  @keydown.stop.enter="handlerEvent"></v-text-field>
+                <v-text-field
+                  v-model="search"
+                  label="Buscar transferencia"
+                  class="mx-4"
+                  @keydown.stop.enter="handlerEvent"
+                ></v-text-field>
               </v-banner>
             </template>
             <template v-slot:[`item.actions`]="{ item }">
@@ -105,31 +218,62 @@
               <span> {{ item.docTotal | currency }} </span>
             </template>
           </v-data-table>
-          <v-skeleton-loader v-if="loadTable" class="mx-auto" type="table"></v-skeleton-loader>
+          <v-skeleton-loader
+            v-if="loadTable"
+            class="mx-auto"
+            type="table"
+          ></v-skeleton-loader>
         </v-col>
         <v-col cols="8" md="8">
-          <v-data-table dense :headers="headers2" :items="selectedToFile" class="elevation-1" hide-default-footer
-            disable-pagination disable-sort :fixed-header="true" :height="tableHeight" id="tabledetalle">
+          <v-data-table
+            dense
+            :headers="headers2"
+            :items="selectedToFile"
+            class="elevation-1"
+            hide-default-footer
+            disable-pagination
+            disable-sort
+            :fixed-header="true"
+            :height="tableHeight"
+            id="tabledetalle"
+          >
             <template v-slot:top>
               <v-row no-gutters>
                 <v-col cols="8" sm="6" md="8">
-                  <v-btn rounded icon title="Eliminar todos" @click="selectedToFile = []">
+                  <v-btn
+                    rounded
+                    icon
+                    title="Eliminar todos"
+                    @click="selectedToFile = []"
+                  >
                     <v-icon>delete</v-icon>
                   </v-btn>
                   {{ selectedToFile.length }} seleccionadas | Total:
                   {{ getTotal | currency }}
                 </v-col>
                 <v-col>
-                  <v-checkbox class="pa-0 ma-1" dense label="Timbrar Pago" v-model="value" value="value"></v-checkbox>
+                  <v-checkbox
+                    class="pa-0 ma-1"
+                    dense
+                    label="Timbrar Pago"
+                    v-model="value"
+                    value="value"
+                  ></v-checkbox>
                 </v-col>
               </v-row>
               <v-dialog v-model="dialogDelete" max-width="600px">
                 <v-card>
-                  <v-card-title class="headline">¿Esta seguro que desea borrar esta factura?</v-card-title>
+                  <v-card-title class="headline"
+                    >¿Esta seguro que desea borrar esta factura?</v-card-title
+                  >
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="closeDelete">Cancelar</v-btn>
-                    <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                    <v-btn color="blue darken-1" text @click="closeDelete"
+                      >Cancelar</v-btn
+                    >
+                    <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                      >OK</v-btn
+                    >
                     <v-spacer></v-spacer>
                   </v-card-actions>
                 </v-card>
@@ -174,7 +318,11 @@
               </v-list-item-content>
 
               <v-list-item-action>
-                <v-btn icon :href="'ftp://192.168.1.206/' + file" target="_blank">
+                <v-btn
+                  icon
+                  :href="'ftp://192.168.1.206/' + file"
+                  target="_blank"
+                >
                   <v-icon color="grey lighten-1">information</v-icon>
                 </v-btn>
               </v-list-item-action>
@@ -251,10 +399,10 @@ export default {
     fecha: new Date().toISOString().substr(0, 10),
   }),
   watch: {
-    dialog (val) {
+    dialog(val) {
       val || this.close();
     },
-    dialogDelete (val) {
+    dialogDelete(val) {
       val || this.closeDelete();
     },
   },
@@ -267,25 +415,25 @@ export default {
       "generarTxtUnoxUno",
       "limpiar",
     ]),
-    getSociedadText (item) {
+    getSociedadText(item) {
       return `${item.code} - ${item.u_CompnyName}`;
     },
-    getSucursalText (item) {
+    getSucursalText(item) {
       return `${item.bplName} - ${item.bplFrName}`;
     },
-    getOperacionText (item) {
+    getOperacionText(item) {
       return `${item.d} - ${item.n}`;
     },
-    getCuentaText (item) {
+    getCuentaText(item) {
       return `${item.glAccount} - ${item.acctName}`;
     },
-    cargarDatos (sociedad) {
+    cargarDatos(sociedad) {
       this.loadSucural = true;
       this.getSucursales(sociedad.u_DB).then((res) => {
         this.loadSucural = false;
       });
     },
-    cargarDatos2 (sucursal) {
+    cargarDatos2(sucursal) {
       this.loadRest = true;
       this.getCuentas({
         sociedad: this.selectedSociedad.u_DB,
@@ -294,7 +442,7 @@ export default {
         this.loadRest = false;
       });
     },
-    cargarDatos3 (cuenta) {
+    cargarDatos3(cuenta) {
       this.loadTable = true;
       this.getTransfers({
         sociedad: this.selectedSociedad.u_DB,
@@ -311,7 +459,7 @@ export default {
     //     this.loadTable = false;
     //   });
     // },
-    handlerEvent (e) {
+    handlerEvent(e) {
       if (this.$refs.table._data.internalCurrentItems.length > 0) {
         this.selectedToFile.push(
           this.$refs.table._data.internalCurrentItems[0]
@@ -320,25 +468,25 @@ export default {
         this.search = "";
       } else alert("Tranferencia no encontrada, intente de nuevo.");
     },
-    addItem (item) {
+    addItem(item) {
       this.selectedToFile.push(item);
       this.selectedToFile = [...new Set(this.selectedToFile)];
     },
-    deleteItem (item) {
+    deleteItem(item) {
       this.editedIndex = this.selectedToFile.indexOf(item);
       this.dialogDelete = true;
     },
-    deleteItemConfirm () {
+    deleteItemConfirm() {
       this.selectedToFile.splice(this.editedIndex, 1);
       this.closeDelete();
     },
-    closeDelete () {
+    closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
         this.editedIndex = -1;
       });
     },
-    generaUnoxUno () {
+    generaUnoxUno() {
       this.overlay = true;
       let data = {
         transferencias: this.selectedToFile,
@@ -364,13 +512,13 @@ export default {
           console.log(err);
         });
     },
-    cancelProcess () {
+    cancelProcess() {
       this.search = "";
       this.selectedToFile = [];
       this.limpiar();
       this.getAllTransfers();
     },
-    onFileChange (event) {
+    onFileChange(event) {
       if (!this.selectedFile) {
         this.rows = [];
         return;
@@ -402,29 +550,29 @@ export default {
     },
   },
   computed: {
-    tableHeight () {
+    tableHeight() {
       return window.innerHeight - 50;
     },
-    transferencias () {
+    transferencias() {
       return this.$store.state.dispersion.transferencias;
     },
-    getValuesFromSet () {
+    getValuesFromSet() {
       return this.selectedToFile.entries().next().value;
     },
-    getTotal () {
+    getTotal() {
       return this.selectedToFile.reduce((a, b) => a + (b["docTotal"] || 0), 0);
     },
-    sociedades () {
+    sociedades() {
       return this.$store.state.dispersion.sociedades;
     },
-    sucursales () {
+    sucursales() {
       return this.$store.state.dispersion.sucursales;
     },
-    cuentas () {
+    cuentas() {
       return this.$store.state.dispersion.cuentas;
     },
   },
-  mounted () {
+  mounted() {
     this.limpiar();
     //this.getAllTransfers();
     this.getSociedades();

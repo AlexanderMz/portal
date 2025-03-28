@@ -114,7 +114,14 @@ const routes = [
         name: "Pagos",
         component: () =>
           import("../views/Credito/AutorizacionPreaplicaciones.vue"),
-        meta: { desc: "Pagos FA/NC" },
+        meta: { desc: "Autorizacion de Prealplicaciones" },
+      },
+      {
+        path: "/creditocobranza/informe-de-operaciones",
+        name: "Pagos",
+        component: () =>
+          import("../views/Credito/InformeOperacionesAplicadas.vue"),
+        meta: { desc: "Informe de Operaciones" },
       },
       {
         path: "/bancos/pagofilieales",
