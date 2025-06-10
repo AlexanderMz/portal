@@ -114,7 +114,7 @@ const Dispersion = {
       return new Promise((resolve, reject) => {
         axiosInstance
           .get(
-            `/api/dataapp/transferencias?sociedad=${data.sociedad}&sucursal=${data.sucursal}&cuenta=${data.cuenta}&operacion=${data.operacion}&year${data.year}`
+            `/api/dataapp/transferencias?sociedad=${data.sociedad}&sucursal=${data.sucursal}&cuenta=${data.cuenta}&operacion=${data.operacion}&year=${data.year}`
           )
           .then((res) => {
             commit("SET_TRANSFERS", res.data);
