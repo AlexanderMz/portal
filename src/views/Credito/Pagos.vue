@@ -95,10 +95,10 @@
             label="Cliente"
             dense
             solo
-            :items="cuentas"
-            :item-text="getCuentaText"
-            item-value="glAccount"
-            @input="cargarDatos3"
+            :items="customers"
+            :item-text="getCustomerText"
+            item-value="cardCode"
+            @input="cargarDatos4"
           ></v-select>
         </v-col>
       </v-row>
@@ -109,8 +109,8 @@
             label="Pago edo. Cta"
             dense
             solo
-            :items="cuentas"
-            :item-text="getCuentaText"
+            :items="pagosCta"
+            :item-text="getPagoCtaText"
             item-value="glAccount"
             @input="cargarDatos3"
           ></v-select>
@@ -187,7 +187,7 @@
             v-if="!loadTable"
             v-model="selected"
             :headers="headers"
-            :items="transferencias"
+            :items="pendingBills"
             :search="search"
             hide-default-footer
             disable-pagination
@@ -214,8 +214,8 @@
                 forward
               </v-icon>
             </template>
-            <template v-slot:[`item.docTotal`]="{ item }">
-              <span> {{ item.docTotal | currency }} </span>
+            <template v-slot:[`item.saldoVencido`]="{ item }">
+              <span> {{ item.saldoVencido | currency }} </span>
             </template>
           </v-data-table>
           <v-skeleton-loader
@@ -357,11 +357,15 @@ export default {
     archivos: [],
     Respuesta: "",
     dialog: false,
+    value: false,
     dialogDelete: false,
     editedIndex: -1,
     search: "",
     selected: [],
+    items: [],
     selectedToFile: [],
+    selectedSociedad: null,
+    selectedSucursal: null,
     loadSucural: false,
     loadRest: false,
     loadTable: false,
@@ -370,8 +374,8 @@ export default {
     zIndex: 0,
     headers: [
       { text: "Folio", value: "docNum" },
-      { text: "Saldo Pendiente", value: "docTotal", align: "right" },
-      { text: "Vencimiento", value: "docTotal", align: "right" },
+      { text: "Saldo Pendiente", value: "saldoVencido", align: "right" },
+      { text: "Vencimiento", value: "docDate", align: "right" },
       { text: "Add", value: "actions" },
     ],
     headers2: [
@@ -415,6 +419,7 @@ export default {
       "generarTxtUnoxUno",
       "limpiar",
     ]),
+    ...mapActions("credito", ["getCustomers", "getPagosCta", "getPendingBill"]),
     getSociedadText(item) {
       return `${item.code} - ${item.u_CompnyName}`;
     },
@@ -426,6 +431,12 @@ export default {
     },
     getCuentaText(item) {
       return `${item.glAccount} - ${item.acctName}`;
+    },
+    getCustomerText(item) {
+      return `${item.cardCode} - ${item.cardName}`;
+    },
+    getPagoCtaText(item) {
+      return `${item.credAmnt} - ${item.referencia}`;
     },
     cargarDatos(sociedad) {
       this.loadSucural = true;
@@ -441,14 +452,25 @@ export default {
       }).then((res) => {
         this.loadRest = false;
       });
+      this.getCustomers({
+        sociedad: this.selectedSociedad.u_DB,
+        sucursal: sucursal.bplFrName,
+      }).then((res) => {
+        this.loadRest = false;
+      });
     },
     cargarDatos3(cuenta) {
-      this.loadTable = true;
-      this.getTransfers({
+      this.getPagosCta({
         sociedad: this.selectedSociedad.u_DB,
-        sucursal: this.selectedSucursal.bplName,
         cuenta,
-        operacion: this.operacion,
+      }).then((res) => {});
+    },
+    cargarDatos4(cliente) {
+      this.loadTable = true;
+      this.getPendingBill({
+        sociedad: this.selectedSociedad.u_DB,
+        sucursal: this.selectedSucursal.bplFrName,
+        cliente,
       }).then((res) => {
         this.loadTable = false;
       });
@@ -553,8 +575,8 @@ export default {
     tableHeight() {
       return window.innerHeight - 50;
     },
-    transferencias() {
-      return this.$store.state.dispersion.transferencias;
+    pendingBills() {
+      return this.$store.state.credito.pendingBills;
     },
     getValuesFromSet() {
       return this.selectedToFile.entries().next().value;
@@ -570,6 +592,12 @@ export default {
     },
     cuentas() {
       return this.$store.state.dispersion.cuentas;
+    },
+    customers() {
+      return this.$store.state.credito.customers;
+    },
+    pagosCta() {
+      return this.$store.state.credito.pagos;
     },
   },
   mounted() {

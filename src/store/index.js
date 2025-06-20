@@ -741,6 +741,78 @@ const Cancelacion = {
   },
 };
 
+/**
+ * Credito
+ */
+const Credito = {
+  namespaced: true,
+  state: () => ({
+    customers: [],
+    pagos: [],
+    pendingBills: [],
+  }),
+  mutations: {
+    SET_CUSTOMERS: (state, datos) => {
+      state.customers = datos;
+    },
+    SET_PAGOS: (state, datos) => {
+      state.pagos = [];
+      state.pagos = datos;
+    },
+    SET_PENDINGBILLS: (state, datos) => {
+      state.pendingBills = [];
+      state.pendingBills = datos;
+    },
+  },
+  actions: {
+    getCustomers: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        axiosInstance
+          .get(
+            `/api/credit/customers?sociedad=${data.sociedad}&sucursal=${data.sucursal}`
+          )
+          .then((res) => {
+            commit("SET_CUSTOMERS", res.data);
+            resolve(true);
+          })
+          .catch((err) => {
+            reject(err.response.data);
+          });
+      });
+    },
+    getPagosCta: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        axiosInstance
+          .get(
+            `/api/credit/pagocta?sociedad=${data.sociedad}&cuenta=${data.cuenta}`
+          )
+          .then((res) => {
+            commit("SET_PAGOS", res.data);
+            resolve(true);
+          })
+          .catch((err) => {
+            reject(err.response.data);
+          });
+      });
+    },
+    getPendingBill: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        axiosInstance
+          .get(
+            `/api/credit/pendingbill?sociedad=${data.sociedad}&sucursal=${data.sucursal}&cliente=${data.cliente}`
+          )
+          .then((res) => {
+            commit("SET_PENDINGBILLS", res.data);
+            resolve(true);
+          })
+          .catch((err) => {
+            reject(err.response.data);
+          });
+      });
+    },
+  },
+};
+
 export default new Vuex.Store({
   modules: {
     dispersion: Dispersion,
@@ -751,5 +823,6 @@ export default new Vuex.Store({
     config: Config,
     notas: Notas,
     cancelacion: Cancelacion,
+    credito: Credito,
   },
 });
