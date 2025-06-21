@@ -122,7 +122,7 @@
             solo
             :items="typeDiscounts"
             v-model="tipoDescuento1"
-            item-text="ItemName"
+            item-text="itemName"
             label="Tipo de descuento 1"
             append
           ></v-select>
@@ -142,7 +142,7 @@
             solo
             :items="typeDiscounts"
             v-model="tipoDescuento2"
-            item-text="ItemName"
+            item-text="itemName"
             label="Tipo de descuento 2"
             append
           ></v-select>
@@ -173,7 +173,7 @@
             solo
             :items="typeDiscounts"
             v-model="tipoDescuento3"
-            item-text="ItemName"
+            item-text="itemName"
             label="Tipo de descuento 3"
             append
           ></v-select>
@@ -193,7 +193,7 @@
             solo
             :items="typeDiscounts"
             v-model="tipoDescuento4"
-            item-text="ItemName"
+            item-text="itemName"
             label="Tipo de descuento 4"
             append
           ></v-select>
@@ -218,8 +218,7 @@
             :headers="headers"
             :items="pendingBills"
             :search="search"
-            hide-default-footer
-            disable-pagination
+            :items-per-page="15"
             disable-sort
             fixed-header
             item-key="name"
@@ -670,7 +669,7 @@ export default {
   },
   computed: {
     tableHeight() {
-      return window.innerHeight - 50;
+      return window.innerHeight - 30;
     },
     pendingBills() {
       return this.$store.state.credito.pendingBills;
