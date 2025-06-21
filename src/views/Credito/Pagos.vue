@@ -114,15 +114,15 @@
             :items="pagosCta"
             :item-text="getPagoCtaText"
             item-value="glAccount"
-            @input="cargarDatos3"
           ></v-select>
         </v-col>
         <v-col cols="3">
           <v-select
             dense
             solo
-            :items="items"
-            v-model="value"
+            :items="typeDiscounts"
+            v-model="tipoDescuento1"
+            item-text="ItemName"
             label="Tipo de descuento 1"
             append
           ></v-select>
@@ -140,8 +140,9 @@
           <v-select
             dense
             solo
-            :items="items"
-            v-model="value"
+            :items="typeDiscounts"
+            v-model="tipoDescuento2"
+            item-text="ItemName"
             label="Tipo de descuento 2"
             append
           ></v-select>
@@ -170,8 +171,9 @@
           <v-select
             dense
             solo
-            :items="items"
-            v-model="value"
+            :items="typeDiscounts"
+            v-model="tipoDescuento3"
+            item-text="ItemName"
             label="Tipo de descuento 3"
             append
           ></v-select>
@@ -189,8 +191,9 @@
           <v-select
             dense
             solo
-            :items="items"
-            v-model="value"
+            :items="typeDiscounts"
+            v-model="tipoDescuento4"
+            item-text="ItemName"
             label="Tipo de descuento 4"
             append
           ></v-select>
@@ -407,6 +410,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import { mapActions } from "vuex";
 //const setClass = new Set()
 export default {
@@ -460,6 +464,10 @@ export default {
     descuento2: 0,
     descuento3: 0,
     descuento4: 0,
+    tipoDescuento1: null,
+    tipoDescuento2: null,
+    tipoDescuento3: null,
+    tipoDescuento4: null,
   }),
   watch: {
     dialog(val) {
@@ -478,7 +486,12 @@ export default {
       "generarTxtUnoxUno",
       "limpiar",
     ]),
-    ...mapActions("credito", ["getCustomers", "getPagosCta", "getPendingBill"]),
+    ...mapActions("credito", [
+      "getCustomers",
+      "getPagosCta",
+      "getPendingBill",
+      "getTypeDiscounts",
+    ]),
     getSociedadText(item) {
       return `${item.code} - ${item.u_CompnyName}`;
     },
@@ -495,13 +508,16 @@ export default {
       return `${item.cardCode} - ${item.cardName}`;
     },
     getPagoCtaText(item) {
-      return `${item.credAmnt} - ${item.referencia}`;
+      return `${Vue.filter("currency")(item.credAmnt)} - ${item.referencia}`;
     },
     cargarDatos(sociedad) {
       this.loadSucural = true;
       this.getSucursales(sociedad.u_DB).then((res) => {
         this.loadSucural = false;
       });
+      this.getTypeDiscounts({
+        sociedad: sociedad.u_DB,
+      }).then(() => {});
     },
     cargarDatos2(sucursal) {
       this.loadRest = true;
@@ -679,6 +695,9 @@ export default {
     },
     pagosCta() {
       return this.$store.state.credito.pagos;
+    },
+    typeDiscounts() {
+      return this.$store.state.credito.typeDiscounts;
     },
   },
   mounted() {

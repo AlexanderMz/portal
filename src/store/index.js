@@ -750,6 +750,7 @@ const Credito = {
     customers: [],
     pagos: [],
     pendingBills: [],
+    typeDiscounts: [],
   }),
   mutations: {
     SET_CUSTOMERS: (state, datos) => {
@@ -762,6 +763,10 @@ const Credito = {
     SET_PENDINGBILLS: (state, datos) => {
       state.pendingBills = [];
       state.pendingBills = datos;
+    },
+    SET_TYPESDISCOUNT: (state, datos) => {
+      state.typeDiscounts = [];
+      state.typeDiscounts = datos;
     },
   },
   actions: {
@@ -803,6 +808,19 @@ const Credito = {
           )
           .then((res) => {
             commit("SET_PENDINGBILLS", res.data);
+            resolve(true);
+          })
+          .catch((err) => {
+            reject(err.response.data);
+          });
+      });
+    },
+    getTypeDiscounts: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        axiosInstance
+          .get(`/api/credit/typediscount?sociedad=${data.sociedad}`)
+          .then((res) => {
+            commit("SET_TYPESDISCOUNT", res.data);
             resolve(true);
           })
           .catch((err) => {
