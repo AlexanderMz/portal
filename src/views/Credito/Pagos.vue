@@ -88,6 +88,7 @@
             :item-text="getCuentaText"
             item-value="glAccount"
             @input="cargarDatos3"
+            :disabled="selectedToFile.length > 0"
           ></v-select>
         </v-col>
         <v-col class="d-flex" cols="3" md="3">
@@ -99,6 +100,7 @@
             :item-text="getCustomerText"
             item-value="cardCode"
             @input="cargarDatos4"
+            :disabled="selectedToFile.length > 0"
           ></v-select>
         </v-col>
       </v-row>
@@ -126,7 +128,13 @@
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field name="name" label="%" id="id"></v-text-field>
+          <v-text-field v-model="descuento1" @change="recalculateAll()">
+            <template v-slot:append>
+              <v-icon>
+                percent
+              </v-icon>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col cols="3">
           <v-select
@@ -139,7 +147,13 @@
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field name="name" label="%" id="id"></v-text-field>
+          <v-text-field v-model="descuento2" @change="recalculateAll()">
+            <template v-slot:append>
+              <v-icon>
+                percent
+              </v-icon>
+            </template>
+          </v-text-field>
         </v-col>
       </v-row>
       <v-row align="start">
@@ -163,7 +177,13 @@
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field name="name" label="%" id="id"></v-text-field>
+          <v-text-field v-model="descuento3" @change="recalculateAll()"
+            ><template v-slot:append>
+              <v-icon>
+                percent
+              </v-icon>
+            </template>
+          </v-text-field>
         </v-col>
         <v-col cols="3">
           <v-select
@@ -176,7 +196,13 @@
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field name="name" label="%" id="id"></v-text-field>
+          <v-text-field v-model="descuento4" @change="recalculateAll()">
+            <template v-slot:append>
+              <v-icon>
+                percent
+              </v-icon>
+            </template>
+          </v-text-field>
         </v-col>
       </v-row>
       <!-- Tablas -->
@@ -216,6 +242,9 @@
             </template>
             <template v-slot:[`item.saldoVencido`]="{ item }">
               <span> {{ item.saldoVencido | currency }} </span>
+            </template>
+            <template v-slot:[`item.docDate`]="{ item }">
+              <span> {{ item.docDate | textcrop2(10) }} </span>
             </template>
           </v-data-table>
           <v-skeleton-loader
@@ -284,13 +313,42 @@
                 delete
               </v-icon>
             </template>
-            <template v-slot:[`item.docTotal`]="{ item }">
-              <span> {{ item.docTotal | currency }} </span>
+            <template v-slot:[`item.saldoVencido`]="{ item }">
+              <span> {{ item.saldoVencido | currency }} </span>
             </template>
-            <template v-slot:[`item.cardName`]="{ item }">
-              <span :title="item.cardName">
-                {{ item.cardName | textcrop(18) }}
-              </span>
+            <template v-slot:[`item.total1`]="{ item }">
+              <span> {{ item.total1 | currency }} </span>
+            </template>
+            <template v-slot:[`item.total2`]="{ item }">
+              <span> {{ item.total2 | currency }} </span>
+            </template>
+            <template v-slot:[`item.total3`]="{ item }">
+              <span> {{ item.total3 | currency }} </span>
+            </template>
+            <template v-slot:[`item.total4`]="{ item }">
+              <span> {{ item.total4 | currency }} </span>
+            </template>
+            <template v-slot:[`item.total`]="{ item }">
+              <v-chip color="green" dark>
+                <span> {{ item.total | currency }} </span>
+              </v-chip>
+            </template>
+            <template v-slot:[`item.rebajesoDevoluciones`]="{ item }">
+              <v-edit-dialog
+                :return-value.sync="item.rebajesoDevoluciones"
+                @save="recalculate(item)"
+              >
+                {{ item.rebajesoDevoluciones | currency }}
+                <template v-slot:input>
+                  <v-text-field
+                    v-model="item.rebajesoDevoluciones"
+                    :label="item.docNum"
+                    single-line
+                    counter
+                    type="number"
+                  ></v-text-field>
+                </template>
+              </v-edit-dialog>
             </template>
           </v-data-table>
         </v-col>
@@ -379,28 +437,29 @@ export default {
       { text: "Add", value: "actions" },
     ],
     headers2: [
-      { text: "Borrar", value: "actions" },
-      { text: "DocNum", value: "docNum" },
-      { text: "DocTotal", value: "docTotal" },
-      { text: "CardName", value: "cardName" },
-      { text: "Sociedad", value: "sociedad" },
-      { text: "VATRegNum", value: "vatRegNum" },
-      { text: "BankCtlKey", value: "bankCtlKey" },
-      { text: "MandateID", value: "mandateID" },
-      { text: "Account", value: "account" },
-      { text: "DflAccount", value: "dflAccount" },
-      { text: "JrnlMemo", value: "jrnlMemo" },
-      { text: "County", value: "county" },
-      { text: "LicTradNum", value: "licTradNum" },
-      { text: "IVA", value: "IVA" },
-      { text: "E_Mail", value: "e_Mail" },
-      { text: "DocDate", value: "docDate" },
-      { text: "DocEntry", value: "docEntry" },
+      { text: "", value: "actions" },
+      // { text: "Factura", value: "docNum" },
+      { text: "Saldo Pendiente", value: "saldoVencido" },
+      // { text: "Vencimiento", value: "docDate" },
+      { text: "Rebaja o Devol.", value: "rebajesoDevoluciones" },
+      { text: "Dcto. 1", value: "descuento1" },
+      { text: "Total dcto. 1", value: "total1" },
+      { text: "Dcto. 2", value: "descuento2" },
+      { text: "Total dcto. 2", value: "total2" },
+      { text: "Dcto. 3", value: "descuento3" },
+      { text: "Total dcto. 3", value: "total3" },
+      { text: "Dcto. 4", value: "descuento4" },
+      { text: "Total dcto. 4", value: "total4" },
+      { text: "Total del pago", value: "total" },
     ],
     showdialog: false,
     showResult: false,
     selectedFile: undefined,
     fecha: new Date().toISOString().substr(0, 10),
+    descuento1: 0,
+    descuento2: 0,
+    descuento3: 0,
+    descuento4: 0,
   }),
   watch: {
     dialog(val) {
@@ -491,6 +550,10 @@ export default {
       } else alert("Tranferencia no encontrada, intente de nuevo.");
     },
     addItem(item) {
+      item.descuento1 = this.descuento1;
+      item.descuento2 = this.descuento2;
+      item.descuento3 = this.descuento3;
+      item.descuento4 = this.descuento4;
       this.selectedToFile.push(item);
       this.selectedToFile = [...new Set(this.selectedToFile)];
     },
@@ -501,6 +564,24 @@ export default {
     deleteItemConfirm() {
       this.selectedToFile.splice(this.editedIndex, 1);
       this.closeDelete();
+    },
+    recalculate(item) {
+      item.descuento1 = this.descuento1;
+      item.descuento2 = this.descuento2;
+      item.descuento3 = this.descuento3;
+      item.descuento4 = this.descuento4;
+      item.total1 =
+        item.saldoVencido -
+        item.rebajesoDevoluciones -
+        ((item.saldoVencido - +item.rebajesoDevoluciones) * item.descuento1) /
+          100;
+      item.total2 = item.total1 - (item.total1 * item.descuento2) / 100;
+      item.total3 = item.total2 - (item.total2 * item.descuento3) / 100;
+      item.total4 = item.total3 - (item.total3 * item.descuento4) / 100;
+      item.total = item.total4;
+    },
+    recalculateAll() {
+      this.selectedToFile.forEach((item) => this.recalculate(item));
     },
     closeDelete() {
       this.dialogDelete = false;
