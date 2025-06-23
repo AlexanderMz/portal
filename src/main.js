@@ -22,6 +22,9 @@ Vue.filter("currency", (value) => {
 Vue.filter("textcrop", (value, len) => {
   return value.length > len ? value.substr(0, len) + "..." : value;
 });
+Vue.filter("textcrop2", (value, len) => {
+  return value.length > len ? value.substr(0, len) : value;
+});
 
 const axiosInstance = axios.create({
   baseURL: url,

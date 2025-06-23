@@ -7,12 +7,7 @@
       <v-spacer> </v-spacer>
       <v-row justify="end">
         <v-col>
-          <v-btn
-            depressed
-            color="primary"
-            @click="generaUnoxUno"
-            :disabled="!selectedToFile.length"
-          >
+          <v-btn depressed color="primary" :disabled="!selectedToFile.length">
             Preaplicación
           </v-btn>
         </v-col>
@@ -21,7 +16,7 @@
             class="col"
             depressed
             color="primary"
-            @click="generaUnoxUno"
+            @click="guardarPago"
             :disabled="!selectedToFile.length"
           >
             Generar Operación
@@ -87,6 +82,8 @@
             :items="cuentas"
             :item-text="getCuentaText"
             item-value="glAccount"
+            v-model="selectedCuenta"
+            return-object
             @input="cargarDatos3"
             :disabled="selectedToFile.length > 0"
           ></v-select>
@@ -99,6 +96,8 @@
             :items="customers"
             :item-text="getCustomerText"
             item-value="cardCode"
+            v-model="selectedCustomer"
+            return-object
             @input="cargarDatos4"
             :disabled="selectedToFile.length > 0"
           ></v-select>
@@ -114,6 +113,9 @@
             :items="pagosCta"
             :item-text="getPagoCtaText"
             item-value="glAccount"
+            v-model="selectedPagoCta"
+            return-object
+            :disabled="selectedToFile.length > 0"
           ></v-select>
         </v-col>
         <v-col cols="3">
@@ -125,10 +127,15 @@
             item-text="itemName"
             label="Tipo de descuento 1"
             append
+            :disabled="selectedToFile.length > 0"
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field v-model="descuento1" @change="recalculateAll()">
+          <v-text-field
+            v-model="descuento1"
+            @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0"
+          >
             <template v-slot:append>
               <v-icon>
                 percent
@@ -145,10 +152,15 @@
             item-text="itemName"
             label="Tipo de descuento 2"
             append
+            :disabled="selectedToFile.length > 0"
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field v-model="descuento2" @change="recalculateAll()">
+          <v-text-field
+            v-model="descuento2"
+            @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0"
+          >
             <template v-slot:append>
               <v-icon>
                 percent
@@ -176,10 +188,14 @@
             item-text="itemName"
             label="Tipo de descuento 3"
             append
+            :disabled="selectedToFile.length > 0"
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field v-model="descuento3" @change="recalculateAll()"
+          <v-text-field
+            v-model="descuento3"
+            @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0"
             ><template v-slot:append>
               <v-icon>
                 percent
@@ -196,10 +212,15 @@
             item-text="itemName"
             label="Tipo de descuento 4"
             append
+            :disabled="selectedToFile.length > 0"
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field v-model="descuento4" @change="recalculateAll()">
+          <v-text-field
+            v-model="descuento4"
+            @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0"
+          >
             <template v-slot:append>
               <v-icon>
                 percent
@@ -218,7 +239,7 @@
             :headers="headers"
             :items="pendingBills"
             :search="search"
-            :items-per-page="15"
+            :items-per-page="25"
             disable-sort
             fixed-header
             item-key="name"
@@ -427,6 +448,9 @@ export default {
     selectedToFile: [],
     selectedSociedad: null,
     selectedSucursal: null,
+    selectedCuenta: null,
+    selectedCustomer: null,
+    selectedPagoCta: null,
     loadSucural: false,
     loadRest: false,
     loadTable: false,
@@ -481,8 +505,6 @@ export default {
       "getSucursales",
       "getSociedades",
       "getCuentas",
-      "getAllTransfers",
-      "generarTxtUnoxUno",
       "limpiar",
     ]),
     ...mapActions("credito", [
@@ -490,6 +512,8 @@ export default {
       "getPagosCta",
       "getPendingBill",
       "getTypeDiscounts",
+      "insertarPago",
+      "limpiarCredito",
     ]),
     getSociedadText(item) {
       return `${item.code} - ${item.u_CompnyName}`;
@@ -536,7 +560,7 @@ export default {
     cargarDatos3(cuenta) {
       this.getPagosCta({
         sociedad: this.selectedSociedad.u_DB,
-        cuenta,
+        cuenta: cuenta.glAccount,
       }).then((res) => {});
     },
     cargarDatos4(cliente) {
@@ -544,17 +568,11 @@ export default {
       this.getPendingBill({
         sociedad: this.selectedSociedad.u_DB,
         sucursal: this.selectedSucursal.bplFrName,
-        cliente,
+        cliente: cliente.cardCode,
       }).then((res) => {
         this.loadTable = false;
       });
     },
-    // cargarDatos3() {
-    //   this.loadTable = true;
-    //   this.getAllTransfers().then((res) => {
-    //     this.loadTable = false;
-    //   });
-    // },
     handlerEvent(e) {
       if (this.$refs.table._data.internalCurrentItems.length > 0) {
         this.selectedToFile.push(
@@ -569,6 +587,7 @@ export default {
       item.descuento2 = this.descuento2;
       item.descuento3 = this.descuento3;
       item.descuento4 = this.descuento4;
+      this.recalculate(item);
       this.selectedToFile.push(item);
       this.selectedToFile = [...new Set(this.selectedToFile)];
     },
@@ -596,7 +615,7 @@ export default {
       item.total = item.total4;
     },
     recalculateAll() {
-      this.selectedToFile.forEach((item) => this.recalculate(item));
+      this.selectedToFile.forEach(this.recalculate);
     },
     closeDelete() {
       this.dialogDelete = false;
@@ -604,37 +623,72 @@ export default {
         this.editedIndex = -1;
       });
     },
-    generaUnoxUno() {
-      this.overlay = true;
-      let data = {
-        transferencias: this.selectedToFile,
-        g: this.isGenerate ? 1 : 0,
-      };
-      this.generarTxtUnoxUno(data)
-        .then((res) => {
-          if (res != null) {
-            if (!Array.isArray(res)) {
-              this.overlay = false;
-              this.showResult = true;
-              this.Respuesta = res;
-            } else {
-              this.archivos = res;
-              this.overlay = false;
-              this.showdialog = true;
-            }
-            this.cancelProcess();
-          }
-        })
-        .catch((err) => {
-          this.overlay = false;
-          console.log(err);
-        });
+    async guardarPago() {
+      try {
+        const totalAPagar = this.getTotal;
+        const pago = {
+          fecha: this.fecha,
+          sociedad: this.selectedSociedad.u_DB,
+          sucursal: this.selectedSucursal.bplFrName,
+          idCuenta: this.selectedCuenta.glAccount,
+          cuenta: this.selectedCuenta.acctName,
+          cardCode: this.selectedCustomer.cardCode,
+          cardName: this.selectedCustomer.cardName,
+          monto: this.selectedPagoCta.credAmnt,
+          referencia: this.selectedPagoCta.referencia,
+          descuento1: this.tipoDescuento1 || "",
+          porcDesc1: this.descuento1,
+          descuento2: this.tipoDescuento2 || "",
+          porcDesc2: this.descuento2,
+          descuento3: this.tipoDescuento3 || "",
+          porcDesc3: this.descuento3,
+          descuento4: this.tipoDescuento4 || "",
+          porcDesc4: this.descuento4,
+          totalAPagar,
+          estatus: "",
+          comentarios: "",
+          detalles: this.selectedToFile.map((detalle, index) => {
+            return {
+              docEntry: detalle.docEntry,
+              docNum: detalle.docNum,
+              saldoVencido: detalle.saldoVencido,
+              rebjDev: detalle.rebajesoDevoluciones,
+              montoDcto1:
+                ((detalle.saldoVencido - +detalle.rebajesoDevoluciones) *
+                  detalle.descuento1) /
+                100,
+              tDcto1: total1,
+              montoDcto2: (detalle.total1 * detalle.descuento2) / 100,
+              tDcto2: total2,
+              montoDcto3: (detalle.total2 * detalle.descuento3) / 100,
+              tDcto3: total3,
+              montoDcto4: (detalle.total3 * detalle.descuento4) / 100,
+              tDcto4: total4,
+              totalPago: total4,
+              manual: +this.value,
+              tipo: "",
+              estatus: "",
+              comentarios: "",
+            };
+          }),
+        };
+
+        try {
+          const result = await insertarPago(pago);
+          console.log("Pago insertado con éxito:", result);
+          this.cancelProcess();
+        } catch (e) {
+          console.error("Error al insertar pago:", e);
+        }
+      } catch (error) {
+        alert("Debe seleccionar todas las opciones");
+      }
     },
     cancelProcess() {
       this.search = "";
       this.selectedToFile = [];
       this.limpiar();
-      this.getAllTransfers();
+      this.limpiarCredito();
     },
     onFileChange(event) {
       if (!this.selectedFile) {
@@ -678,7 +732,7 @@ export default {
       return this.selectedToFile.entries().next().value;
     },
     getTotal() {
-      return this.selectedToFile.reduce((a, b) => a + (b["docTotal"] || 0), 0);
+      return this.selectedToFile.reduce((a, b) => a + (b["total4"] || 0), 0);
     },
     sociedades() {
       return this.$store.state.dispersion.sociedades;
@@ -701,7 +755,7 @@ export default {
   },
   mounted() {
     this.limpiar();
-    //this.getAllTransfers();
+    this.limpiarCredito();
     this.getSociedades();
   },
 };

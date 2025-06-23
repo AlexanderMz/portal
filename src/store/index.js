@@ -751,6 +751,8 @@ const Credito = {
     pagos: [],
     pendingBills: [],
     typeDiscounts: [],
+    mensaje: "",
+    error: null,
   }),
   mutations: {
     SET_CUSTOMERS: (state, datos) => {
@@ -768,8 +770,19 @@ const Credito = {
       state.typeDiscounts = [];
       state.typeDiscounts = datos;
     },
+    SET_MENSAJE(state, payload) {
+      state.mensaje = payload;
+    },
+    SET_ERROR(state, error) {
+      state.error = error;
+    },
   },
   actions: {
+    limpiarCredito: ({ commit }) => {
+      commit("SET_CUSTOMERS", []);
+      commit("SET_PAGOS", []);
+      commit("SET_PENDINGBILLS", []);
+    },
     getCustomers: ({ commit }, data) => {
       return new Promise((resolve, reject) => {
         axiosInstance
@@ -827,6 +840,20 @@ const Credito = {
             reject(err.response.data);
           });
       });
+    },
+    async insertarPago({ commit }, pago) {
+      try {
+        const response = await axiosInstance.post("/api/pagos", pago);
+        commit(
+          "SET_MENSAJE",
+          `Pago insertado con Folio: ${response.data.folio}`
+        );
+        commit("SET_ERROR", null);
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
     },
   },
 };
