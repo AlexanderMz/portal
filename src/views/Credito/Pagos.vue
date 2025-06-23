@@ -674,11 +674,13 @@ export default {
         };
 
         try {
-          const result = await insertarPago(pago);
+          const result = await this.insertarPago(pago);
           console.log("Pago insertado con éxito:", result);
+          alert("Pago insertado con éxito");
           this.cancelProcess();
         } catch (e) {
           console.error("Error al insertar pago:", e);
+          alert("Error al insertar pago");
         }
       } catch (error) {
         alert("Debe seleccionar todas las opciones");
