@@ -843,7 +843,7 @@ const Credito = {
     },
     async insertarPago({ commit }, pago) {
       try {
-        const response = await axiosInstance.post("/api/pagos", pago);
+        const response = await axiosInstance.post("/api/credit/pagos", pago);
         commit(
           "SET_MENSAJE",
           `Pago insertado con Folio: ${response.data.folio}`
