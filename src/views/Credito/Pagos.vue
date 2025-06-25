@@ -61,7 +61,7 @@
           ></v-select>
         </v-col>
         <v-col class="d-flex" cols="3" md="3">
-          <v-select
+          <v-combobox
             label="Surcural"
             dense
             solo
@@ -72,10 +72,10 @@
             item-value="bplName"
             @input="cargarDatos2"
             :disabled="selectedToFile.length > 0"
-          ></v-select>
+          ></v-combobox>
         </v-col>
         <v-col class="d-flex" cols="3" md="3">
-          <v-select
+          <v-combobox
             label="Cuenta Bancaria"
             dense
             solo
@@ -86,10 +86,10 @@
             return-object
             @input="cargarDatos3"
             :disabled="selectedToFile.length > 0"
-          ></v-select>
+          ></v-combobox>
         </v-col>
         <v-col class="d-flex" cols="3" md="3">
-          <v-select
+          <v-combobox
             label="Cliente"
             dense
             solo
@@ -100,13 +100,13 @@
             return-object
             @input="cargarDatos4"
             :disabled="selectedToFile.length > 0"
-          ></v-select>
+          ></v-combobox>
         </v-col>
       </v-row>
       <!-- Descuentos -->
       <v-row align="start">
         <v-col cols="4">
-          <v-select
+          <v-combobox
             label="Pago edo. Cta"
             dense
             solo
@@ -116,7 +116,7 @@
             v-model="selectedPagoCta"
             return-object
             :disabled="selectedToFile.length > 0"
-          ></v-select>
+          ></v-combobox>
         </v-col>
         <v-col cols="3">
           <v-select
@@ -183,7 +183,7 @@
           <v-select
             dense
             solo
-            :items="typeDiscounts"
+            :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]"
             v-model="tipoDescuento3"
             item-text="itemName"
             label="Tipo de descuento 3"
@@ -195,6 +195,7 @@
           <v-text-field
             v-model="descuento3"
             @change="recalculateAll()"
+            :rules="rules"
             :disabled="selectedToFile.length > 0"
             ><template v-slot:append>
               <v-icon>
@@ -308,7 +309,7 @@
                     class="pa-0 ma-1"
                     dense
                     label="Timbrar Pago"
-                    v-model="value"
+                    v-model="timbrarPago"
                     value="value"
                   ></v-checkbox>
                 </v-col>
@@ -355,6 +356,9 @@
               <v-chip color="green" dark>
                 <span> {{ item.total | currency }} </span>
               </v-chip>
+            </template>
+            <template v-slot:[`item.docDate`]="{ item }">
+              <span> {{ item.docDate | textcrop2(10) }} </span>
             </template>
             <template v-slot:[`item.rebajesoDevoluciones`]="{ item }">
               <v-edit-dialog
@@ -415,6 +419,28 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="showdialogCta" persistent width="700">
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          Seleccionar cuenta
+        </v-card-title>
+        <v-card-text>
+          <v-data-table
+            :items="pagosCta"
+            hide-actions
+            class="elevation-1"
+            select-all
+            item-key="id"
+            loading="true"
+            search="search"
+          >
+          </v-data-table>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn text color="primary" @click="showdialog = false">Cerrar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <v-overlay style="text-align: center" :value="overlay">
       <p>Generando dispersion de pagos</p>
@@ -440,6 +466,7 @@ export default {
     Respuesta: "",
     dialog: false,
     value: false,
+    timbrarPago: true,
     dialogDelete: false,
     editedIndex: -1,
     search: "",
@@ -465,10 +492,10 @@ export default {
     ],
     headers2: [
       { text: "", value: "actions" },
-      // { text: "Factura", value: "docNum" },
+      { text: "Factura", value: "docNum" },
+      { text: "Vencimiento", value: "docDate" },
       { text: "Saldo Pendiente", value: "saldoVencido" },
-      // { text: "Vencimiento", value: "docDate" },
-      { text: "Rebaja o Devol.", value: "rebajesoDevoluciones" },
+      { text: "Monto a Pagar", value: "rebajesoDevoluciones" },
       { text: "Dcto. 1", value: "descuento1" },
       { text: "Total dcto. 1", value: "total1" },
       { text: "Dcto. 2", value: "descuento2" },
@@ -480,6 +507,7 @@ export default {
       { text: "Total del pago", value: "total" },
     ],
     showdialog: false,
+    showdialogCta: false,
     showResult: false,
     selectedFile: undefined,
     fecha: new Date().toISOString().substr(0, 10),
@@ -587,6 +615,7 @@ export default {
       item.descuento2 = this.descuento2;
       item.descuento3 = this.descuento3;
       item.descuento4 = this.descuento4;
+      item.rebajesoDevoluciones = item.saldoVencido;
       this.recalculate(item);
       this.selectedToFile.push(item);
       this.selectedToFile = [...new Set(this.selectedToFile)];
@@ -605,10 +634,8 @@ export default {
       item.descuento3 = this.descuento3;
       item.descuento4 = this.descuento4;
       item.total1 =
-        item.saldoVencido -
         item.rebajesoDevoluciones -
-        ((item.saldoVencido - +item.rebajesoDevoluciones) * item.descuento1) /
-          100;
+        (+item.rebajesoDevoluciones * item.descuento1) / 100;
       item.total2 = item.total1 - (item.total1 * item.descuento2) / 100;
       item.total3 = item.total2 - (item.total2 * item.descuento3) / 100;
       item.total4 = item.total3 - (item.total3 * item.descuento4) / 100;
@@ -654,9 +681,7 @@ export default {
               saldoVencido: detalle.saldoVencido,
               rebjDev: detalle.rebajesoDevoluciones,
               montoDcto1:
-                ((detalle.saldoVencido - +detalle.rebajesoDevoluciones) *
-                  detalle.descuento1) /
-                100,
+                (+detalle.rebajesoDevoluciones * detalle.descuento1) / 100,
               tDcto1: detalle.total1,
               montoDcto2: (detalle.total1 * detalle.descuento2) / 100,
               tDcto2: detalle.total2,
@@ -753,6 +778,34 @@ export default {
     },
     typeDiscounts() {
       return this.$store.state.credito.typeDiscounts;
+    },
+    rules() {
+      return [
+        (value) => {
+          if (this.tipoDescuento3 === "Especial") {
+            const parsedValue = parseFloat(value);
+            if (isNaN(parsedValue)) {
+              return "Input must be a number.";
+            }
+            if (parsedValue >= 1 && parsedValue <= 10) {
+              return true;
+            }
+            return `El rango para este tipo de descuentos es de ${1} y ${10}.`;
+          }
+        },
+        (value) => {
+          if (this.tipoDescuento3 === "Pronto Pago") {
+            const parsedValue = parseFloat(value);
+            if (isNaN(parsedValue)) {
+              return "Input must be a number.";
+            }
+            if (parsedValue <= 3) {
+              return true;
+            }
+            return `El máximo para este tipo de descuentos es de ${3}.`;
+          }
+        },
+      ];
     },
   },
   mounted() {
