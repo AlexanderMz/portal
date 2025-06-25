@@ -191,17 +191,17 @@
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field
+          <v-select
             v-model="descuento3"
+            :items="porcentageTipoDcto3"
             @change="recalculateAll()"
-            :rules="rules"
             :disabled="selectedToFile.length > 0"
             ><template v-slot:append>
               <v-icon>
                 percent
               </v-icon>
             </template>
-          </v-text-field>
+          </v-select>
         </v-col>
         <v-col cols="3">
           <v-select
@@ -359,21 +359,30 @@
               <span> {{ item.docDate | textcrop2(10) }} </span>
             </template>
             <template v-slot:[`item.rebajesoDevoluciones`]="{ item }">
-              <v-edit-dialog
-                :return-value.sync="item.rebajesoDevoluciones"
-                @save="recalculate(item)"
+              <v-chip
+                :color="
+                  item.rebajesoDevoluciones != item.saldoVencido
+                    ? 'red'
+                    : 'blue'
+                "
+                dark
               >
-                {{ item.rebajesoDevoluciones | currency }}
-                <template v-slot:input>
-                  <v-text-field
-                    v-model="item.rebajesoDevoluciones"
-                    :label="item.docNum"
-                    single-line
-                    counter
-                    type="number"
-                  ></v-text-field>
-                </template>
-              </v-edit-dialog>
+                <v-edit-dialog
+                  :return-value.sync="item.rebajesoDevoluciones"
+                  @save="recalculate(item)"
+                >
+                  {{ item.rebajesoDevoluciones | currency }}
+                  <template v-slot:input>
+                    <v-text-field
+                      v-model="item.rebajesoDevoluciones"
+                      :label="item.docNum"
+                      single-line
+                      counter
+                      type="number"
+                    ></v-text-field>
+                  </template>
+                </v-edit-dialog>
+              </v-chip>
             </template>
           </v-data-table>
         </v-col>
@@ -547,7 +556,7 @@ export default {
     descuento4: 0,
     tipoDescuento1: null,
     tipoDescuento2: null,
-    tipoDescuento3: null,
+    tipoDescuento3: "Especial",
     tipoDescuento4: null,
   }),
   watch: {
@@ -641,17 +650,14 @@ export default {
       } else alert("Tranferencia no encontrada, intente de nuevo.");
     },
     addItem(item) {
-      const totalAPagar = this.getTotal + item.saldoVencido;
-      if (this.selectedPagoCta.credAmnt > totalAPagar) {
-        item.descuento1 = this.descuento1;
-        item.descuento2 = this.descuento2;
-        item.descuento3 = this.descuento3;
-        item.descuento4 = this.descuento4;
-        item.rebajesoDevoluciones = item.saldoVencido;
-        this.recalculate(item);
-        this.selectedToFile.push(item);
-        this.selectedToFile = [...new Set(this.selectedToFile)];
-      } else alert("El saldo sobrepasa el valor de la cuenta");
+      item.descuento1 = this.descuento1;
+      item.descuento2 = this.descuento2;
+      item.descuento3 = this.descuento3;
+      item.descuento4 = this.descuento4;
+      item.rebajesoDevoluciones = item.saldoVencido;
+      this.recalculate(item);
+      this.selectedToFile.push(item);
+      this.selectedToFile = [...new Set(this.selectedToFile)];
     },
     deleteItem(item) {
       this.editedIndex = this.selectedToFile.indexOf(item);
@@ -686,6 +692,10 @@ export default {
     async guardarPago() {
       try {
         const totalAPagar = this.getTotal;
+        if (this.selectedPagoCta.credAmnt < totalAPagar) {
+          alert("El saldo sobrepasa el valor de la cuenta");
+          return;
+        }
         const pago = {
           fecha: this.fecha,
           sociedad: this.selectedSociedad.u_DB,
@@ -811,6 +821,11 @@ export default {
     },
     typeDiscounts() {
       return this.$store.state.credito.typeDiscounts;
+    },
+    porcentageTipoDcto3() {
+      return this.tipoDescuento3 == "Especial"
+        ? [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        : [1, 2, 3];
     },
     rules() {
       return [
