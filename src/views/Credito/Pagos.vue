@@ -110,12 +110,11 @@
             label="Pago edo. Cta"
             dense
             solo
-            :items="pagosCta"
             :item-text="getPagoCtaText"
             item-value="glAccount"
             v-model="selectedPagoCta"
-            return-object
             :disabled="selectedToFile.length > 0"
+            @click="() => (this.showdialogCta = true)"
           ></v-combobox>
         </v-col>
         <v-col cols="3">
@@ -310,7 +309,6 @@
                     dense
                     label="Timbrar Pago"
                     v-model="timbrarPago"
-                    value="value"
                   ></v-checkbox>
                 </v-col>
               </v-row>
@@ -419,7 +417,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="showdialogCta" persistent width="700">
+    <v-dialog v-model="showdialogCta" persistent width="800">
       <v-card>
         <v-card-title class="headline grey lighten-2">
           Seleccionar cuenta
@@ -427,17 +425,48 @@
         <v-card-text>
           <v-data-table
             :items="pagosCta"
-            hide-actions
+            :items-per-page="10"
+            :search="searchCta"
+            :headers="[
+              { text: 'Valor', value: 'credAmnt' },
+              { text: 'Fecha', value: 'dueDate' },
+              { text: 'Referencia', value: 'referencia' },
+            ]"
             class="elevation-1"
-            select-all
-            item-key="id"
-            loading="true"
-            search="search"
+            item-key="sequence"
+            disable-sort
+            fixed-header
+            single-select
+            show-select
+            every-item
+            @item-selected="
+              ({ item }) => {
+                this.selectedPagoCta = item;
+                this.showdialogCta = false;
+              }
+            "
           >
+            <template v-slot:top>
+              <v-banner sticky icon="search" flat>
+                <v-text-field
+                  v-model="searchCta"
+                  label="Buscar transferencia"
+                  class="mx-4"
+                ></v-text-field>
+              </v-banner>
+            </template>
+            <template v-slot:[`item.credAmnt`]="{ item }">
+              <span> {{ item.credAmnt | currency }} </span>
+            </template>
+            <template v-slot:[`item.dueDate`]="{ item }">
+              <span> {{ item.dueDate | textcrop2(10) }} </span>
+            </template>
           </v-data-table>
         </v-card-text>
         <v-card-actions>
-          <v-btn text color="primary" @click="showdialog = false">Cerrar</v-btn>
+          <v-btn text color="primary" @click="showdialogCta = false"
+            >Cerrar</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -470,6 +499,7 @@ export default {
     dialogDelete: false,
     editedIndex: -1,
     search: "",
+    searchCta: "",
     selected: [],
     items: [],
     selectedToFile: [],
@@ -611,14 +641,17 @@ export default {
       } else alert("Tranferencia no encontrada, intente de nuevo.");
     },
     addItem(item) {
-      item.descuento1 = this.descuento1;
-      item.descuento2 = this.descuento2;
-      item.descuento3 = this.descuento3;
-      item.descuento4 = this.descuento4;
-      item.rebajesoDevoluciones = item.saldoVencido;
-      this.recalculate(item);
-      this.selectedToFile.push(item);
-      this.selectedToFile = [...new Set(this.selectedToFile)];
+      const totalAPagar = this.getTotal + item.saldoVencido;
+      if (this.selectedPagoCta.credAmnt > totalAPagar) {
+        item.descuento1 = this.descuento1;
+        item.descuento2 = this.descuento2;
+        item.descuento3 = this.descuento3;
+        item.descuento4 = this.descuento4;
+        item.rebajesoDevoluciones = item.saldoVencido;
+        this.recalculate(item);
+        this.selectedToFile.push(item);
+        this.selectedToFile = [...new Set(this.selectedToFile)];
+      } else alert("El saldo sobrepasa el valor de la cuenta");
     },
     deleteItem(item) {
       this.editedIndex = this.selectedToFile.indexOf(item);
