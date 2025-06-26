@@ -486,7 +486,7 @@ import Vue from "vue";
 import { mapActions } from "vuex";
 //const setClass = new Set()
 export default {
-  name: "Dispersion",
+  name: "Pagos",
   data: () => ({
     archivos: [],
     Respuesta: "",

@@ -855,6 +855,28 @@ const Credito = {
         throw error;
       }
     },
+    async getReportHeader({ commit }, fecha) {
+      try {
+        const response = await axiosInstance.get(
+          `/api/credit/report/header?fecha=${fecha}`
+        );
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
+    async getReportDetail({ commit }, folio) {
+      try {
+        const response = await axiosInstance.get(
+          `/api/credit/report/details?folio=${folio}`
+        );
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
   },
 };
 
