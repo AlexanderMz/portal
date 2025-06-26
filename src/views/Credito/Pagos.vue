@@ -121,7 +121,7 @@
           <v-select
             dense
             solo
-            :items="typeDiscounts"
+            :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]"
             v-model="tipoDescuento1"
             item-text="itemName"
             label="Tipo de descuento 1"
@@ -130,23 +130,20 @@
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field
+          <v-select
             v-model="descuento1"
+            :items="porcentageTipoDcto(tipoDescuento1)"
             @change="recalculateAll()"
             :disabled="selectedToFile.length > 0"
+            append-outer-icon="percent"
           >
-            <template v-slot:append>
-              <v-icon>
-                percent
-              </v-icon>
-            </template>
-          </v-text-field>
+          </v-select>
         </v-col>
         <v-col cols="3">
           <v-select
             dense
             solo
-            :items="typeDiscounts"
+            :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]"
             v-model="tipoDescuento2"
             item-text="itemName"
             label="Tipo de descuento 2"
@@ -155,17 +152,14 @@
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field
+          <v-select
             v-model="descuento2"
+            :items="porcentageTipoDcto(tipoDescuento2)"
             @change="recalculateAll()"
             :disabled="selectedToFile.length > 0"
+            append-outer-icon="percent"
           >
-            <template v-slot:append>
-              <v-icon>
-                percent
-              </v-icon>
-            </template>
-          </v-text-field>
+          </v-select>
         </v-col>
       </v-row>
       <v-row align="start">
@@ -193,21 +187,18 @@
         <v-col cols="1">
           <v-select
             v-model="descuento3"
-            :items="porcentageTipoDcto3"
+            :items="porcentageTipoDcto(tipoDescuento3)"
             @change="recalculateAll()"
             :disabled="selectedToFile.length > 0"
-            ><template v-slot:append>
-              <v-icon>
-                percent
-              </v-icon>
-            </template>
+            append-outer-icon="percent"
+          >
           </v-select>
         </v-col>
         <v-col cols="3">
           <v-select
             dense
             solo
-            :items="typeDiscounts"
+            :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]"
             v-model="tipoDescuento4"
             item-text="itemName"
             label="Tipo de descuento 4"
@@ -216,17 +207,14 @@
           ></v-select>
         </v-col>
         <v-col cols="1">
-          <v-text-field
+          <v-select
             v-model="descuento4"
+            :items="porcentageTipoDcto(tipoDescuento4)"
             @change="recalculateAll()"
             :disabled="selectedToFile.length > 0"
+            append-outer-icon="percent"
           >
-            <template v-slot:append>
-              <v-icon>
-                percent
-              </v-icon>
-            </template>
-          </v-text-field>
+          </v-select>
         </v-col>
       </v-row>
       <!-- Tablas -->
@@ -556,7 +544,7 @@ export default {
     descuento4: 0,
     tipoDescuento1: null,
     tipoDescuento2: null,
-    tipoDescuento3: "Especial",
+    tipoDescuento3: null,
     tipoDescuento4: null,
   }),
   watch: {
@@ -605,9 +593,9 @@ export default {
       this.getSucursales(sociedad.u_DB).then((res) => {
         this.loadSucural = false;
       });
-      this.getTypeDiscounts({
-        sociedad: sociedad.u_DB,
-      }).then(() => {});
+      // this.getTypeDiscounts({
+      //   sociedad: sociedad.u_DB,
+      // }).then(() => {});
     },
     cargarDatos2(sucursal) {
       this.loadRest = true;
@@ -790,6 +778,11 @@ export default {
       };
       fileReader.readAsBinaryString(this.selectedFile);
     },
+    porcentageTipoDcto(tipoDescuento) {
+      return tipoDescuento == "Especial"
+        ? [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        : [1, 2, 3];
+    },
   },
   computed: {
     tableHeight() {
@@ -821,11 +814,6 @@ export default {
     },
     typeDiscounts() {
       return this.$store.state.credito.typeDiscounts;
-    },
-    porcentageTipoDcto3() {
-      return this.tipoDescuento3 == "Especial"
-        ? [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        : [1, 2, 3];
     },
     rules() {
       return [
