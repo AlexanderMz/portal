@@ -1,9 +1,7 @@
 <template>
   <v-container>
     <v-toolbar dense id="p">
-      <v-toolbar-title
-        >Aplicación de pagos | Facturas con descuentos</v-toolbar-title
-      >
+      <v-toolbar-title>Aplicación de pagos | Facturas con descuentos</v-toolbar-title>
       <v-spacer> </v-spacer>
       <v-row justify="end">
         <v-col>
@@ -12,13 +10,7 @@
           </v-btn>
         </v-col>
         <v-col>
-          <v-btn
-            class="col"
-            depressed
-            color="primary"
-            @click="guardarPago"
-            :disabled="!selectedToFile.length"
-          >
+          <v-btn class="col" depressed color="primary" @click="guardarPago" :disabled="!selectedToFile.length">
             Generar Operación
           </v-btn>
         </v-col>
@@ -27,223 +19,98 @@
     <div>
       <v-row no-gutters>
         <v-col class="d-flex" cols="2" md="2">
-          <v-checkbox
-            dense
-            label="Manual"
-            v-model="value"
-            value="value"
-          ></v-checkbox>
+          <v-checkbox dense label="Manual" v-model="value" value="value"></v-checkbox>
         </v-col>
         <v-col cols="3">
-          <v-text-field
-            v-model="fecha"
-            label="Fecha"
-            prepend-icon="event"
-            type="date"
-            disabled
-          ></v-text-field>
+          <v-text-field v-model="fecha" label="Fecha" prepend-icon="event" type="date" disabled></v-text-field>
+        </v-col>
+        <v-col cols="3">
+          <v-text-field v-model="fechaPago" label="Fecha Pago" prepend-icon="event" type="date"></v-text-field>
         </v-col>
       </v-row>
       <!-- Sociedad & Sucursal -->
       <v-row>
         <v-col class="d-flex" cols="3" md="3">
-          <v-select
-            label="Sociedad o Empresa"
-            dense
-            solo
-            :items="sociedades"
-            v-model="selectedSociedad"
-            :item-text="getSociedadText"
-            item-value="u_CompnyName"
-            return-object
-            @input="cargarDatos"
-            :disabled="selectedToFile.length > 0"
-          ></v-select>
+          <v-select label="Sociedad o Empresa" dense solo :items="sociedades" v-model="selectedSociedad"
+            :item-text="getSociedadText" item-value="u_CompnyName" return-object @input="cargarDatos"
+            :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col class="d-flex" cols="3" md="3">
-          <v-combobox
-            label="Surcural"
-            dense
-            solo
-            :items="sucursales"
-            v-model="selectedSucursal"
-            :item-text="getSucursalText"
-            return-object
-            item-value="bplName"
-            @input="cargarDatos2"
-            :disabled="selectedToFile.length > 0"
-          ></v-combobox>
+          <v-combobox label="Surcural" dense solo :items="sucursales" v-model="selectedSucursal"
+            :item-text="getSucursalText" return-object item-value="bplName" @input="cargarDatos2"
+            :disabled="selectedToFile.length > 0"></v-combobox>
         </v-col>
         <v-col class="d-flex" cols="3" md="3">
-          <v-combobox
-            label="Cuenta Bancaria"
-            dense
-            solo
-            :items="cuentas"
-            :item-text="getCuentaText"
-            item-value="glAccount"
-            v-model="selectedCuenta"
-            return-object
-            @input="cargarDatos3"
-            :disabled="selectedToFile.length > 0"
-          ></v-combobox>
+          <v-combobox label="Cuenta Bancaria" dense solo :items="cuentas" :item-text="getCuentaText"
+            item-value="glAccount" v-model="selectedCuenta" return-object @input="cargarDatos3"
+            :disabled="selectedToFile.length > 0"></v-combobox>
         </v-col>
         <v-col class="d-flex" cols="3" md="3">
-          <v-combobox
-            label="Cliente"
-            dense
-            solo
-            :items="customers"
-            :item-text="getCustomerText"
-            item-value="cardCode"
-            v-model="selectedCustomer"
-            return-object
-            @input="cargarDatos4"
-            :disabled="selectedToFile.length > 0"
-          ></v-combobox>
+          <v-combobox label="Cliente" dense solo :items="customers" :item-text="getCustomerText" item-value="cardCode"
+            v-model="selectedCustomer" return-object @input="cargarDatos4"
+            :disabled="selectedToFile.length > 0"></v-combobox>
         </v-col>
       </v-row>
       <!-- Descuentos -->
       <v-row align="start">
         <v-col cols="4">
-          <v-combobox
-            label="Pago edo. Cta"
-            dense
-            solo
-            :item-text="getPagoCtaText"
-            item-value="glAccount"
-            v-model="selectedPagoCta"
-            :disabled="selectedToFile.length > 0"
-            @click="() => (this.showdialogCta = true)"
-          ></v-combobox>
+          <v-combobox label="Pago edo. Cta" dense solo :item-text="getPagoCtaText" item-value="glAccount"
+            v-model="selectedPagoCta" :disabled="selectedToFile.length > 0"
+            @click="() => (this.showdialogCta = true)"></v-combobox>
         </v-col>
         <v-col cols="3">
-          <v-select
-            dense
-            solo
-            :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]"
-            v-model="tipoDescuento1"
-            item-text="itemName"
-            label="Tipo de descuento 1"
-            append
-            :disabled="selectedToFile.length > 0"
-          ></v-select>
+          <v-select dense solo :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]" v-model="tipoDescuento1"
+            item-text="itemName" label="Tipo de descuento 1" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select
-            v-model="descuento1"
-            :items="porcentageTipoDcto(tipoDescuento1)"
-            @change="recalculateAll()"
-            :disabled="selectedToFile.length > 0"
-            append-outer-icon="percent"
-          >
+          <v-select v-model="descuento1" :items="porcentageTipoDcto(tipoDescuento1)" @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0" append-outer-icon="percent">
           </v-select>
         </v-col>
         <v-col cols="3">
-          <v-select
-            dense
-            solo
-            :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]"
-            v-model="tipoDescuento2"
-            item-text="itemName"
-            label="Tipo de descuento 2"
-            append
-            :disabled="selectedToFile.length > 0"
-          ></v-select>
+          <v-select dense solo :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]" v-model="tipoDescuento2"
+            item-text="itemName" label="Tipo de descuento 2" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select
-            v-model="descuento2"
-            :items="porcentageTipoDcto(tipoDescuento2)"
-            @change="recalculateAll()"
-            :disabled="selectedToFile.length > 0"
-            append-outer-icon="percent"
-          >
+          <v-select v-model="descuento2" :items="porcentageTipoDcto(tipoDescuento2)" @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0" append-outer-icon="percent">
           </v-select>
         </v-col>
       </v-row>
       <v-row align="start">
         <v-col class="d-flex" cols="4" md="4">
-          <v-file-input
-            label="Adjuntar template"
-            outlined
-            dense
-            @change="onFileChange"
-            v-model="selectedFile"
-          ></v-file-input>
+          <v-file-input label="Adjuntar template" outlined dense @change="onFileChange"
+            v-model="selectedFile"></v-file-input>
         </v-col>
         <v-col cols="3">
-          <v-select
-            dense
-            solo
-            :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]"
-            v-model="tipoDescuento3"
-            item-text="itemName"
-            label="Tipo de descuento 3"
-            append
-            :disabled="selectedToFile.length > 0"
-          ></v-select>
+          <v-select dense solo :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]" v-model="tipoDescuento3"
+            item-text="itemName" label="Tipo de descuento 3" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select
-            v-model="descuento3"
-            :items="porcentageTipoDcto(tipoDescuento3)"
-            @change="recalculateAll()"
-            :disabled="selectedToFile.length > 0"
-            append-outer-icon="percent"
-          >
+          <v-select v-model="descuento3" :items="porcentageTipoDcto(tipoDescuento3)" @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0" append-outer-icon="percent">
           </v-select>
         </v-col>
         <v-col cols="3">
-          <v-select
-            dense
-            solo
-            :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]"
-            v-model="tipoDescuento4"
-            item-text="itemName"
-            label="Tipo de descuento 4"
-            append
-            :disabled="selectedToFile.length > 0"
-          ></v-select>
+          <v-select dense solo :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]" v-model="tipoDescuento4"
+            item-text="itemName" label="Tipo de descuento 4" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select
-            v-model="descuento4"
-            :items="porcentageTipoDcto(tipoDescuento4)"
-            @change="recalculateAll()"
-            :disabled="selectedToFile.length > 0"
-            append-outer-icon="percent"
-          >
+          <v-select v-model="descuento4" :items="porcentageTipoDcto(tipoDescuento4)" @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0" append-outer-icon="percent">
           </v-select>
         </v-col>
       </v-row>
       <!-- Tablas -->
       <v-row>
         <v-col cols="4" md="4">
-          <v-data-table
-            dense
-            v-if="!loadTable"
-            v-model="selected"
-            :headers="headers"
-            :items="pendingBills"
-            :search="search"
-            :items-per-page="25"
-            disable-sort
-            fixed-header
-            item-key="name"
-            class="elevation-1"
-            ref="table"
-            :height="tableHeight"
-            id="tablemain"
-          >
+          <v-data-table dense v-if="!loadTable" v-model="selected" :headers="headers" :items="pendingBills"
+            :search="search" :items-per-page="25" disable-sort fixed-header item-key="name" class="elevation-1"
+            ref="table" :height="tableHeight" id="tablemain">
             <template v-slot:top>
               <v-banner sticky icon="search" flat>
-                <v-text-field
-                  v-model="search"
-                  label="Buscar transferencia"
-                  class="mx-4"
-                  @keydown.stop.enter="handlerEvent"
-                ></v-text-field>
+                <v-text-field v-model="search" label="Buscar transferencia" class="mx-4"
+                  @keydown.stop.enter="handlerEvent"></v-text-field>
               </v-banner>
             </template>
             <template v-slot:[`item.actions`]="{ item }">
@@ -258,61 +125,31 @@
               <span> {{ item.docDate | textcrop2(10) }} </span>
             </template>
           </v-data-table>
-          <v-skeleton-loader
-            v-if="loadTable"
-            class="mx-auto"
-            type="table"
-          ></v-skeleton-loader>
+          <v-skeleton-loader v-if="loadTable" class="mx-auto" type="table"></v-skeleton-loader>
         </v-col>
         <v-col cols="8" md="8">
-          <v-data-table
-            dense
-            :headers="headers2"
-            :items="selectedToFile"
-            class="elevation-1"
-            hide-default-footer
-            disable-pagination
-            disable-sort
-            :fixed-header="true"
-            :height="tableHeight"
-            id="tabledetalle"
-          >
+          <v-data-table dense :headers="headers2" :items="selectedToFile" class="elevation-1" hide-default-footer
+            disable-pagination disable-sort :fixed-header="true" :height="tableHeight" id="tabledetalle">
             <template v-slot:top>
               <v-row no-gutters>
                 <v-col cols="8" sm="6" md="8">
-                  <v-btn
-                    rounded
-                    icon
-                    title="Eliminar todos"
-                    @click="selectedToFile = []"
-                  >
+                  <v-btn rounded icon title="Eliminar todos" @click="selectedToFile = []">
                     <v-icon>delete</v-icon>
                   </v-btn>
                   {{ selectedToFile.length }} seleccionadas | Total:
                   {{ getTotal | currency }}
                 </v-col>
                 <v-col>
-                  <v-checkbox
-                    class="pa-0 ma-1"
-                    dense
-                    label="Timbrar Pago"
-                    v-model="timbrarPago"
-                  ></v-checkbox>
+                  <v-checkbox class="pa-0 ma-1" dense label="Timbrar Pago" v-model="timbrarPago"></v-checkbox>
                 </v-col>
               </v-row>
               <v-dialog v-model="dialogDelete" max-width="600px">
                 <v-card>
-                  <v-card-title class="headline"
-                    >¿Esta seguro que desea borrar esta factura?</v-card-title
-                  >
+                  <v-card-title class="headline">¿Esta seguro que desea borrar esta factura?</v-card-title>
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="closeDelete"
-                      >Cancelar</v-btn
-                    >
-                    <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                      >OK</v-btn
-                    >
+                    <v-btn color="blue darken-1" text @click="closeDelete">Cancelar</v-btn>
+                    <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
                     <v-spacer></v-spacer>
                   </v-card-actions>
                 </v-card>
@@ -347,27 +184,15 @@
               <span> {{ item.docDate | textcrop2(10) }} </span>
             </template>
             <template v-slot:[`item.rebajesoDevoluciones`]="{ item }">
-              <v-chip
-                :color="
-                  item.rebajesoDevoluciones != item.saldoVencido
-                    ? 'red'
-                    : 'blue'
-                "
-                dark
-              >
-                <v-edit-dialog
-                  :return-value.sync="item.rebajesoDevoluciones"
-                  @save="recalculate(item)"
-                >
+              <v-chip :color="item.rebajesoDevoluciones != item.saldoVencido
+            ? 'red'
+            : 'blue'
+            " dark>
+                <v-edit-dialog :return-value.sync="item.rebajesoDevoluciones" @save="recalculate(item)">
                   {{ item.rebajesoDevoluciones | currency }}
                   <template v-slot:input>
-                    <v-text-field
-                      v-model="item.rebajesoDevoluciones"
-                      :label="item.docNum"
-                      single-line
-                      counter
-                      type="number"
-                    ></v-text-field>
+                    <v-text-field v-model="item.rebajesoDevoluciones" :label="item.docNum" single-line counter
+                      type="number"></v-text-field>
                   </template>
                 </v-edit-dialog>
               </v-chip>
@@ -398,11 +223,7 @@
               </v-list-item-content>
 
               <v-list-item-action>
-                <v-btn
-                  icon
-                  :href="'ftp://192.168.1.206/' + file"
-                  target="_blank"
-                >
+                <v-btn icon :href="'ftp://192.168.1.206/' + file" target="_blank">
                   <v-icon color="grey lighten-1">information</v-icon>
                 </v-btn>
               </v-list-item-action>
@@ -420,36 +241,19 @@
           Seleccionar cuenta
         </v-card-title>
         <v-card-text>
-          <v-data-table
-            :items="pagosCta"
-            :items-per-page="10"
-            :search="searchCta"
-            :headers="[
-              { text: 'Valor', value: 'credAmnt' },
-              { text: 'Fecha', value: 'dueDate' },
-              { text: 'Referencia', value: 'referencia' },
-            ]"
-            class="elevation-1"
-            item-key="sequence"
-            disable-sort
-            fixed-header
-            single-select
-            show-select
-            every-item
-            @item-selected="
-              ({ item }) => {
-                this.selectedPagoCta = item;
-                this.showdialogCta = false;
-              }
-            "
-          >
+          <v-data-table :items="pagosCta" :items-per-page="10" :search="searchCta" :headers="[
+            { text: 'Valor', value: 'credAmnt' },
+            { text: 'Fecha', value: 'dueDate' },
+            { text: 'Referencia', value: 'referencia' },
+          ]" class="elevation-1" item-key="sequence" disable-sort fixed-header single-select show-select every-item
+            @item-selected="({ item }) => {
+            this.selectedPagoCta = item;
+            this.showdialogCta = false;
+          }
+            ">
             <template v-slot:top>
               <v-banner sticky icon="search" flat>
-                <v-text-field
-                  v-model="searchCta"
-                  label="Buscar transferencia"
-                  class="mx-4"
-                ></v-text-field>
+                <v-text-field v-model="searchCta" label="Buscar transferencia" class="mx-4"></v-text-field>
               </v-banner>
             </template>
             <template v-slot:[`item.credAmnt`]="{ item }">
@@ -461,9 +265,7 @@
           </v-data-table>
         </v-card-text>
         <v-card-actions>
-          <v-btn text color="primary" @click="showdialogCta = false"
-            >Cerrar</v-btn
-          >
+          <v-btn text color="primary" @click="showdialogCta = false">Cerrar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -482,6 +284,7 @@
 </template>
 
 <script>
+import moment from "moment";
 import Vue from "vue";
 import { mapActions } from "vuex";
 //const setClass = new Set()
@@ -537,7 +340,8 @@ export default {
     showdialogCta: false,
     showResult: false,
     selectedFile: undefined,
-    fecha: new Date().toISOString().substr(0, 10),
+    fecha: moment().format("YYYY-MM-DD"),
+    fechaPago: moment().format("YYYY-MM-DD"),
     descuento1: 0,
     descuento2: 0,
     descuento3: 0,
@@ -548,10 +352,10 @@ export default {
     tipoDescuento4: null,
   }),
   watch: {
-    dialog(val) {
+    dialog (val) {
       val || this.close();
     },
-    dialogDelete(val) {
+    dialogDelete (val) {
       val || this.closeDelete();
     },
   },
@@ -570,25 +374,25 @@ export default {
       "insertarPago",
       "limpiarCredito",
     ]),
-    getSociedadText(item) {
+    getSociedadText (item) {
       return `${item.code} - ${item.u_CompnyName}`;
     },
-    getSucursalText(item) {
+    getSucursalText (item) {
       return `${item.bplName} - ${item.bplFrName}`;
     },
-    getOperacionText(item) {
+    getOperacionText (item) {
       return `${item.d} - ${item.n}`;
     },
-    getCuentaText(item) {
+    getCuentaText (item) {
       return `${item.glAccount} - ${item.acctName}`;
     },
-    getCustomerText(item) {
+    getCustomerText (item) {
       return `${item.cardCode} - ${item.cardName}`;
     },
-    getPagoCtaText(item) {
+    getPagoCtaText (item) {
       return `${Vue.filter("currency")(item.credAmnt)} - ${item.referencia}`;
     },
-    cargarDatos(sociedad) {
+    cargarDatos (sociedad) {
       this.loadSucural = true;
       this.getSucursales(sociedad.u_DB).then((res) => {
         this.loadSucural = false;
@@ -597,7 +401,7 @@ export default {
       //   sociedad: sociedad.u_DB,
       // }).then(() => {});
     },
-    cargarDatos2(sucursal) {
+    cargarDatos2 (sucursal) {
       this.loadRest = true;
       this.getCuentas({
         sociedad: this.selectedSociedad.u_DB,
@@ -612,13 +416,13 @@ export default {
         this.loadRest = false;
       });
     },
-    cargarDatos3(cuenta) {
+    cargarDatos3 (cuenta) {
       this.getPagosCta({
         sociedad: this.selectedSociedad.u_DB,
         cuenta: cuenta.glAccount,
-      }).then((res) => {});
+      }).then((res) => { });
     },
-    cargarDatos4(cliente) {
+    cargarDatos4 (cliente) {
       this.loadTable = true;
       this.getPendingBill({
         sociedad: this.selectedSociedad.u_DB,
@@ -628,7 +432,7 @@ export default {
         this.loadTable = false;
       });
     },
-    handlerEvent(e) {
+    handlerEvent (e) {
       if (this.$refs.table._data.internalCurrentItems.length > 0) {
         this.selectedToFile.push(
           this.$refs.table._data.internalCurrentItems[0]
@@ -637,7 +441,7 @@ export default {
         this.search = "";
       } else alert("Tranferencia no encontrada, intente de nuevo.");
     },
-    addItem(item) {
+    addItem (item) {
       item.descuento1 = this.descuento1;
       item.descuento2 = this.descuento2;
       item.descuento3 = this.descuento3;
@@ -647,15 +451,15 @@ export default {
       this.selectedToFile.push(item);
       this.selectedToFile = [...new Set(this.selectedToFile)];
     },
-    deleteItem(item) {
+    deleteItem (item) {
       this.editedIndex = this.selectedToFile.indexOf(item);
       this.dialogDelete = true;
     },
-    deleteItemConfirm() {
+    deleteItemConfirm () {
       this.selectedToFile.splice(this.editedIndex, 1);
       this.closeDelete();
     },
-    recalculate(item) {
+    recalculate (item) {
       item.descuento1 = this.descuento1;
       item.descuento2 = this.descuento2;
       item.descuento3 = this.descuento3;
@@ -668,24 +472,24 @@ export default {
       item.total4 = item.total3 - (item.total3 * item.descuento4) / 100;
       item.total = item.total4;
     },
-    recalculateAll() {
+    recalculateAll () {
       this.selectedToFile.forEach(this.recalculate);
     },
-    closeDelete() {
+    closeDelete () {
       this.dialogDelete = false;
       this.$nextTick(() => {
         this.editedIndex = -1;
       });
     },
-    async guardarPago() {
+    async guardarPago () {
       try {
         const totalAPagar = this.getTotal;
-        if (this.selectedPagoCta.credAmnt < totalAPagar) {
+        if (Number.parseFloat(this.selectedPagoCta.credAmnt) < Number.parseFloat(totalAPagar)) {
           alert("El saldo sobrepasa el valor de la cuenta");
           return;
         }
         const pago = {
-          fecha: this.fecha,
+          fecha: this.fechaPago,
           sociedad: this.selectedSociedad.u_DB,
           sucursal: this.selectedSucursal.bplFrName,
           idCuenta: this.selectedCuenta.glAccount,
@@ -742,13 +546,13 @@ export default {
         alert("Debe seleccionar todas las opciones");
       }
     },
-    cancelProcess() {
+    cancelProcess () {
       this.search = "";
       this.selectedToFile = [];
       this.limpiar();
       this.limpiarCredito();
     },
-    onFileChange(event) {
+    onFileChange (event) {
       if (!this.selectedFile) {
         this.rows = [];
         return;
@@ -778,44 +582,44 @@ export default {
       };
       fileReader.readAsBinaryString(this.selectedFile);
     },
-    porcentageTipoDcto(tipoDescuento) {
+    porcentageTipoDcto (tipoDescuento) {
       return tipoDescuento == "Especial"
         ? [1, 2, 3, 4, 5, 6, 7, 8, 9]
         : [1, 2, 3];
     },
   },
   computed: {
-    tableHeight() {
+    tableHeight () {
       return window.innerHeight - 30;
     },
-    pendingBills() {
+    pendingBills () {
       return this.$store.state.credito.pendingBills;
     },
-    getValuesFromSet() {
+    getValuesFromSet () {
       return this.selectedToFile.entries().next().value;
     },
-    getTotal() {
+    getTotal () {
       return this.selectedToFile.reduce((a, b) => a + (b["total4"] || 0), 0);
     },
-    sociedades() {
+    sociedades () {
       return this.$store.state.dispersion.sociedades;
     },
-    sucursales() {
+    sucursales () {
       return this.$store.state.dispersion.sucursales;
     },
-    cuentas() {
+    cuentas () {
       return this.$store.state.dispersion.cuentas;
     },
-    customers() {
+    customers () {
       return this.$store.state.credito.customers;
     },
-    pagosCta() {
+    pagosCta () {
       return this.$store.state.credito.pagos;
     },
-    typeDiscounts() {
+    typeDiscounts () {
       return this.$store.state.credito.typeDiscounts;
     },
-    rules() {
+    rules () {
       return [
         (value) => {
           if (this.tipoDescuento3 === "Especial") {
@@ -844,7 +648,7 @@ export default {
       ];
     },
   },
-  mounted() {
+  mounted () {
     this.limpiar();
     this.limpiarCredito();
     this.getSociedades();
