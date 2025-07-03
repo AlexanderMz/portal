@@ -489,7 +489,8 @@ export default {
           return;
         }
         const pago = {
-          fecha: this.fechaPago,
+          fecha: this.fecha,
+          fechaPago: this.fechaPago,
           sociedad: this.selectedSociedad.u_DB,
           sucursal: this.selectedSucursal.bplFrName,
           idCuenta: this.selectedCuenta.glAccount,
@@ -498,6 +499,7 @@ export default {
           cardName: this.selectedCustomer.cardName,
           monto: this.selectedPagoCta.credAmnt,
           referencia: this.selectedPagoCta.referencia,
+          idEdoCta: this.selectedPagoCta.sequence,
           descuento1: this.tipoDescuento1 || "",
           porcDesc1: this.descuento1,
           descuento2: this.tipoDescuento2 || "",
