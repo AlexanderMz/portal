@@ -493,6 +493,7 @@ export default {
           fechaPago: this.fechaPago,
           sociedad: this.selectedSociedad.u_DB,
           sucursal: this.selectedSucursal.bplFrName,
+          bplId: this.selectedSucursal.bplId,
           idCuenta: this.selectedCuenta.glAccount,
           cuenta: this.selectedCuenta.acctName,
           cardCode: this.selectedCustomer.cardCode,
@@ -531,6 +532,7 @@ export default {
               tipo: "",
               estatus: "",
               comentarios: "",
+              uuid: detalle.uuid
             };
           }),
         };

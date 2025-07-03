@@ -111,14 +111,14 @@ const routes = [
       },
       {
         path: "/creditocobranza/autorizacion-de-preaplicaciones",
-        name: "Pagos",
+        name: "AutorizacionPreaplicaciones",
         component: () =>
           import("../views/Credito/AutorizacionPreaplicaciones.vue"),
         meta: { desc: "Autorizacion de Prealplicaciones" },
       },
       {
         path: "/creditocobranza/informe-de-operaciones",
-        name: "Pagos",
+        name: "InformeOperaciones",
         component: () =>
           import("../views/Credito/InformeOperacionesAplicadas.vue"),
         meta: { desc: "Informe de Operaciones" },

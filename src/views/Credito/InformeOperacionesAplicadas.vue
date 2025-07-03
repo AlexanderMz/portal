@@ -84,6 +84,12 @@
             <span> {{ item.totalAPagar | currency }} </span>
           </v-chip>
         </template>
+        <template v-slot:[`item.cliente`]="{ item }">
+            <span> {{ item.cardCode }} - {{ item.cliente }}  </span>
+        </template>
+        <template v-slot:[`item.fecha`]="{ item }">
+              <span> {{ item.fecha | textcrop2(10) }} </span>
+            </template>
         <template v-slot:expanded-item="{ headers, item }">
           <td :colspan="headers.length">
             <v-data-table
@@ -125,7 +131,9 @@
   </v-container>
 </template>
 <script>
+import moment from "moment";
 import { mapActions } from "vuex";
+
 export default {
   name: "CreditReport",
   data: () => ({
@@ -133,13 +141,16 @@ export default {
     singleExpand: false,
     loadingDetail: false,
     expanded: [],
-    fecha: new Date().toISOString().substr(0, 10),
+    fecha: moment().format("YYYY-MM-DD"),
     items: [],
     itemsDetails: [],
     headers: [
       { text: "Cliente", value: "cliente" },
       { text: "Folio", value: "folioPago" },
       { text: "Sucursal", value: "sucursal" },
+      { text: "Estado", value: "estatus" },
+      { text: "Folio SAP", value: "folioSAP" },
+      { text: "Fecha", value: "fecha" },
       { text: "Total a Pagar", value: "totalAPagar", align: "right" },
       { text: "", value: "data-table-expand" },
     ],
