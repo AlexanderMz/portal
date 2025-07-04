@@ -111,6 +111,10 @@
               <v-banner sticky icon="search" flat>
                 <v-text-field v-model="search" label="Buscar transferencia" class="mx-4"
                   @keydown.stop.enter="handlerEvent"></v-text-field>
+
+                <template v-slot:actions>
+                  {{ pendingBills.length }}
+                </template>
               </v-banner>
             </template>
             <template v-slot:[`item.actions`]="{ item }">
@@ -133,7 +137,7 @@
             <template v-slot:top>
               <v-row no-gutters>
                 <v-col cols="8" sm="6" md="8">
-                  <v-btn rounded icon title="Eliminar todos" @click="selectedToFile = []">
+                  <v-btn rounded icon title="Eliminar todos" @click="deleteAll">
                     <v-icon>delete</v-icon>
                   </v-btn>
                   {{ selectedToFile.length }} seleccionadas | Total:
@@ -287,6 +291,8 @@
 import moment from "moment";
 import Vue from "vue";
 import { mapActions } from "vuex";
+import xlsx from "xlsx";
+import { mixin } from "../../mixin";
 //const setClass = new Set()
 export default {
   name: "Pagos",
@@ -351,6 +357,7 @@ export default {
     tipoDescuento3: null,
     tipoDescuento4: null,
   }),
+  mixins: [mixin],
   watch: {
     dialog (val) {
       val || this.close();
@@ -373,6 +380,8 @@ export default {
       "getTypeDiscounts",
       "insertarPago",
       "limpiarCredito",
+      "deleteItemPending",
+      "addItemPending"
     ]),
     getSociedadText (item) {
       return `${item.code} - ${item.u_CompnyName}`;
@@ -450,14 +459,31 @@ export default {
       this.recalculate(item);
       this.selectedToFile.push(item);
       this.selectedToFile = [...new Set(this.selectedToFile)];
+      this.deleteItemPending(item)
+    },
+    deleteAll () {
+      this.selectedToFile = []
+      this.cargarDatos4(this.selectedCustomer)
     },
     deleteItem (item) {
       this.editedIndex = this.selectedToFile.indexOf(item);
       this.dialogDelete = true;
     },
     deleteItemConfirm () {
+      this.addItemPending(this.selectedToFile[this.editedIndex])
       this.selectedToFile.splice(this.editedIndex, 1);
       this.closeDelete();
+    },
+    resolveExcel () {
+      if (this.pendingBills.length === 0) {
+        alert("Debe cargar las facturas pendientes antes de continuar")
+        return;
+      }
+      this.rows.forEach(f => {
+        const item = this.pendingBills.find(p => Number.parseInt(p.docNum) === f.Folio)
+        this.addItem(item)
+      })
+
     },
     recalculate (item) {
       item.descuento1 = this.descuento1;
@@ -580,6 +606,7 @@ export default {
           const a = workbook.Sheets[workbook.SheetNames[0]];
           const headers = this.getHeader(a);
           this.setTable(headers, ws);
+          this.resolveExcel()
         } catch (e) {
           return alert("Read failure!");
         }
@@ -597,7 +624,12 @@ export default {
       return window.innerHeight - 30;
     },
     pendingBills () {
-      return this.$store.state.credito.pendingBills;
+      return this.$store.state.credito.pendingBills.sort((a, b) => {
+        if (a.docNum > b.docNum) {
+          return 1;
+        }
+        return -1
+      });
     },
     getValuesFromSet () {
       return this.selectedToFile.entries().next().value;

@@ -776,12 +776,25 @@ const Credito = {
     SET_ERROR(state, error) {
       state.error = error;
     },
+    DELETEITEM(state, item) {
+      const index = state.pendingBills.indexOf(item);
+      state.pendingBills.splice(index, 1);
+    },
+    ADDITEM(state, item) {
+      state.pendingBills.push(item);
+    },
   },
   actions: {
     limpiarCredito: ({ commit }) => {
       commit("SET_CUSTOMERS", []);
       commit("SET_PAGOS", []);
       commit("SET_PENDINGBILLS", []);
+    },
+    deleteItemPending: ({ commit }, item) => {
+      commit("DELETEITEM", item);
+    },
+    addItemPending: ({ commit }, item) => {
+      commit("ADDITEM", item);
     },
     getCustomers: ({ commit }, data) => {
       return new Promise((resolve, reject) => {
