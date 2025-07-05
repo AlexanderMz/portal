@@ -509,8 +509,9 @@ export default {
     },
     async guardarPago () {
       try {
-        const totalAPagar = this.getTotal;
-        if (Number.parseFloat(this.selectedPagoCta.credAmnt) < Number.parseFloat(totalAPagar)) {
+        const totalAPagar = this.getTotal.toFixed(2);
+        const totalPorPagar = this.selectedPagoCta.credAmnt.toFixed(2);
+        if (Number.parseFloat(totalPorPagar) < Number.parseFloat(totalAPagar)) {
           alert("El saldo sobrepasa el valor de la cuenta");
           return;
         }
