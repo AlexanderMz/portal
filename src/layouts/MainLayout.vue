@@ -42,15 +42,8 @@
           </template>
 
           <v-list-item-group>
-            <v-list-item
-              v-model="selectedItem"
-              v-for="sub in menu.SubMenu"
-              :key="sub.Id"
-              exact-path
-              :link="false"
-              :to="sub.Path"
-              @click="navegar(sub)"
-            >
+            <v-list-item v-model="selectedItem" v-for="sub in menu.SubMenu" :key="sub.Id" exact-path :link="false"
+              :to="sub.Path" @click="navegar(sub)">
               <v-list-item-icon>
                 <v-icon> </v-icon>
               </v-list-item-icon>
@@ -81,8 +74,8 @@
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="darkMode" icon v-bind="attrs" v-on="on">
             <v-icon>{{
-              $vuetify.theme.isDark ? "light_mode" : "dark_mode"
-            }}</v-icon>
+      $vuetify.theme.isDark ? "light_mode" : "dark_mode"
+    }}</v-icon>
           </v-btn>
         </template>
         <span>{{ $vuetify.theme.isDark ? "Claro" : "Oscuro" }}</span>
@@ -111,25 +104,25 @@ export default {
   }),
   methods: {
     ...mapActions("config", ["getMenu"]),
-    salir() {
+    salir () {
       localStorage.removeItem("jwt");
       this.$router.push({ name: "login" });
     },
-    darkMode() {
+    darkMode () {
       this.$vuetify.theme.isDark = !this.$vuetify.theme.isDark;
       this.dark = this.$vuetify.theme.isDark;
       localStorage.setItem("dark", this.$vuetify.theme.isDark ? true : false);
     },
-    navegar(item) {
+    navegar (item) {
+      localStorage.setItem("canCreate", item.CanCreate);
       this.$store.commit("informes/SET_TITLE", item.Tag);
-
-      this.$router.push({ path: item.Path, params: item.id });
+      this.$router.push({ path: item.Path, params: item.CanCreate });
     },
   },
   computed: {
     ...mapGetters("config", ["doneMenu"]),
   },
-  mounted() {
+  mounted () {
     this.getMenu();
   },
 };

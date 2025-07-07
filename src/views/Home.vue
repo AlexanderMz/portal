@@ -7,25 +7,9 @@
       <v-col cols="12">
         <v-subheader>{{ menu.Tag }}</v-subheader>
       </v-col>
-      <v-col
-        v-for="(item, i) in menu.SubMenu"
-        :key="i"
-        cols="12"
-        sm="6"
-        md="3"
-        lg="3"
-        class="pa-1"
-      >
+      <v-col v-for="(item, i) in menu.SubMenu" :key="i" cols="12" sm="6" md="3" lg="3" class="pa-1">
         <v-hover v-slot="{ hover }">
-          <v-card
-            color="#26c6da"
-            dark
-            max-width="400"
-            :to="{
-              path: item.Path,
-              props: { title: item.Tag },
-            }"
-          >
+          <v-card color="#26c6da" dark max-width="400" @click="navegar(item)">
             <v-card-title>
               <v-icon large left>
                 link
@@ -55,7 +39,7 @@ import { mapGetters } from "vuex";
 
 export default {
   name: "Home",
-  data() {
+  data () {
     return {
       items: [],
       oItems: [],
@@ -64,5 +48,12 @@ export default {
   computed: {
     ...mapGetters("config", ["doneMenu"]),
   },
+  methods: {
+    navegar (item) {
+      localStorage.setItem("canCreate", item.CanCreate);
+      this.$store.commit("informes/SET_TITLE", item.Tag);
+      this.$router.push({ path: item.Path, params: item.CanCreate });
+    },
+  }
 };
 </script>

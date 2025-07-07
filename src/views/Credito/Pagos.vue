@@ -5,12 +5,13 @@
       <v-spacer> </v-spacer>
       <v-row justify="end">
         <v-col>
-          <v-btn depressed color="primary" :disabled="!selectedToFile.length">
+          <v-btn depressed color="primary" @click="guardarPago(1)" :disabled="!selectedToFile.length">
             Preaplicación
           </v-btn>
         </v-col>
         <v-col>
-          <v-btn class="col" depressed color="primary" @click="guardarPago" :disabled="!selectedToFile.length">
+          <v-btn class="col" depressed color="primary" @click="guardarPago(2)"
+            :disabled="canCreate && !selectedToFile.length">
             Generar Operación
           </v-btn>
         </v-col>
@@ -356,6 +357,7 @@ export default {
     tipoDescuento2: null,
     tipoDescuento3: null,
     tipoDescuento4: null,
+    canCreate: localStorage.getItem("canCreate") || true
   }),
   mixins: [mixin],
   watch: {
@@ -507,8 +509,9 @@ export default {
         this.editedIndex = -1;
       });
     },
-    async guardarPago () {
+    async guardarPago (tipoOp) {
       try {
+        let user = localStorage.getItem("user");
         const totalAPagar = this.getTotal.toFixed(2);
         const totalPorPagar = this.selectedPagoCta.credAmnt.toFixed(2);
         if (Number.parseFloat(totalPorPagar) < Number.parseFloat(totalAPagar)) {
@@ -539,6 +542,8 @@ export default {
           totalAPagar,
           estatus: "",
           comentarios: "",
+          tipoOp,
+          usuario: user,
           detalles: this.selectedToFile.map((detalle, index) => {
             return {
               docEntry: detalle.docEntry,
