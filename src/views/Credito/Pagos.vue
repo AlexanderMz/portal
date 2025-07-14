@@ -18,7 +18,7 @@
       </v-row>
     </v-toolbar>
     <div>
-      <v-row no-gutters>
+      <v-row class="align-center">
         <v-col class="d-flex" cols="2" md="2">
           <v-checkbox dense label="Manual" v-model="value" value="value"></v-checkbox>
         </v-col>
@@ -27,6 +27,10 @@
         </v-col>
         <v-col cols="3">
           <v-text-field v-model="fechaPago" label="Fecha Pago" prepend-icon="event" type="date"></v-text-field>
+        </v-col>
+        <v-col cols="4">
+          <v-combobox label="Forma de Pago" dense solo :items="formasPagos" v-model="selectedFormaPago"
+            item-text="descr" return-object item-value="fidValue" :disabled="selectedToFile.length > 0"></v-combobox>
         </v-col>
       </v-row>
       <!-- Sociedad & Sucursal -->
@@ -315,6 +319,7 @@ export default {
     selectedCuenta: null,
     selectedCustomer: null,
     selectedPagoCta: null,
+    selectedFormaPago: null,
     loadSucural: false,
     loadRest: false,
     loadTable: false,
@@ -357,7 +362,15 @@ export default {
     tipoDescuento2: null,
     tipoDescuento3: null,
     tipoDescuento4: null,
-    canCreate: localStorage.getItem("canCreate") || true
+    canCreate: localStorage.getItem("canCreate") || true,
+    formasPagos: [
+      { fidValue: '01', descr: 'Efectivo' },
+      { fidValue: '02', descr: 'Cheque nominativo' },
+      { fidValue: '03', descr: 'Transferencia electrónica de fondos' },
+      { fidValue: '04', descr: 'Tarjeta de crédito' },
+      { fidValue: '28', descr: 'Tarjeta de débito' },
+      { fidValue: '99', descr: 'Por definir' },
+    ]
   }),
   mixins: [mixin],
   watch: {
@@ -544,6 +557,7 @@ export default {
           comentarios: "",
           tipoOp,
           usuario: user,
+          fidValue: selectedFormaPago.fidValue,
           detalles: this.selectedToFile.map((detalle, index) => {
             return {
               docEntry: detalle.docEntry,
@@ -564,7 +578,8 @@ export default {
               tipo: "",
               estatus: "",
               comentarios: "",
-              uuid: detalle.uuid
+              uuid: detalle.uuid,
+              transId: detalle.transId
             };
           }),
         };
