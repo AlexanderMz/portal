@@ -557,7 +557,7 @@ export default {
           comentarios: "",
           tipoOp,
           usuario: user,
-          fidValue: selectedFormaPago.fidValue,
+          fidValue: this.selectedFormaPago.fidValue,
           detalles: this.selectedToFile.map((detalle, index) => {
             return {
               docEntry: detalle.docEntry,
