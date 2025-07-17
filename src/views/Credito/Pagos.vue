@@ -11,7 +11,7 @@
         </v-col>
         <v-col>
           <v-btn class="col" depressed color="primary" @click="guardarPago(2)"
-            :disabled="canCreate && !selectedToFile.length">
+            :disabled="canCreate || selectedToFile.length == 0">
             Generar Operación
           </v-btn>
         </v-col>
