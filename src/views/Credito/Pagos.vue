@@ -194,9 +194,9 @@
             </template>
             <template v-slot:[`item.rebajesoDevoluciones`]="{ item }">
               <v-chip :color="item.rebajesoDevoluciones != item.saldoVencido
-            ? 'red'
-            : 'blue'
-            " dark>
+                ? 'red'
+                : 'blue'
+                " dark>
                 <v-edit-dialog :return-value.sync="item.rebajesoDevoluciones" @save="recalculate(item)">
                   {{ item.rebajesoDevoluciones | currency }}
                   <template v-slot:input>
@@ -256,9 +256,9 @@
             { text: 'Referencia', value: 'referencia' },
           ]" class="elevation-1" item-key="sequence" disable-sort fixed-header single-select show-select every-item
             @item-selected="({ item }) => {
-            this.selectedPagoCta = item;
-            this.showdialogCta = false;
-          }
+              this.selectedPagoCta = item;
+              this.showdialogCta = false;
+            }
             ">
             <template v-slot:top>
               <v-banner sticky icon="search" flat>
@@ -295,7 +295,7 @@
 <script>
 import moment from "moment";
 import Vue from "vue";
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import xlsx from "xlsx";
 import { mixin } from "../../mixin";
 //const setClass = new Set()
@@ -370,7 +370,8 @@ export default {
       { fidValue: '04', descr: 'Tarjeta de crédito' },
       { fidValue: '28', descr: 'Tarjeta de débito' },
       { fidValue: '99', descr: 'Por definir' },
-    ]
+    ],
+    folioPagoConsulta: "",
   }),
   mixins: [mixin],
   watch: {
@@ -396,7 +397,9 @@ export default {
       "insertarPago",
       "limpiarCredito",
       "deleteItemPending",
-      "addItemPending"
+      "addItemPending",
+      "getPagoByFolio",
+      "deletePagoByFolio"
     ]),
     getSociedadText (item) {
       return `${item.code} - ${item.u_CompnyName}`;
@@ -470,7 +473,7 @@ export default {
       item.descuento2 = this.descuento2;
       item.descuento3 = this.descuento3;
       item.descuento4 = this.descuento4;
-      item.rebajesoDevoluciones = item.saldoVencido;
+      item.rebajesoDevoluciones = item.rebajesoDevoluciones ?? item.saldoVencido;
       this.recalculate(item);
       this.selectedToFile.push(item);
       this.selectedToFile = [...new Set(this.selectedToFile)];
@@ -524,6 +527,7 @@ export default {
     },
     async guardarPago (tipoOp) {
       try {
+
         let user = localStorage.getItem("user");
         const totalAPagar = this.getTotal.toFixed(2);
         const totalPorPagar = this.selectedPagoCta.credAmnt.toFixed(2);
@@ -639,6 +643,103 @@ export default {
         ? [1, 2, 3, 4, 5, 6, 7, 8, 9]
         : [1, 2, 3];
     },
+    async consultarPagoPorFolio () {
+      if (!this.folioPagoConsulta) {
+        alert("Ingrese un folio de pago");
+        return;
+      }
+      try {
+        this.overlay = true;
+        const pago = await this.getPagoByFolio(this.folioPagoConsulta);
+        this.overlay = false;
+        if (pago) {
+          await this.cargarPagoEnFormulario(pago);
+        }
+      } catch (e) {
+        this.overlay = false;
+        alert("No se encontró el pago o hubo un error");
+      }
+    },
+    async cargarPagoEnFormulario (pago) {
+      // 1. Sociedad
+      const sociedad = this.sociedades.find(s => s.u_DB === pago.sociedad || s.u_DB === pago.sociedad?.u_DB);
+      if (!sociedad) return alert('No se encontró la sociedad del pago');
+      this.selectedSociedad = sociedad;
+      await this.getSucursales(sociedad.u_DB);
+      // 2. Sucursal
+      const sucursal = this.sucursales.find(s => s.bplFrName === pago.sucursal || s.bplName === pago.sucursal);
+      if (!sucursal) return alert('No se encontró la sucursal del pago');
+      this.selectedSucursal = sucursal;
+      await this.getCuentas({ sociedad: sociedad.u_DB, sucursal: sucursal.bplName });
+      // 3. Cuenta Bancaria
+      const cuenta = this.cuentas.find(c => c.glAccount === pago.idCuenta || c.acctName === pago.cuenta);
+      if (!cuenta) return alert('No se encontró la cuenta bancaria del pago');
+      this.selectedCuenta = cuenta;
+      await this.getCustomers({ sociedad: sociedad.u_DB, sucursal: sucursal.bplFrName });
+      // 4. Cliente
+      const cliente = this.customers.find(c => c.cardCode === pago.cardCode);
+      if (!cliente) return alert('No se encontró el cliente del pago');
+      this.selectedCustomer = cliente;
+      await this.getPagosCta({ sociedad: sociedad.u_DB, cuenta: cuenta.glAccount });
+      // 5. Pago edo. Cta
+      let pagoCta = this.pagosCta.find(p => p.sequence === pago.idEdoCta || p.referencia === pago.referencia);
+      if (pagoCta) {
+        this.selectedPagoCta = pagoCta;
+      } else {
+        // Si no se encuentra, crear un objeto con los valores que hacen match y los demás en null
+        const match = this.pagosCta.find(p => p.referencia === pago.referencia || p.credAmnt === pago.monto);
+        this.selectedPagoCta = match
+          ? { ...match, sequence: pago.idEdoCta || null }
+          : {
+            sequence: pago.idEdoCta || null,
+            referencia: pago.referencia || null,
+            credAmnt: pago.monto || null,
+            dueDate: pago.fechaPago || null,
+            // Otros campos en null
+          };
+      }
+      // Otros campos simples
+      this.fecha = pago.fecha;
+      this.fechaPago = pago.fechaPago;
+      this.selectedFormaPago = this.formasPagos.find(f => f.fidValue === pago.fidValue) || null;
+      this.tipoDescuento1 = pago.descuento1 || null;
+      this.tipoDescuento2 = pago.descuento2 || null;
+      this.tipoDescuento3 = pago.descuento3 || null;
+      this.tipoDescuento4 = pago.descuento4 || null;
+      this.descuento1 = pago.porcDesc1 || 0;
+      this.descuento2 = pago.porcDesc2 || 0;
+      this.descuento3 = pago.porcDesc3 || 0;
+      this.descuento4 = pago.porcDesc4 || 0;
+      // Si hay detalles, puedes setearlos en selectedToFile si aplica
+      if (pago.detalles) {
+        pago.detalles.forEach(item => {
+          this.addItem({
+            docEntry: item.docEntry,
+            transId: item.transId,
+            docNum: item.docNum,
+            saldoVencido: item.saldoVencido,
+            rebajesoDevoluciones: item.rebjDev,
+            uuid: item.uuid
+          })
+        });
+      }
+    },
+    async borrarPagoPorFolio () {
+      if (!this.folioPagoConsulta) {
+        alert("Ingrese un folio de pago");
+        return;
+      }
+      if (!confirm("¿Está seguro de borrar el pago?")) return;
+      try {
+        this.overlay = true;
+        await this.deletePagoByFolio(this.folioPagoConsulta);
+        this.overlay = false;
+        alert("Pago borrado correctamente");
+      } catch (e) {
+        this.overlay = false;
+        alert("No se pudo borrar el pago");
+      }
+    },
   },
   computed: {
     tableHeight () {
@@ -704,11 +805,19 @@ export default {
         },
       ];
     },
+    ...mapState("credito", ["pago"]),
   },
   mounted () {
     this.limpiar();
     this.limpiarCredito();
     this.getSociedades();
+    // Si hay folioPago en el estado, consultar automáticamente
+    if (this.pago && this.pago.folioPago) {
+      this.folioPagoConsulta = this.pago.folioPago;
+      this.consultarPagoPorFolio();
+      // Limpiar el folio temporal para evitar recarga accidental
+      this.$store.commit("credito/SET_PAGO", null);
+    }
   },
 };
 </script>

@@ -753,6 +753,7 @@ const Credito = {
     typeDiscounts: [],
     mensaje: "",
     error: null,
+    pago: null,
   }),
   mutations: {
     SET_CUSTOMERS: (state, datos) => {
@@ -782,6 +783,12 @@ const Credito = {
     },
     ADDITEM(state, item) {
       state.pendingBills.push(item);
+    },
+    SET_PAGO(state, pago) {
+      state.pago = pago;
+    },
+    REMOVE_PAGO(state, folioPago) {
+      state.pagos = state.pagos.filter((p) => p.folioPago !== folioPago);
     },
   },
   actions: {
@@ -885,6 +892,50 @@ const Credito = {
           `/api/credit/report/details?folio=${folio}`
         );
         return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
+    async getAutorizacionPreaplicaciones({ commit }) {
+      try {
+        const response = await axiosInstance.get(
+          `/api/credit/operation/header`
+        );
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
+    async updateAutorizacionPreaplicaciones({ commit }, folio) {
+      try {
+        const response = await axiosInstance.put(
+          `/api/credit/operation/header?folio=${folio}`
+        );
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
+    async getPagoByFolio({ commit }, folioPago) {
+      try {
+        const response = await axiosInstance.get(
+          `/api/credit/pagos/${folioPago}`
+        );
+        commit("SET_PAGO", response.data);
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
+    async deletePagoByFolio({ commit }, folioPago) {
+      try {
+        await axiosInstance.delete(`/api/credit/pagos/${folioPago}`);
+        commit("REMOVE_PAGO", folioPago);
+        return true;
       } catch (error) {
         commit("SET_ERROR", error.response?.data || error.message);
         throw error;

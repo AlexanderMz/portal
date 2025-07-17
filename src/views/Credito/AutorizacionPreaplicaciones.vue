@@ -5,69 +5,84 @@
       <v-spacer> </v-spacer>
       <v-row justify="end">
         <v-col>
-          <v-btn class="col" depressed color="primary">
+          <v-btn class="col" depressed color="primary" :disabled="!selected.length"
+            @click="updateAutorizacionPreaplicacionesMethod">
             Aplicar Operaciones
           </v-btn>
         </v-col>
       </v-row>
     </v-toolbar>
     <div>
-      <v-row dense>
+      <v-row dense class="align-center">
         <v-col class="d-flex" cols="6">
-          <v-text-field
-            label="Buscar Operaciones"
-            class="mx-4"
-            prepend-inner-icon="search"
-            @keydown.stop.enter="handlerEvent"
-          ></v-text-field>
+          <v-text-field label="Buscar Operaciones" class="mx-4" prepend-inner-icon="search"
+            v-model="search"></v-text-field>
         </v-col>
         <v-col class="d-flex" cols="3">
           Registros cargados:
-          {{ getRegistros.length }}
+          {{ items.length }}
         </v-col>
         <v-col class="d-flex" cols="3">
           Registros seleccionados:
-          {{ selectedTxt.length }}
+          {{ selected.length }}
         </v-col>
       </v-row>
-      <v-skeleton-loader boilerplate type="table"></v-skeleton-loader>
-      <v-row dense>
+      <v-skeleton-loader boilerplate type="table" v-if="loading"></v-skeleton-loader>
+      <v-row dense v-else>
         <v-col class="d-flex">
-          <v-expansion-panels accordion focusable>
-            <v-expansion-panel v-for="(item, i) in getRegistros" :key="i">
-              <v-expansion-panel-header>
-                <v-row no-gutters>
-                  <v-col cols="1">
-                    <v-checkbox
-                      hide-details
-                      class="shrink mr-2 mt-0"
-                      dense
-                      style="margin-top: 0px"
-                      v-model="selectedTxt"
-                      :value="item.id"
-                      @click.stop=""
-                    ></v-checkbox>
-                  </v-col>
-                  <v-col cols="9"> {{ item.name }} - {{ item.nombre }} </v-col>
-                  <v-col cols="2">
-                    {{ item.totalImporte | currency }}
-                  </v-col>
-                </v-row>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-data-table
-                  dense
-                  :headers="responseColumns"
-                  :items="item.filas"
-                  hide-default-footer
-                  class="elevation-1"
-                  item-key="referencia"
-                  loading="true"
-                >
+          <v-data-table class="elevation-1" item-key="folioPago" v-model="selected" :headers="headers" :items="items"
+            :loading="loadingDetail" :search="search" :single-expand="singleExpand" :expanded.sync="expanded"
+            show-expand show-select @item-expanded="onItemExpanded">
+            <template v-slot:[`item.totalAPagar`]="{ item }">
+              <v-chip color="green" dark>
+                <span> {{ item.totalAPagar | currency }} </span>
+              </v-chip>
+            </template>
+            <template v-slot:[`item.cliente`]="{ item }">
+              <span> {{ item.cardCode }} - {{ item.cliente }} </span>
+            </template>
+            <template v-slot:[`item.fecha`]="{ item }">
+              <span> {{ item.fecha | textcrop2(10) }} </span>
+            </template>
+            <template v-slot:[`item.actions`]="{ item }">
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn disabled color="primary" icon="" small v-on="on" v-bind="attrs"
+                    @click="irAPago(item.folioPago)">
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                </template>
+                <span>Editar</span>
+              </v-tooltip>
+            </template>
+            <template v-slot:expanded-item="{ headers, item }">
+              <td :colspan="headers.length">
+                <v-data-table dense :headers="headersDetails" :items="itemsDetails" hide-default-footer
+                  disable-pagination disable-sort class="elevation-1" item-key="id" :loading="loadingDetail">
+                  <template v-slot:[`item.saldoVencido`]="{ item }">
+                    <span> {{ item.saldoVencido | currency }} </span>
+                  </template>
+                  <template v-slot:[`item.descuento1`]="{ item }">
+                    <span> {{ item.descuento1 | currency }} </span>
+                  </template>
+                  <template v-slot:[`item.descuento2`]="{ item }">
+                    <span> {{ item.descuento2 | currency }} </span>
+                  </template>
+                  <template v-slot:[`item.descuento3`]="{ item }">
+                    <span> {{ item.descuento3 | currency }} </span>
+                  </template>
+                  <template v-slot:[`item.descuento4`]="{ item }">
+                    <span> {{ item.descuento4 | currency }} </span>
+                  </template>
+                  <template v-slot:[`item.totalPago`]="{ item }">
+                    <v-chip color="green" dark>
+                      <span> {{ item.totalPago | currency }} </span>
+                    </v-chip>
+                  </template>
                 </v-data-table>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
+              </td>
+            </template>
+          </v-data-table>
         </v-col>
       </v-row>
     </div>
@@ -76,86 +91,69 @@
 <script>
 import { mapActions } from "vuex";
 export default {
-  name: "TunelBancarioServicio",
+  name: "AutorizacionPreaplicaciones",
   data: () => ({
-    selectedFile: undefined,
-    motivo: "",
-    overlay: false,
-    selectedTxt: [],
-    showAlert: false,
-    showResult: false,
-    Respuesta: "",
-    responseColumns: [
-      { text: "Id", value: "referencia" },
-      { text: "Cliente", value: "cuentaOrigen" },
-      { text: "Monto Pago", value: "referencia1", align: "end" },
-      { text: "Sucursal", value: "importe" },
-      { text: "Agente CyC", value: "importe" },
-      { text: "Fecha", value: "fechaAplicacion", align: "end" },
-      { text: "Descuento", value: "referencia1", align: "end" },
+    loading: false,
+    singleExpand: false,
+    loadingDetail: false,
+    expanded: [],
+    selected: [],
+    items: [],
+    itemsDetails: [],
+    search: "",
+    headersDetails: [
+      { text: "Factura", value: "factura" },
+      { text: "Saldo Vencido", value: "saldoVencido", align: "right" },
+      { text: "Desc 1", value: "descuento1", align: "right" },
+      { text: "Desc 2", value: "descuento2", align: "right" },
+      { text: "Desc 3", value: "descuento3", align: "right" },
+      { text: "Desc 4", value: "descuento4", align: "right" },
+      { text: "Total Pago", value: "totalPago", align: "right" },
     ],
-    header: [
-      { text: "Id", value: "referencia" },
-      { text: "Cliente", value: "cuentaOrigen" },
-      { text: "Monto Pago", value: "referencia1", align: "end" },
-      { text: "Sucursal", value: "importe" },
-      { text: "Agente CyC", value: "importe" },
-      { text: "Fecha", value: "fechaAplicacion", align: "end" },
-      { text: "Descuento", value: "referencia1", align: "end" },
+    headers: [
+      { text: "Cliente", value: "cliente" },
+      { text: "Folio", value: "folioPago" },
+      { text: "Sucursal", value: "sucursal" },
+      { text: "Estado", value: "estatus" },
+      { text: "Folio SAP", value: "folioSAP" },
+      { text: "Fecha", value: "fecha" },
+      { text: "Total a Pagar", value: "totalAPagar", align: "right" },
+      { text: "", value: "actions" },
+      { text: "", value: "data-table-expand" },
     ],
   }),
-  methods: {
-    ...mapActions("tunel", ["postTunelServicio", "postUploadServicio"]),
-    handlerEvent() {},
-    enviarTunel() {
-      this.overlay = true;
-      this.postTunelServicio(this.selectedTxt)
-        .then((res) => {
-          if (res) {
-            this.overlay = false;
-            this.showResult = true;
-            this.Respuesta = res.data;
-            this.selectedFile = undefined;
-          }
-        })
-        .catch((err) => {
-          this.overlay = false;
-          alert(err);
-          console.error(err);
-        })
-        .finally(() => {
-          this.overlay = false;
-        });
-    },
-    onFileChange(event) {
-      if (!this.selectedFile) return;
-      this.selectedTxt = [];
-      this.overlay = true;
-      var formData = new FormData();
-      this.selectedFile.forEach((element) => {
-        formData.append("files", element);
-      });
-      this.postUploadServicio(formData)
-        .then((res) => {
-          if (res) {
-            this.overlay = false;
-            this.selectedFile = undefined;
-          }
-        })
-        .catch((err) => {
-          this.overlay = false;
-          alert(err);
-          console.error(err);
-        })
-        .finally(() => {
-          this.selectedTxt = [];
-          this.overlay = false;
-        });
-    },
+  mounted () {
+    this.getAutorizacionPreaplicacionesMethod()
   },
-  computed: {
-    getRegistros() {
-      return this.$store.state.tunel.resultado;
+  methods: {
+    ...mapActions("credito", ["getAutorizacionPreaplicaciones", "updateAutorizacionPreaplicaciones", "getReportDetail", "getPagoByFolio"]),
+    async getAutorizacionPreaplicacionesMethod () {
+      this.loading = false;
+      this.items = await this.getAutorizacionPreaplicaciones();
+      this.loading = this.items.length == 0;
+    },
+    async updateAutorizacionPreaplicacionesMethod () {
+      this.loading = false;
+      this.selected.forEach(async (item) => {
+        await this.updateAutorizacionPreaplicaciones(item.folioPago);
+      });
+      this.loading = this.items.length == 0;
+      this.getAutorizacionPreaplicacionesMethod()
+    },
+    async onItemExpanded ({ item, value }) {
+      if (value) {
+        this.loadingDetail = true;
+        this.itemsDetails = await this.getReportDetail(item.folioPago);
+        this.loadingDetail = false;
+        return;
+      }
+      this.itemsDetails = [];
+    },
+    irAPago (folioPago) {
+      this.$store.commit("credito/SET_PAGO", null); // Limpiar pago anterior
+      this.$store.commit("credito/SET_ERROR", null);
+      this.$store.commit("credito/SET_PAGO", { folioPago }); // Setear folioPago temporalmente
+      this.$router.push({ name: "Pagos" });
     },
   },
 };
