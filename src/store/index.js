@@ -11,13 +11,18 @@ const Config = {
   namespaced: true,
   state: () => ({
     menus: [],
+    canCreate: true
   }),
   getters: {
     doneMenu: (state) => state.menus,
+    doneCanCreate: (state) => state.canCreate,
   },
   mutations: {
     SET_MENUS: (state, datos) => {
       state.menus = datos;
+    },
+    SET_CANCREATE: (state, datos) => {
+      state.canCreate = datos;
     },
   },
   actions: {

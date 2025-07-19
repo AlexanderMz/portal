@@ -8,9 +8,10 @@ import store from "./store";
 
 let url = "";
 //url = "http://192.168.1.206:8087";
+//url = "http://192.168.1.211:8080";
 //url = 'https://localhost:5001'
 //url = 'https://localhost:44393'
-url = "http://172.28.124.54:8080";
+//url = "http://172.28.124.54:8080";
 
 Vue.use(excel);
 Vue.config.productionTip = false;

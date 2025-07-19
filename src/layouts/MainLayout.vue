@@ -117,7 +117,7 @@ export default {
       localStorage.setItem("dark", this.$vuetify.theme.isDark ? true : false);
     },
     navegar (item) {
-      localStorage.setItem("canCreate", item.CanCreate);
+      this.$store.commit("config/SET_CANCREATE", item.CanCreate);
       this.$store.commit("informes/SET_TITLE", item.Tag);
       this.$router.push({ path: item.Path, params: item.CanCreate });
     },

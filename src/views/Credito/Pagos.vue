@@ -9,9 +9,9 @@
             Preaplicación
           </v-btn>
         </v-col>
-        <v-col>
+        <v-col v-if="canCreate">
           <v-btn class="col" depressed color="primary" @click="guardarPago(2)"
-            :disabled="!canCreate || selectedToFile.length == 0">
+            :disabled="!selectedToFile.length">
             Generar Operación
           </v-btn>
         </v-col>
@@ -362,7 +362,6 @@ export default {
     tipoDescuento2: null,
     tipoDescuento3: null,
     tipoDescuento4: null,
-    canCreate: localStorage.getItem("canCreate") || true,
     formasPagos: [
       { fidValue: '01', descr: 'Efectivo' },
       { fidValue: '02', descr: 'Cheque nominativo' },
@@ -638,7 +637,7 @@ export default {
         }
       };
       fileReader.readAsBinaryString(this.selectedFile);
-    },
+    },    
     porcentageTipoDcto (tipoDescuento) {
       return tipoDescuento == "Especial"
         ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40]
@@ -805,6 +804,7 @@ export default {
       ];
     },
     ...mapState("credito", ["pago"]),
+    ...mapState("config", ["canCreate"]),
   },
   mounted () {
     this.limpiar();
