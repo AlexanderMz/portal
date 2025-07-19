@@ -11,7 +11,7 @@
         </v-col>
         <v-col>
           <v-btn class="col" depressed color="primary" @click="guardarPago(2)"
-            :disabled="canCreate || selectedToFile.length == 0">
+            :disabled="!canCreate || selectedToFile.length == 0">
             Generar Operación
           </v-btn>
         </v-col>
@@ -20,7 +20,7 @@
     <div>
       <v-row class="align-center">
         <v-col class="d-flex" cols="2" md="2">
-          <v-checkbox dense label="Manual" v-model="value" value="value"></v-checkbox>
+          <v-checkbox dense label="Manual" v-model="value"></v-checkbox>
         </v-col>
         <v-col cols="3">
           <v-text-field v-model="fecha" label="Fecha" prepend-icon="event" type="date" disabled></v-text-field>
@@ -371,7 +371,7 @@ export default {
       { fidValue: '28', descr: 'Tarjeta de débito' },
       { fidValue: '99', descr: 'Por definir' },
     ],
-    folioPagoConsulta: "",
+    folioPagoConsulta: null,
   }),
   mixins: [mixin],
   watch: {
@@ -499,6 +499,7 @@ export default {
       }
       this.rows.forEach(f => {
         const item = this.pendingBills.find(p => Number.parseInt(p.docNum) === f.Folio)
+        item.rebajesoDevoluciones = f.ValorAplicar
         this.addItem(item)
       })
 
@@ -527,14 +528,14 @@ export default {
     },
     async guardarPago (tipoOp) {
       try {
-
         let user = localStorage.getItem("user");
         const totalAPagar = this.getTotal.toFixed(2);
-        const totalPorPagar = this.selectedPagoCta.credAmnt.toFixed(2);
-        if (Number.parseFloat(totalPorPagar) < Number.parseFloat(totalAPagar)) {
+        const totalPorPagar = (this.selectedPagoCta?.credAmnt || 0).toFixed(2);
+        if (!this.value && Number.parseFloat(totalPorPagar) < Number.parseFloat(totalAPagar)) {
           alert("El saldo sobrepasa el valor de la cuenta");
           return;
         }
+        await this.borrarPagoPorFolio()
         const pago = {
           fecha: this.fecha,
           fechaPago: this.fechaPago,
@@ -545,9 +546,9 @@ export default {
           cuenta: this.selectedCuenta.acctName,
           cardCode: this.selectedCustomer.cardCode,
           cardName: this.selectedCustomer.cardName,
-          monto: this.selectedPagoCta.credAmnt,
-          referencia: this.selectedPagoCta.referencia,
-          idEdoCta: this.selectedPagoCta.sequence,
+          monto: this.selectedPagoCta?.credAmnt || 0,
+          referencia: this.selectedPagoCta?.referencia || '',
+          idEdoCta: this.selectedPagoCta?.sequence || 0,
           descuento1: this.tipoDescuento1 || "",
           porcDesc1: this.descuento1,
           descuento2: this.tipoDescuento2 || "",
@@ -640,7 +641,7 @@ export default {
     },
     porcentageTipoDcto (tipoDescuento) {
       return tipoDescuento == "Especial"
-        ? [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40]
         : [1, 2, 3];
     },
     async consultarPagoPorFolio () {
@@ -699,8 +700,8 @@ export default {
           };
       }
       // Otros campos simples
-      this.fecha = pago.fecha;
-      this.fechaPago = pago.fechaPago;
+      this.fecha = pago.fecha.substr(10);
+      this.fechaPago = pago.fechaPago.substr(10);
       this.selectedFormaPago = this.formasPagos.find(f => f.fidValue === pago.fidValue) || null;
       this.tipoDescuento1 = pago.descuento1 || null;
       this.tipoDescuento2 = pago.descuento2 || null;
@@ -712,6 +713,7 @@ export default {
       this.descuento4 = pago.porcDesc4 || 0;
       // Si hay detalles, puedes setearlos en selectedToFile si aplica
       if (pago.detalles) {
+        this.value = !!pago.detalles[0].manual
         pago.detalles.forEach(item => {
           this.addItem({
             docEntry: item.docEntry,
@@ -719,27 +721,24 @@ export default {
             docNum: item.docNum,
             saldoVencido: item.saldoVencido,
             rebajesoDevoluciones: item.rebjDev,
-            uuid: item.uuid
+            uuid: item.uuid,
+            docDate: moment().format("YYYY-MM-DD")
           })
         });
       }
     },
     async borrarPagoPorFolio () {
       if (!this.folioPagoConsulta) {
-        alert("Ingrese un folio de pago");
-        return;
+        try {
+          this.overlay = true;
+          await this.deletePagoByFolio(this.folioPagoConsulta);
+          this.folioPagoConsulta = null;
+          this.overlay = false;
+        } catch (e) {
+          this.overlay = false;
+        }
       }
-      if (!confirm("¿Está seguro de borrar el pago?")) return;
-      try {
-        this.overlay = true;
-        await this.deletePagoByFolio(this.folioPagoConsulta);
-        this.overlay = false;
-        alert("Pago borrado correctamente");
-      } catch (e) {
-        this.overlay = false;
-        alert("No se pudo borrar el pago");
-      }
-    },
+    }
   },
   computed: {
     tableHeight () {

@@ -47,8 +47,7 @@
             <template v-slot:[`item.actions`]="{ item }">
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn disabled color="primary" icon="" small v-on="on" v-bind="attrs"
-                    @click="irAPago(item.folioPago)">
+                  <v-btn color="primary" icon="" small v-on="on" v-bind="attrs" @click="irAPago(item.folioPago)">
                     <v-icon>edit</v-icon>
                   </v-btn>
                 </template>

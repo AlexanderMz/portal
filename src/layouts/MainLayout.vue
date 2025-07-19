@@ -74,8 +74,8 @@
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="darkMode" icon v-bind="attrs" v-on="on">
             <v-icon>{{
-      $vuetify.theme.isDark ? "light_mode" : "dark_mode"
-    }}</v-icon>
+              $vuetify.theme.isDark ? "light_mode" : "dark_mode"
+              }}</v-icon>
           </v-btn>
         </template>
         <span>{{ $vuetify.theme.isDark ? "Claro" : "Oscuro" }}</span>
@@ -106,6 +106,9 @@ export default {
     ...mapActions("config", ["getMenu"]),
     salir () {
       localStorage.removeItem("jwt");
+      localStorage.removeItem("canCreate");
+      localStorage.removeItem("user");
+      localStorage.removeItem("pass");
       this.$router.push({ name: "login" });
     },
     darkMode () {

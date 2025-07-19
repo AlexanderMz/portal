@@ -160,6 +160,7 @@ const routes = [
     name: "login",
     path: "/login",
     component: () => import("../layouts/Login.vue"),
+    meta: { desc: "Iniciar sesión" },
   },
   {
     path: "/about",
