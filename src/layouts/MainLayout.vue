@@ -3,12 +3,15 @@
     <v-navigation-drawer v-model="drawer" fixed app>
       <v-list dense>
         <v-list-item>
+          <v-list-item-avatar>
+            <v-img src="https://cdn.vuetifyjs.com/images/lists/1.jpg"></v-img>
+          </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title class="title">
-              Menu
+              {{ userName }}
             </v-list-item-title>
             <v-list-item-subtitle>
-              Opciones
+              Bienvenido
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
@@ -67,7 +70,7 @@
     <v-app-bar app fixed id="appbar">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-toolbar-title>Portal GOVI</v-toolbar-title>
+      <v-toolbar-title>Portal GOVI - {{ $router.currentRoute.meta.desc }}</v-toolbar-title>
       <v-spacer></v-spacer>
 
       <v-tooltip bottom>
@@ -75,7 +78,7 @@
           <v-btn @click="darkMode" icon v-bind="attrs" v-on="on">
             <v-icon>{{
               $vuetify.theme.isDark ? "light_mode" : "dark_mode"
-              }}</v-icon>
+            }}</v-icon>
           </v-btn>
         </template>
         <span>{{ $vuetify.theme.isDark ? "Claro" : "Oscuro" }}</span>
@@ -94,7 +97,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 
 export default {
   name: "MainLayout",
@@ -106,9 +109,9 @@ export default {
     ...mapActions("config", ["getMenu"]),
     salir () {
       localStorage.removeItem("jwt");
-      localStorage.removeItem("canCreate");
-      localStorage.removeItem("user");
-      localStorage.removeItem("pass");
+      this.$store.commit("config/SET_CANCREATE", null);
+      this.$store.commit("login/SET_USERNAME", '');
+      this.$store.commit("login/SET_USERPASS", '');
       this.$router.push({ name: "login" });
     },
     darkMode () {
@@ -124,6 +127,7 @@ export default {
   },
   computed: {
     ...mapGetters("config", ["doneMenu"]),
+    ...mapState("login", ["userName"]),
   },
   mounted () {
     this.getMenu();

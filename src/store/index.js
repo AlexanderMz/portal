@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import createPersistedState from "vuex-persistedstate";
 import { axiosInstance } from "../main";
 
 Vue.use(Vuex);
@@ -11,7 +12,7 @@ const Config = {
   namespaced: true,
   state: () => ({
     menus: [],
-    canCreate: true
+    canCreate: true,
   }),
   getters: {
     doneMenu: (state) => state.menus,
@@ -26,8 +27,8 @@ const Config = {
     },
   },
   actions: {
-    getMenu: ({ commit }) => {
-      let user = localStorage.getItem("user");
+    getMenu: ({ commit, rootState }) => {
+      let user = rootState.login.userName;
       axiosInstance.get(`/api/config/menu?u=${user}`).then((res) => {
         commit("SET_MENUS", res.data);
       });
@@ -436,10 +437,18 @@ const LoginModule = {
   namespaced: true,
   state: () => ({
     isLogin: null,
+    userName: "",
+    userPass: "",
   }),
   mutations: {
     SET_LOGIN: (state, datos) => {
       state.isLogin = datos;
+    },
+    SET_USERNAME: (state, datos) => {
+      state.userName = datos;
+    },
+    SET_USERPASS: (state, datos) => {
+      state.userPass = datos;
     },
   },
   actions: {
@@ -451,6 +460,8 @@ const LoginModule = {
             commit("SET_LOGIN", true);
             localStorage.setItem("b1session", res.headers["b1session"]);
             localStorage.setItem("routeid", res.headers["routeid"]);
+            commit("SET_USERNAME", data.UserName);
+            commit("SET_USERPASS", data.Password);
             resolve(true);
           })
           .catch((err) => {
@@ -961,4 +972,11 @@ export default new Vuex.Store({
     cancelacion: Cancelacion,
     credito: Credito,
   },
+  plugins: [
+    createPersistedState({
+      key: "AIzaSyC4d3pkEslVbx3xLc1037FdfgoYPW6b-yI",
+      paths: ["login.userName"],
+      storage: window.sessionStorage,
+    }),
+  ],
 });

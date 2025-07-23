@@ -10,8 +10,7 @@
           </v-btn>
         </v-col>
         <v-col v-if="canCreate">
-          <v-btn class="col" depressed color="primary" @click="guardarPago(2)"
-            :disabled="!selectedToFile.length">
+          <v-btn class="col" depressed color="primary" @click="guardarPago(2)" :disabled="!selectedToFile.length">
             Generar Operación
           </v-btn>
         </v-col>
@@ -527,7 +526,7 @@ export default {
     },
     async guardarPago (tipoOp) {
       try {
-        let user = localStorage.getItem("user");
+        let user = this.userName;
         const totalAPagar = this.getTotal.toFixed(2);
         const totalPorPagar = (this.selectedPagoCta?.credAmnt || 0).toFixed(2);
         if (!this.value && Number.parseFloat(totalPorPagar) < Number.parseFloat(totalAPagar)) {
@@ -637,7 +636,7 @@ export default {
         }
       };
       fileReader.readAsBinaryString(this.selectedFile);
-    },    
+    },
     porcentageTipoDcto (tipoDescuento) {
       return tipoDescuento == "Especial"
         ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40]
@@ -698,9 +697,11 @@ export default {
             // Otros campos en null
           };
       }
+
+      this.cargarDatos4(this.selectedCustomer)
       // Otros campos simples
-      this.fecha = pago.fecha.substr(10);
-      this.fechaPago = pago.fechaPago.substr(10);
+      this.fecha = pago.fecha.substring(0, 10);
+      this.fechaPago = pago.fechaPago.substring(0, 10);
       this.selectedFormaPago = this.formasPagos.find(f => f.fidValue === pago.fidValue) || null;
       this.tipoDescuento1 = pago.descuento1 || null;
       this.tipoDescuento2 = pago.descuento2 || null;
@@ -805,6 +806,7 @@ export default {
     },
     ...mapState("credito", ["pago"]),
     ...mapState("config", ["canCreate"]),
+    ...mapState("login", ["userName"]),
   },
   mounted () {
     this.limpiar();

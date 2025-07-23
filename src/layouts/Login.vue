@@ -9,13 +9,7 @@
                 <v-col cols="12" md="3" class="pa-0"> </v-col>
                 <v-col cols="12" md="6">
                   <v-card elevation="2" color="#26c6da">
-                    <v-img
-                      class="white--text pt-5"
-                      height="33px"
-                      src="../assets/sap.png"
-                      position="left top"
-                      contain
-                    >
+                    <v-img class="white--text pt-5" height="33px" src="../assets/sap.png" position="left top" contain>
                     </v-img>
                     <v-card-title>PORTAL GOVI</v-card-title>
 
@@ -26,33 +20,15 @@
                     <v-card-text class="pt-4">
                       <div>
                         <v-form v-model="valid" ref="form">
-                          <v-text-field
-                            label="Usuario"
-                            v-model="username"
-                            :rules="emailRules"
-                            required
-                            solo
-                            prepend-inner-icon="people"
-                          ></v-text-field>
-                          <v-text-field
-                            label="Contraseña"
-                            v-model="password"
-                            type="password"
-                            :rules="passwordRules"
-                            required
-                            solo
-                            prepend-inner-icon="password"
-                          ></v-text-field>
+                          <v-text-field label="Usuario" v-model="username" :rules="emailRules" required solo
+                            prepend-inner-icon="people"></v-text-field>
+                          <v-text-field label="Contraseña" v-model="password" type="password" :rules="passwordRules"
+                            required solo prepend-inner-icon="password" @keydown.stop.enter="submit"></v-text-field>
                           <v-card-actions>
-                            <v-btn
-                              block
-                              @click="submit"
-                              :class="{
-                                '#26c6da white--text': valid,
-                                disabled: !valid,
-                              }"
-                              >Entrar</v-btn
-                            >
+                            <v-btn block @click="submit" :class="{
+                              '#26c6da white--text': valid,
+                              disabled: !valid,
+                            }">Entrar</v-btn>
                           </v-card-actions>
                         </v-form>
                       </div>
@@ -76,7 +52,7 @@
 import { mapActions } from "vuex";
 export default {
   name: "login",
-  data() {
+  data () {
     return {
       valid: false,
       overlay: false,
@@ -89,7 +65,7 @@ export default {
   },
   methods: {
     ...mapActions("login", ["login"]),
-    submit() {
+    submit () {
       if (this.$refs.form.validate()) {
         this.overlay = true;
         this.login({ UserName: this.username, Password: this.password })
@@ -101,8 +77,8 @@ export default {
                   JSON.stringify({ email: this.email, jwt: this.password })
                 )
               );
-              localStorage.setItem("user", this.username);
-              localStorage.setItem("pass", this.password);
+              this.$store.commit("login/SET_USERNAME", this.username);
+              this.$store.commit("login/SET_USERPASS", this.password);
               this.overlay = false;
 
               this.$router.push("/");
@@ -115,7 +91,7 @@ export default {
           });
       }
     },
-    clear() {
+    clear () {
       this.$refs.form.reset();
     },
   },

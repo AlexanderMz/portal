@@ -33,6 +33,19 @@
           <v-data-table class="elevation-1" item-key="folioPago" v-model="selected" :headers="headers" :items="items"
             :loading="loadingDetail" :search="search" :single-expand="singleExpand" :expanded.sync="expanded"
             show-expand show-select @item-expanded="onItemExpanded">
+            <template v-slot:top>
+              <v-dialog v-model="dialogDelete" max-width="600px">
+                <v-card>
+                  <v-card-title class="headline">¿Esta seguro que desea borrar esta factura?</v-card-title>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="closeDelete">Cancelar</v-btn>
+                    <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                    <v-spacer></v-spacer>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </template>
             <template v-slot:[`item.totalAPagar`]="{ item }">
               <v-chip color="green" dark>
                 <span> {{ item.totalAPagar | currency }} </span>
@@ -52,6 +65,14 @@
                   </v-btn>
                 </template>
                 <span>Editar</span>
+              </v-tooltip>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn color="error" icon="" small v-on="on" v-bind="attrs" @click="deleteItem(item)">
+                    <v-icon>delete</v-icon>
+                  </v-btn>
+                </template>
+                <span>Eliminar</span>
               </v-tooltip>
             </template>
             <template v-slot:expanded-item="{ headers, item }">
@@ -100,6 +121,7 @@ export default {
     items: [],
     itemsDetails: [],
     search: "",
+    dialogDelete: false,
     headersDetails: [
       { text: "Factura", value: "factura" },
       { text: "Saldo Vencido", value: "saldoVencido", align: "right" },
@@ -120,12 +142,27 @@ export default {
       { text: "", value: "actions" },
       { text: "", value: "data-table-expand" },
     ],
+    editedIndex: -1,
   }),
+  watch: {
+    dialog (val) {
+      val || this.close();
+    },
+    dialogDelete (val) {
+      val || this.closeDelete();
+    },
+  },
   mounted () {
     this.getAutorizacionPreaplicacionesMethod()
   },
   methods: {
-    ...mapActions("credito", ["getAutorizacionPreaplicaciones", "updateAutorizacionPreaplicaciones", "getReportDetail", "getPagoByFolio"]),
+    ...mapActions("credito", [
+      "getAutorizacionPreaplicaciones",
+      "updateAutorizacionPreaplicaciones",
+      "getReportDetail",
+      "getPagoByFolio",
+      "deletePagoByFolio"
+    ]),
     async getAutorizacionPreaplicacionesMethod () {
       this.loading = false;
       this.items = await this.getAutorizacionPreaplicaciones();
@@ -148,11 +185,38 @@ export default {
       }
       this.itemsDetails = [];
     },
+    async borrarPagoPorFolio (folioPago) {
+      try {
+        this.loading = true;
+        await this.deletePagoByFolio(folioPago);
+        alert('Registro borrado')
+        this.loading = false;
+      } catch (e) {
+        this.loading = false;
+      }
+      this.getAutorizacionPreaplicacionesMethod()
+    },
     irAPago (folioPago) {
       this.$store.commit("credito/SET_PAGO", null); // Limpiar pago anterior
       this.$store.commit("credito/SET_ERROR", null);
       this.$store.commit("credito/SET_PAGO", { folioPago }); // Setear folioPago temporalmente
       this.$router.push({ name: "Pagos" });
+    },
+    deleteItem (item) {
+      this.editedIndex = this.items.indexOf(item);
+      this.dialogDelete = true;
+    },
+    async deleteItemConfirm () {
+      const { folioPago } = this.items[this.editedIndex]
+      this.items.splice(this.editedIndex, 1);
+      await this.borrarPagoPorFolio(folioPago)
+      this.closeDelete();
+    },
+    closeDelete () {
+      this.dialogDelete = false;
+      this.$nextTick(() => {
+        this.editedIndex = -1;
+      });
     },
   },
 };
