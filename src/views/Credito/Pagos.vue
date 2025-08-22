@@ -57,17 +57,21 @@
       </v-row>
       <!-- Descuentos -->
       <v-row align="start">
-        <v-col cols="4">
+        <v-col cols="6">
           <v-combobox label="Pago edo. Cta" dense solo :item-text="getPagoCtaText" item-value="glAccount"
             v-model="selectedPagoCta" :disabled="selectedToFile.length > 0"
             @click="() => (this.showdialogCta = true)"></v-combobox>
         </v-col>
-        <v-col cols="3">
+        <v-col class="d-flex" cols="6" md="6">
+          <v-file-input label="Adjuntar template" outlined dense @change="onFileChange"
+            v-model="selectedFile"></v-file-input>
+        </v-col>
+        <!-- <v-col cols="3">
           <v-select dense solo :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]" v-model="tipoDescuento1"
             item-text="itemName" label="Tipo de descuento 1" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select v-model="descuento1" :items="porcentageTipoDcto(tipoDescuento1)" @change="recalculateAll()"
+          <v-select v-model="descuento1" :items="porcentajeTipoDcto(tipoDescuento1)" @change="recalculateAll()"
             :disabled="selectedToFile.length > 0" append-outer-icon="percent">
           </v-select>
         </v-col>
@@ -76,12 +80,12 @@
             item-text="itemName" label="Tipo de descuento 2" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select v-model="descuento2" :items="porcentageTipoDcto(tipoDescuento2)" @change="recalculateAll()"
+          <v-select v-model="descuento2" :items="porcentajeTipoDcto(tipoDescuento2)" @change="recalculateAll()"
             :disabled="selectedToFile.length > 0" append-outer-icon="percent">
           </v-select>
-        </v-col>
+        </v-col> -->
       </v-row>
-      <v-row align="start">
+      <!-- <v-row align="start">
         <v-col class="d-flex" cols="4" md="4">
           <v-file-input label="Adjuntar template" outlined dense @change="onFileChange"
             v-model="selectedFile"></v-file-input>
@@ -91,7 +95,7 @@
             item-text="itemName" label="Tipo de descuento 3" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select v-model="descuento3" :items="porcentageTipoDcto(tipoDescuento3)" @change="recalculateAll()"
+          <v-select v-model="descuento3" :items="porcentajeTipoDcto(tipoDescuento3)" @change="recalculateAll()"
             :disabled="selectedToFile.length > 0" append-outer-icon="percent">
           </v-select>
         </v-col>
@@ -100,26 +104,30 @@
             item-text="itemName" label="Tipo de descuento 4" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select v-model="descuento4" :items="porcentageTipoDcto(tipoDescuento4)" @change="recalculateAll()"
+          <v-select v-model="descuento4" :items="porcentajeTipoDcto(tipoDescuento4)" @change="recalculateAll()"
             :disabled="selectedToFile.length > 0" append-outer-icon="percent">
           </v-select>
         </v-col>
-      </v-row>
+      </v-row> -->
       <!-- Tablas -->
-      <v-row>
-        <v-col cols="4" md="4">
+      <v-row no-gutters>
+        <v-col cols="3" md="3">
           <v-data-table dense v-if="!loadTable" v-model="selected" :headers="headers" :items="pendingBills"
             :search="search" :items-per-page="25" disable-sort fixed-header item-key="name" class="elevation-1"
-            ref="table" :height="tableHeight" id="tablemain">
+            ref="table" :height="tableHeight" id="tablemain" @click:row="(item) => addItem(item)">
             <template v-slot:top>
-              <v-banner sticky icon="search" flat>
-                <v-text-field v-model="search" label="Buscar transferencia" class="mx-4"
-                  @keydown.stop.enter="handlerEvent"></v-text-field>
+              <v-toolbar sticky icon="search" flat>
+                <v-toolbar-title>
+                  <v-text-field dense v-model="search" label="Buscar transferencia" class="mx-4" prepend-icon="search"
+                    @keydown.stop.enter="handlerEvent" persistent-hint
+                    :hint="`Total: ${pendingBills.length}`"></v-text-field>
+                </v-toolbar-title>
 
+                <!-- <div class="text-caption">Click en la fila para agregar</div> -->
                 <template v-slot:actions>
                   {{ pendingBills.length }}
                 </template>
-              </v-banner>
+              </v-toolbar>
             </template>
             <template v-slot:[`item.actions`]="{ item }">
               <v-icon small @click="addItem(item)">
@@ -135,22 +143,21 @@
           </v-data-table>
           <v-skeleton-loader v-if="loadTable" class="mx-auto" type="table"></v-skeleton-loader>
         </v-col>
-        <v-col cols="8" md="8">
-          <v-data-table dense :headers="headers2" :items="selectedToFile" class="elevation-1" hide-default-footer
-            disable-pagination disable-sort :fixed-header="true" :height="tableHeight" id="tabledetalle">
+        <v-col class="pl-2" cols="9" md="9">
+          <v-data-table dense :headers="headers2" :items="selectedToFile" class="elevation-1" :item-per-page="25"
+            disable-sort :fixed-header="true" :height="tableHeight" id="tabledetalle">
             <template v-slot:top>
-              <v-row no-gutters>
-                <v-col cols="8" sm="6" md="8">
+              <v-toolbar flat>
+                <v-toolbar-title>
                   <v-btn rounded icon title="Eliminar todos" @click="deleteAll">
                     <v-icon>delete</v-icon>
                   </v-btn>
                   {{ selectedToFile.length }} seleccionadas | Total:
                   {{ getTotal | currency }}
-                </v-col>
-                <v-col>
-                  <v-checkbox class="pa-0 ma-1" dense label="Timbrar Pago" v-model="timbrarPago"></v-checkbox>
-                </v-col>
-              </v-row>
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-checkbox class="pa-0 ma-1" dense label="Timbrar Pago" v-model="timbrarPago"></v-checkbox>
+              </v-toolbar>
               <v-dialog v-model="dialogDelete" max-width="600px">
                 <v-card>
                   <v-card-title class="headline">¿Esta seguro que desea borrar esta factura?</v-card-title>
@@ -190,6 +197,26 @@
             </template>
             <template v-slot:[`item.docDate`]="{ item }">
               <span> {{ item.docDate | textcrop2(10) }} </span>
+            </template>
+            <template v-slot:[`item.descuento1`]="{ item }">
+              <v-combobox dense v-model="item.descuento1" :items="porcentajeTipoDcto('Especial')"
+                @change="recalculate(item)">
+              </v-combobox>
+            </template>
+            <template v-slot:[`item.descuento2`]="{ item }">
+              <v-combobox dense v-model="item.descuento2" :items="porcentajeTipoDcto('Especial')"
+                @change="recalculate(item)">
+              </v-combobox>
+            </template>
+            <template v-slot:[`item.descuento3`]="{ item }">
+              <v-combobox dense v-model="item.descuento3" :items="porcentajeTipoDcto('Especial')"
+                @change="recalculate(item)">
+              </v-combobox>
+            </template>
+            <template v-slot:[`item.descuento4`]="{ item }">
+              <v-combobox dense v-model="item.descuento4" :items="porcentajeTipoDcto('Especial')"
+                @change="recalculate(item)">
+              </v-combobox>
             </template>
             <template v-slot:[`item.rebajesoDevoluciones`]="{ item }">
               <v-chip :color="item.rebajesoDevoluciones != item.saldoVencido
@@ -337,13 +364,13 @@ export default {
       { text: "Vencimiento", value: "docDate" },
       { text: "Saldo Pendiente", value: "saldoVencido" },
       { text: "Monto a Pagar", value: "rebajesoDevoluciones" },
-      { text: "Dcto. 1", value: "descuento1" },
+      { text: "Dcto. 1", value: "descuento1", width: "100px" },
       { text: "Total dcto. 1", value: "total1" },
-      { text: "Dcto. 2", value: "descuento2" },
+      { text: "Dcto. 2", value: "descuento2", width: "100px" },
       { text: "Total dcto. 2", value: "total2" },
-      { text: "Dcto. 3", value: "descuento3" },
+      { text: "Dcto. 3", value: "descuento3", width: "100px" },
       { text: "Total dcto. 3", value: "total3" },
-      { text: "Dcto. 4", value: "descuento4" },
+      { text: "Dcto. 4", value: "descuento4", width: "100px" },
       { text: "Total dcto. 4", value: "total4" },
       { text: "Total del pago", value: "total" },
     ],
@@ -416,6 +443,12 @@ export default {
     },
     getPagoCtaText (item) {
       return `${Vue.filter("currency")(item.credAmnt)} - ${item.referencia}`;
+    },
+    eventHandle (item, e) {
+      console.log(e);
+      console.log(item);
+
+      $(this).prop('title', 'Click para agregar')
     },
     cargarDatos (sociedad) {
       this.loadSucural = true;
@@ -503,10 +536,6 @@ export default {
 
     },
     recalculate (item) {
-      item.descuento1 = this.descuento1;
-      item.descuento2 = this.descuento2;
-      item.descuento3 = this.descuento3;
-      item.descuento4 = this.descuento4;
       item.total1 =
         item.rebajesoDevoluciones -
         (+item.rebajesoDevoluciones * item.descuento1) / 100;
@@ -637,7 +666,7 @@ export default {
       };
       fileReader.readAsBinaryString(this.selectedFile);
     },
-    porcentageTipoDcto (tipoDescuento) {
+    porcentajeTipoDcto (tipoDescuento) {
       return tipoDescuento == "Especial"
         ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40]
         : [1, 2, 3];
@@ -742,7 +771,7 @@ export default {
   },
   computed: {
     tableHeight () {
-      return window.innerHeight - 30;
+      return window.innerHeight - 700
     },
     pendingBills () {
       return this.$store.state.credito.pendingBills.sort((a, b) => {
@@ -823,4 +852,12 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style>
+#tablemain>.v-data-table__wrapper>table>tbody>tr {
+  cursor: pointer;
+}
+
+#tablemain>.v-data-table__wrapper>table>tbody>tr:hover {
+  transform: scale(1.05);
+}
+</style>
