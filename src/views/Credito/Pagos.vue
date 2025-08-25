@@ -732,14 +732,14 @@ export default {
       this.fecha = pago.fecha.substring(0, 10);
       this.fechaPago = pago.fechaPago.substring(0, 10);
       this.selectedFormaPago = this.formasPagos.find(f => f.fidValue === pago.fidValue) || null;
-      this.tipoDescuento1 = pago.descuento1 || null;
-      this.tipoDescuento2 = pago.descuento2 || null;
-      this.tipoDescuento3 = pago.descuento3 || null;
-      this.tipoDescuento4 = pago.descuento4 || null;
-      this.descuento1 = pago.porcDesc1 || 0;
-      this.descuento2 = pago.porcDesc2 || 0;
-      this.descuento3 = pago.porcDesc3 || 0;
-      this.descuento4 = pago.porcDesc4 || 0;
+      // this.tipoDescuento1 = pago.descuento1 || null;
+      // this.tipoDescuento2 = pago.descuento2 || null;
+      // this.tipoDescuento3 = pago.descuento3 || null;
+      // this.tipoDescuento4 = pago.descuento4 || null;
+      // this.descuento1 = pago.porcDesc1 || 0;
+      // this.descuento2 = pago.porcDesc2 || 0;
+      // this.descuento3 = pago.porcDesc3 || 0;
+      // this.descuento4 = pago.porcDesc4 || 0;
       // Si hay detalles, puedes setearlos en selectedToFile si aplica
       if (pago.detalles) {
         this.value = !!pago.detalles[0].manual
