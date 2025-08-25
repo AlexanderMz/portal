@@ -67,8 +67,8 @@
             item-text="itemName" label="Tipo de descuento 1" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select v-model="descuento1" :items="porcentajeTipoDcto(tipoDescuento1)" @change="recalculateAll()"
-            :disabled="selectedToFile.length > 0" append-outer-icon="percent">
+          <v-select dense v-model="descuento1" :items="porcentajeTipoDcto(tipoDescuento1)" @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0">
           </v-select>
         </v-col>
         <v-col cols="3">
@@ -76,8 +76,8 @@
             item-text="itemName" label="Tipo de descuento 2" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select v-model="descuento2" :items="porcentajeTipoDcto(tipoDescuento2)" @change="recalculateAll()"
-            :disabled="selectedToFile.length > 0" append-outer-icon="percent">
+          <v-select dense v-model="descuento2" :items="porcentajeTipoDcto(tipoDescuento2)" @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0">
           </v-select>
         </v-col>
       </v-row>
@@ -91,8 +91,8 @@
             item-text="itemName" label="Tipo de descuento 3" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select v-model="descuento3" :items="porcentajeTipoDcto(tipoDescuento3)" @change="recalculateAll()"
-            :disabled="selectedToFile.length > 0" append-outer-icon="percent">
+          <v-select dense v-model="descuento3" :items="porcentajeTipoDcto(tipoDescuento3)" @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0">
           </v-select>
         </v-col>
         <v-col cols="3">
@@ -100,8 +100,8 @@
             item-text="itemName" label="Tipo de descuento 4" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
         <v-col cols="1">
-          <v-select v-model="descuento4" :items="porcentajeTipoDcto(tipoDescuento4)" @change="recalculateAll()"
-            :disabled="selectedToFile.length > 0" append-outer-icon="percent">
+          <v-select dense v-model="descuento4" :items="porcentajeTipoDcto(tipoDescuento4)" @change="recalculateAll()"
+            :disabled="selectedToFile.length > 0">
           </v-select>
         </v-col>
       </v-row>
@@ -195,24 +195,20 @@
               <span> {{ item.docDate | textcrop2(10) }} </span>
             </template>
             <template v-slot:[`item.descuento1`]="{ item }">
-              <v-combobox dense v-model="item.descuento1" :items="porcentajeTipoDcto('Especial')"
-                @change="recalculate(item)">
-              </v-combobox>
+              <v-checkbox dense :label="item.descuento1.toString()" :value="vModelValue(item.descuento1)"
+                @change="(e) => itemCheckHandle(e, item, 'descuento1')"></v-checkbox>
             </template>
             <template v-slot:[`item.descuento2`]="{ item }">
-              <v-combobox dense v-model="item.descuento2" :items="porcentajeTipoDcto('Especial')"
-                @change="recalculate(item)">
-              </v-combobox>
+              <v-checkbox dense :label="item.descuento2.toString()" :value="vModelValue(item.descuento2)"
+                @change="(e) => itemCheckHandle(e, item, 'descuento2')"></v-checkbox>
             </template>
             <template v-slot:[`item.descuento3`]="{ item }">
-              <v-combobox dense v-model="item.descuento3" :items="porcentajeTipoDcto('Especial')"
-                @change="recalculate(item)">
-              </v-combobox>
+              <v-checkbox dense :label="item.descuento3.toString()" :value="vModelValue(item.descuento3)"
+                @change="(e) => itemCheckHandle(e, item, 'descuento3')"></v-checkbox>
             </template>
             <template v-slot:[`item.descuento4`]="{ item }">
-              <v-combobox dense v-model="item.descuento4" :items="porcentajeTipoDcto('Especial')"
-                @change="recalculate(item)">
-              </v-combobox>
+              <v-checkbox dense :label="item.descuento4.toString()" :value="vModelValue(item.descuento4)"
+                @change="(e) => itemCheckHandle(e, item, 'descuento4')"></v-checkbox>
             </template>
             <template v-slot:[`item.rebajesoDevoluciones`]="{ item }">
               <v-chip :color="item.rebajesoDevoluciones != item.saldoVencido
@@ -505,6 +501,15 @@ export default {
       this.selectedToFile.push(item);
       this.selectedToFile = [...new Set(this.selectedToFile)];
       this.deleteItemPending(item)
+    },
+    vModelValue (val) {
+      return val > 0
+    },
+    itemCheckHandle (val, item, key) {
+      if (val && val === true)
+        item[key] = this[key]
+      else
+        item[key] = 0
     },
     deleteAll () {
       this.selectedToFile = []
