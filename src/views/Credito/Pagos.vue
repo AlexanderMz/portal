@@ -57,16 +57,12 @@
       </v-row>
       <!-- Descuentos -->
       <v-row align="start">
-        <v-col cols="6">
+        <v-col cols="4">
           <v-combobox label="Pago edo. Cta" dense solo :item-text="getPagoCtaText" item-value="glAccount"
             v-model="selectedPagoCta" :disabled="selectedToFile.length > 0"
             @click="() => (this.showdialogCta = true)"></v-combobox>
         </v-col>
-        <v-col class="d-flex" cols="6" md="6">
-          <v-file-input label="Adjuntar template" outlined dense @change="onFileChange"
-            v-model="selectedFile"></v-file-input>
-        </v-col>
-        <!-- <v-col cols="3">
+        <v-col cols="3">
           <v-select dense solo :items="[{ itemName: 'Especial' }, { itemName: 'Pronto Pago' }]" v-model="tipoDescuento1"
             item-text="itemName" label="Tipo de descuento 1" append :disabled="selectedToFile.length > 0"></v-select>
         </v-col>
@@ -83,9 +79,9 @@
           <v-select v-model="descuento2" :items="porcentajeTipoDcto(tipoDescuento2)" @change="recalculateAll()"
             :disabled="selectedToFile.length > 0" append-outer-icon="percent">
           </v-select>
-        </v-col> -->
+        </v-col>
       </v-row>
-      <!-- <v-row align="start">
+      <v-row align="start">
         <v-col class="d-flex" cols="4" md="4">
           <v-file-input label="Adjuntar template" outlined dense @change="onFileChange"
             v-model="selectedFile"></v-file-input>
@@ -108,7 +104,7 @@
             :disabled="selectedToFile.length > 0" append-outer-icon="percent">
           </v-select>
         </v-col>
-      </v-row> -->
+      </v-row>
       <!-- Tablas -->
       <v-row no-gutters>
         <v-col cols="3" md="3">
@@ -500,10 +496,10 @@ export default {
       } else alert("Tranferencia no encontrada, intente de nuevo.");
     },
     addItem (item) {
-      item.descuento1 = this.descuento1;
-      item.descuento2 = this.descuento2;
-      item.descuento3 = this.descuento3;
-      item.descuento4 = this.descuento4;
+      item.descuento1 = item.descuento1 || this.descuento1;
+      item.descuento2 = item.descuento2 || this.descuento2;
+      item.descuento3 = item.descuento3 || this.descuento3;
+      item.descuento4 = item.descuento4 || this.descuento4;
       item.rebajesoDevoluciones = item.rebajesoDevoluciones ?? item.saldoVencido;
       this.recalculate(item);
       this.selectedToFile.push(item);
@@ -732,14 +728,14 @@ export default {
       this.fecha = pago.fecha.substring(0, 10);
       this.fechaPago = pago.fechaPago.substring(0, 10);
       this.selectedFormaPago = this.formasPagos.find(f => f.fidValue === pago.fidValue) || null;
-      // this.tipoDescuento1 = pago.descuento1 || null;
-      // this.tipoDescuento2 = pago.descuento2 || null;
-      // this.tipoDescuento3 = pago.descuento3 || null;
-      // this.tipoDescuento4 = pago.descuento4 || null;
-      // this.descuento1 = pago.porcDesc1 || 0;
-      // this.descuento2 = pago.porcDesc2 || 0;
-      // this.descuento3 = pago.porcDesc3 || 0;
-      // this.descuento4 = pago.porcDesc4 || 0;
+      this.tipoDescuento1 = pago.descuento1 || null;
+      this.tipoDescuento2 = pago.descuento2 || null;
+      this.tipoDescuento3 = pago.descuento3 || null;
+      this.tipoDescuento4 = pago.descuento4 || null;
+      this.descuento1 = pago.porcDesc1 || 0;
+      this.descuento2 = pago.porcDesc2 || 0;
+      this.descuento3 = pago.porcDesc3 || 0;
+      this.descuento4 = pago.porcDesc4 || 0;
       // Si hay detalles, puedes setearlos en selectedToFile si aplica
       if (pago.detalles) {
         this.value = !!pago.detalles[0].manual
