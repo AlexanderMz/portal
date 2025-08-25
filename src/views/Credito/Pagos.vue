@@ -195,19 +195,19 @@
               <span> {{ item.docDate | textcrop2(10) }} </span>
             </template>
             <template v-slot:[`item.descuento1`]="{ item }">
-              <v-checkbox dense :label="item.descuento1.toString()" :value="true"
+              <v-checkbox dense :label="item.descuento1.toString()" :input-value="item.descuento1 > 0" value
                 @change="(e) => itemCheckHandle(e, item, 'descuento1')"></v-checkbox>
             </template>
             <template v-slot:[`item.descuento2`]="{ item }">
-              <v-checkbox dense :label="item.descuento2.toString()" :value="true"
+              <v-checkbox dense :label="item.descuento2.toString()" :input-value="item.descuento2 > 0" value
                 @change="(e) => itemCheckHandle(e, item, 'descuento2')"></v-checkbox>
             </template>
             <template v-slot:[`item.descuento3`]="{ item }">
-              <v-checkbox dense :label="item.descuento3.toString()" :value="true"
+              <v-checkbox dense :label="item.descuento3.toString()" :input-value="item.descuento3 > 0" value
                 @change="(e) => itemCheckHandle(e, item, 'descuento3')"></v-checkbox>
             </template>
             <template v-slot:[`item.descuento4`]="{ item }">
-              <v-checkbox dense :label="item.descuento4.toString()" :value="true"
+              <v-checkbox dense :label="item.descuento4.toString()" :input-value="item.descuento4 > 0" value
                 @change="(e) => itemCheckHandle(e, item, 'descuento4')"></v-checkbox>
             </template>
             <template v-slot:[`item.rebajesoDevoluciones`]="{ item }">
