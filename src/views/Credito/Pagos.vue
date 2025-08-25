@@ -510,6 +510,8 @@ export default {
         item[key] = this[key]
       else
         item[key] = 0
+
+      this.recalculate(item)
     },
     deleteAll () {
       this.selectedToFile = []
