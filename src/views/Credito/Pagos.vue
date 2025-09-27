@@ -713,21 +713,25 @@ export default {
       this.selectedCustomer = cliente;
       await this.getPagosCta({ sociedad: sociedad.u_DB, cuenta: cuenta.glAccount });
       // 5. Pago edo. Cta
-      let pagoCta = this.pagosCta.find(p => p.sequence === pago.idEdoCta || p.referencia === pago.referencia);
-      if (pagoCta) {
-        this.selectedPagoCta = pagoCta;
+      if (pago.idEdoCta == null || pago.idEdoCta == 0) {
+        this.selectedPagoCta = null;
       } else {
-        // Si no se encuentra, crear un objeto con los valores que hacen match y los demás en null
-        const match = this.pagosCta.find(p => p.referencia === pago.referencia || p.credAmnt === pago.monto);
-        this.selectedPagoCta = match
-          ? { ...match, sequence: pago.idEdoCta || null }
-          : {
-            sequence: pago.idEdoCta || null,
-            referencia: pago.referencia || null,
-            credAmnt: pago.monto || null,
-            dueDate: pago.fechaPago || null,
-            // Otros campos en null
-          };
+        let pagoCta = this.pagosCta.find(p => p.sequence === pago.idEdoCta || p.referencia === pago.referencia);
+        if (pagoCta) {
+          this.selectedPagoCta = pagoCta;
+        } else {
+          // Si no se encuentra, crear un objeto con los valores que hacen match y los demás en null
+          const match = this.pagosCta.find(p => p.referencia === pago.referencia || p.credAmnt === pago.monto);
+          this.selectedPagoCta = match
+            ? { ...match, sequence: pago.idEdoCta || null }
+            : {
+              sequence: pago.idEdoCta || null,
+              referencia: pago.referencia || null,
+              credAmnt: pago.monto || null,
+              dueDate: pago.fechaPago || null,
+              // Otros campos en null
+            };
+        }
       }
 
       this.cargarDatos4(this.selectedCustomer)
@@ -754,7 +758,11 @@ export default {
             saldoVencido: item.saldoVencido,
             rebajesoDevoluciones: item.rebjDev,
             uuid: item.uuid,
-            docDate: moment().format("YYYY-MM-DD")
+            docDate: moment().format("YYYY-MM-DD"),
+            descuento1: item.montoDcto1,
+            descuento2: item.montoDcto2,
+            descuento3: item.montoDcto3,
+            descuento4: item.montoDcto4
           })
         });
       }

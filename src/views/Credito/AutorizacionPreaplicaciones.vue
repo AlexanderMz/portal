@@ -51,6 +51,14 @@
                 <span> {{ item.totalAPagar | currency }} </span>
               </v-chip>
             </template>
+            <template v-slot:[`item.monto`]="{ item }">
+              <v-chip color="green" dark>
+                <span> {{ item.monto | currency }} </span>
+              </v-chip>
+            </template>
+            <template v-slot:[`item.manual`]="{ item }">
+              <v-checkbox dense :input-value="item.manual" readonly></v-checkbox>
+            </template>
             <template v-slot:[`item.cliente`]="{ item }">
               <span> {{ item.cardCode }} - {{ item.cliente }} </span>
             </template>
@@ -139,6 +147,8 @@ export default {
       { text: "Folio SAP", value: "folioSAP" },
       { text: "Fecha", value: "fecha" },
       { text: "Total a Pagar", value: "totalAPagar", align: "right" },
+      { text: "Monto Banco", value: "monto", align: "right" },
+      { text: "Manual", value: "manual" },
       { text: "", value: "actions" },
       { text: "", value: "data-table-expand" },
     ],
