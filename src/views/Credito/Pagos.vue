@@ -105,12 +105,26 @@
           </v-select>
         </v-col>
       </v-row>
+      <v-row no-gutters>
+        <v-col cols="12" md="12">
+          <v-toolbar flat>
+            <v-checkbox class="pa-0 ma-1" dense label="Pago a cuenta" v-model="pagoaCuenta"></v-checkbox>
+            <v-text-field v-model="pagoaCuentaValue" :disabled="!pagoaCuenta" dense persistent-hint hint="Monto a pagar"
+              prepend-icon="attach_money" type="number"></v-text-field>
+            <v-text-field v-model="saldoFavorCliente" disabled dense persistent-hint hint="Saldo a favor"
+              prepend-icon="attach_money" type="number"></v-text-field>
+            <v-checkbox class="pa-0 ma-1" dense label="Usar saldo favor" v-model="useSaldoFavor"></v-checkbox>
+            <v-text-field v-model="saldoFavorValue" :disabled="!useSaldoFavor" dense persistent-hint
+              hint="Saldo a favor" prepend-icon="attach_money" type="number" :max="saldoFavorCliente"></v-text-field>
+          </v-toolbar>
+        </v-col>
+      </v-row>
       <!-- Tablas -->
       <v-row no-gutters>
         <v-col cols="3" md="3">
           <v-data-table dense v-if="!loadTable" v-model="selected" :headers="headers" :items="pendingBills"
             :search="search" :items-per-page="25" disable-sort fixed-header item-key="name" class="elevation-1"
-            ref="table" :height="tableHeight" id="tablemain" @click:row="(item) => addItem(item)">
+            ref="table" :height="tableHeight" id="tablemain">
             <template v-slot:top>
               <v-toolbar sticky icon="search" flat>
                 <v-toolbar-title>
@@ -325,7 +339,12 @@ export default {
     dialog: false,
     value: false,
     timbrarPago: true,
+    pagoaCuenta: false,
+    useSaldoFavor: false,
     dialogDelete: false,
+    pagoaCuentaValue: 0,
+    saldoFavorCliente: 0,
+    saldoFavorValue: 0,
     editedIndex: -1,
     search: "",
     searchCta: "",
@@ -410,6 +429,7 @@ export default {
       "getCustomers",
       "getPagosCta",
       "getPendingBill",
+      "getSaldoFavor",
       "getTypeDiscounts",
       "insertarPago",
       "limpiarCredito",
@@ -480,6 +500,11 @@ export default {
         cliente: cliente.cardCode,
       }).then((res) => {
         this.loadTable = false;
+      });
+      this.getSaldoFavor({
+        cliente: cliente.cardCode,
+      }).then((res) => {
+        this.saldoFavorCliente = res.data;
       });
     },
     handlerEvent (e) {
@@ -796,7 +821,7 @@ export default {
       return this.selectedToFile.entries().next().value;
     },
     getTotal () {
-      return this.selectedToFile.reduce((a, b) => a + (b["total4"] || 0), 0);
+      return this.selectedToFile.reduce((a, b) => a + (b["total4"] || 0), 0) + (this.pagoaCuenta ? +this.pagoaCuentaValue : 0) - (this.useSaldoFavor ? +this.saldoFavorValue : 0);
     },
     sociedades () {
       return this.$store.state.dispersion.sociedades;

@@ -104,6 +104,18 @@ const Credito = {
           });
       });
     },
+    getSaldoFavor: ({ commit }, data) => {
+      return new Promise((resolve, reject) => {
+        axiosInstance
+          .get(`/api/credit/saldoFavor?cliente=${data.cliente}`)
+          .then((res) => {
+            resolve(res.data);
+          })
+          .catch((err) => {
+            reject(err.response.data);
+          });
+      });
+    },
     getTypeDiscounts: ({ commit }, data) => {
       return new Promise((resolve, reject) => {
         axiosInstance
@@ -146,6 +158,28 @@ const Credito = {
       try {
         const response = await axiosInstance.get(
           `/api/credit/report/details?folio=${folio}`
+        );
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
+    async getReportHeaderCuadroInversion({ commit }, fecha) {
+      try {
+        const response = await axiosInstance.get(
+          `/api/credit/report/header/cuadroinversion?fecha=${fecha}`
+        );
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
+    async getReportDetailCuadroInversion({ commit }, cuentas) {
+      try {
+        const response = await axiosInstance.get(
+          `/api/credit/report/details/cuadroinversion?cuentas=${cuentas}`
         );
         return response.data;
       } catch (error) {
