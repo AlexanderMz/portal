@@ -147,6 +147,12 @@ const routes = [
         component: () => import("../views/InformeCuadroInversion.vue"),
         meta: { desc: "Cuadro de Inversión" },
       },
+      {
+        path: "/informe/analisiscuadroinversion",
+        name: "AnalisisCuadroInversion",
+        component: () => import("../views/Credito/AnalisisCuadroInversion.vue"),
+        meta: { desc: "Análisis Cuadro de Inversión" },
+      },
       ,
       // Always leave this as last one,
       // but you can also remove it
