@@ -4,12 +4,24 @@
       <v-toolbar-title>Aplicación de pagos | Facturas con descuentos</v-toolbar-title>
       <v-spacer> </v-spacer>
       <v-row justify="end">
-        <v-col>
+        <v-col v-if="folioPagoConsulta">
+          <v-btn depressed color="primary" @click="autorizarPago">
+            <v-icon>check</v-icon>
+            Autorizar Pago {{ folioPagoConsulta }}
+          </v-btn>
+        </v-col>
+        <v-col v-if="folioPagoConsulta">
+          <v-btn depressed color="error" @click="cancelarPago">
+            <v-icon>close</v-icon>
+            Cancelar
+          </v-btn>
+        </v-col>
+        <v-col v-else>
           <v-btn depressed color="primary" @click="guardarPago(1)" :disabled="!selectedToFile.length">
             Preaplicación
           </v-btn>
         </v-col>
-        <v-col v-if="canCreate">
+        <v-col v-else v-if="canCreate && !folioPagoConsulta">
           <v-btn class="col" depressed color="primary" @click="guardarPago(2)" :disabled="!selectedToFile.length">
             Generar Operación
           </v-btn>
@@ -426,6 +438,7 @@ export default {
       "limpiar",
     ]),
     ...mapActions("credito", [
+      "updateAutorizacionPreaplicaciones",
       "getCustomers",
       "getPagosCta",
       "getPendingBill",
@@ -436,7 +449,7 @@ export default {
       "deleteItemPending",
       "addItemPending",
       "getPagoByFolio",
-      "deletePagoByFolio"
+      "deletePagoByFolio",
     ]),
     getSociedadText (item) {
       return `${item.code} - ${item.u_CompnyName}`;
@@ -662,6 +675,30 @@ export default {
       this.selectedToFile = [];
       this.limpiar();
       this.limpiarCredito();
+    },
+    async autorizarPago () {
+      if (!this.folioPagoConsulta) {
+        alert("Ingrese un folio de pago");
+        return;
+      }
+      this.overlay = true;
+      try {
+        await this.updateAutorizacionPreaplicaciones(this.folioPagoConsulta);
+        alert("Pago autorizado con éxito");
+        this.cancelarPago();
+      } catch (e) {
+        alert("Error al autorizar el pago: " + e.message);
+      } finally {
+        this.overlay = false;
+      }
+    },
+    cancelarPago () {
+      this.limpiar();
+      this.limpiarCredito();
+      this.$store.commit("credito/SET_PAGO", null); // Limpiar pago anterior
+      this.$store.commit("credito/SET_ERROR", null); // Limpiar error
+      this.folioPagoConsulta = null;
+      this.$router.push({ name: "AutorizacionPreaplicaciones" });
     },
     onFileChange (event) {
       if (!this.selectedFile) {
