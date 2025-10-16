@@ -32,7 +32,7 @@
         <v-col class="d-flex">
           <v-data-table class="elevation-1" item-key="folioPago" v-model="selected" :headers="headers" :items="items"
             :loading="loadingDetail" :search="search" :single-expand="singleExpand" :expanded.sync="expanded"
-            fixed-header hide-default-footer disable-pagination disable-sort show-expand show-select max-height="800px"
+            fixed-header hide-default-footer disable-pagination show-expand show-select max-height="800px"
             height="800px" @item-expanded="onItemExpanded">
             <template v-slot:top>
               <v-dialog v-model="dialogDelete" max-width="600px">

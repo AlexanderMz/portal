@@ -17,7 +17,7 @@
       <v-skeleton-loader boilerplate type="table" v-if="loading"></v-skeleton-loader>
       <v-data-table v-else :headers="headers" :items="items" class="elevation-1" item-key="folioPago"
         :loading="loadingDetail" :search="search" :single-expand="singleExpand" :expanded.sync="expanded" fixed-header
-        hide-default-footer disable-pagination disable-sort show-expand show-select max-height="800px" height="800px"
+        hide-default-footer disable-pagination show-expand show-select max-height="800px" height="800px"
         @item-expanded="onItemExpanded">
         <template v-slot:[`item.totalAPagar`]="{ item }">
           <v-chip color="green" dark>
