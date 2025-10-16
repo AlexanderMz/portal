@@ -7,102 +7,33 @@
     </v-toolbar>
     <div>
       <v-row>
-        <v-text-field
-          v-model="fecha"
-          label="Fecha"
-          prepend-icon="event"
-          type="date"
-          class="col-3"
-          @input="getReportHeaderMethod"
-        ></v-text-field>
+        <v-text-field v-model="fecha" label="Fecha" prepend-icon="event" type="date" class="col-3"
+          @input="getReportHeaderMethod"></v-text-field>
       </v-row>
       <v-row>
-        <v-text-field
-          label="Buscar Operaciones"
-          class="mx-4"
-          prepend-inner-icon="search"
-          v-model="search"
-        ></v-text-field>
+        <v-text-field label="Buscar Operaciones" class="mx-4" prepend-inner-icon="search"
+          v-model="search"></v-text-field>
       </v-row>
-      <v-skeleton-loader
-        boilerplate
-        type="table"
-        v-if="loading"
-      ></v-skeleton-loader>
-      <!-- <v-expansion-panels v-else accordion>
-        <v-expansion-panel v-for="(item, i) in items" :key="i">
-          <v-expansion-panel-header>
-            <v-row dense no-gutters>
-              <v-col cols="2">
-                {{ item.folioPago }}
-              </v-col>
-              <v-col cols="3">
-                {{ item.cliente }}
-              </v-col>
-              <v-col cols="5">
-                {{ item.sucursal }}
-              </v-col>
-              <v-col cols="2">
-                <span> {{ item.totalAPagar | currency }} </span>
-              </v-col>
-            </v-row>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-data-table
-              dense
-              :headers="headers"
-              :items="items"
-              hide-default-footer
-              disable-pagination
-              disable-sort
-              class="elevation-1"
-              item-key="id"
-              loading="true"
-            >
-              <template v-slot:[`item.importe`]="{ item }">
-                <span> {{ item.importe | currency }} </span>
-              </template>
-            </v-data-table>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels> -->
-      <v-data-table
-        v-else
-        :headers="headers"
-        :items="items"
-        class="elevation-1"
-        item-key="folioPago"
-        :loading="loadingDetail"
-        :search="search"
-        :single-expand="singleExpand"
-        :expanded.sync="expanded"
-        show-expand
-        @item-expanded="onItemExpanded"
-      >
+      <v-skeleton-loader boilerplate type="table" v-if="loading"></v-skeleton-loader>
+      <v-data-table v-else :headers="headers" :items="items" class="elevation-1" item-key="folioPago"
+        :loading="loadingDetail" :search="search" :single-expand="singleExpand" :expanded.sync="expanded" fixed-header
+        hide-default-footer disable-pagination disable-sort show-expand show-select max-height="800px" height="800px"
+        @item-expanded="onItemExpanded">
         <template v-slot:[`item.totalAPagar`]="{ item }">
           <v-chip color="green" dark>
             <span> {{ item.totalAPagar | currency }} </span>
           </v-chip>
         </template>
         <template v-slot:[`item.cliente`]="{ item }">
-            <span> {{ item.cardCode }} - {{ item.cliente }}  </span>
+          <span> {{ item.cardCode }} - {{ item.cliente }} </span>
         </template>
         <template v-slot:[`item.fecha`]="{ item }">
-              <span> {{ item.fecha | textcrop2(10) }} </span>
-            </template>
+          <span> {{ item.fecha | textcrop2(10) }} </span>
+        </template>
         <template v-slot:expanded-item="{ headers, item }">
           <td :colspan="headers.length">
-            <v-data-table
-              dense
-              :headers="headersDetails"
-              :items="itemsDetails"
-              hide-default-footer
-              disable-pagination
-              disable-sort
-              class="elevation-1"
-              item-key="id"
-              :loading="loadingDetail"
-            >
+            <v-data-table dense :headers="headersDetails" :items="itemsDetails" hide-default-footer disable-pagination
+              disable-sort class="elevation-1" item-key="id" :loading="loadingDetail">
               <template v-slot:[`item.saldoVencido`]="{ item }">
                 <span> {{ item.saldoVencido | currency }} </span>
               </template>
@@ -167,12 +98,12 @@ export default {
   }),
   methods: {
     ...mapActions("credito", ["getReportHeader", "getReportDetail"]),
-    async getReportHeaderMethod() {
+    async getReportHeaderMethod () {
       this.loading = false;
       this.items = await this.getReportHeader(this.fecha);
       this.loading = this.items.length == 0;
     },
-    async onItemExpanded({ item, value }) {
+    async onItemExpanded ({ item, value }) {
       if (value) {
         this.loadingDetail = true;
         this.itemsDetails = await this.getReportDetail(item.folioPago);
@@ -182,7 +113,7 @@ export default {
       this.itemsDetails = [];
     },
   },
-  mounted() {
+  mounted () {
     this.getReportHeaderMethod();
   },
 };

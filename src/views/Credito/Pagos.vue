@@ -123,8 +123,8 @@
       <v-row no-gutters>
         <v-col cols="3" md="3">
           <v-data-table dense v-if="!loadTable" v-model="selected" :headers="headers" :items="pendingBills"
-            :search="search" :items-per-page="25" disable-sort fixed-header item-key="name" class="elevation-1"
-            ref="table" :height="tableHeight" id="tablemain">
+            :search="search" hide-default-footer disable-pagination disable-sort fixed-header item-key="name"
+            class="elevation-1" ref="table" :height="tableHeight" id="tablemain">
             <template v-slot:top>
               <v-toolbar sticky icon="search" flat>
                 <v-toolbar-title>
@@ -154,8 +154,8 @@
           <v-skeleton-loader v-if="loadTable" class="mx-auto" type="table"></v-skeleton-loader>
         </v-col>
         <v-col class="pl-2" cols="9" md="9">
-          <v-data-table dense :headers="headers2" :items="selectedToFile" class="elevation-1" :item-per-page="25"
-            disable-sort :fixed-header="true" :height="tableHeight" id="tabledetalle">
+          <v-data-table dense :headers="headers2" :items="selectedToFile" class="elevation-1" hide-default-footer
+            disable-pagination disable-sort :fixed-header="true" :height="tableHeight" id="tabledetalle">
             <template v-slot:top>
               <v-toolbar flat>
                 <v-toolbar-title>
