@@ -821,10 +821,10 @@ export default {
             rebajesoDevoluciones: item.rebjDev,
             uuid: item.uuid,
             docDate: moment().format("YYYY-MM-DD"),
-            descuento1: item.montoDcto1,
-            descuento2: item.montoDcto2,
-            descuento3: item.montoDcto3,
-            descuento4: item.montoDcto4
+            descuento1: item.montoDcto1 > 0 ? this.descuento1 : this.descuento1,
+            descuento2: item.montoDcto2 > 0 ? this.descuento2 : this.descuento2,
+            descuento3: item.montoDcto3 > 0 ? this.descuento3 : this.descuento3,
+            descuento4: item.montoDcto4 > 0 ? this.descuento4 : this.descuento4,
           })
         });
       }
