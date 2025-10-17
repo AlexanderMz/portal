@@ -775,7 +775,8 @@ export default {
       this.selectedCustomer = cliente;
       await this.getPagosCta({ sociedad: sociedad.u_DB, cuenta: cuenta.glAccount });
       // 5. Pago edo. Cta
-      if (pago.idEdoCta == null || pago.idEdoCta == 0) {
+      this.value = !!pago.detalles[0].manual
+      if (pago.idEdoCta == null || pago.idEdoCta == 0 || this.value) {
         this.selectedPagoCta = null;
       } else {
         let pagoCta = this.pagosCta.find(p => p.sequence === pago.idEdoCta || p.referencia === pago.referencia);
