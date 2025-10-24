@@ -8,6 +8,7 @@ import Config from "./config";
 import Credito from "./credito";
 import Dispersion from "./dispersion";
 import Informes from "./informes";
+import Inversion from "./inversion";
 import LoginModule from "./login";
 import Notas from "./notas";
 import TunelBancario from "./tunel";
@@ -25,6 +26,7 @@ export default new Vuex.Store({
     notas: Notas,
     cancelacion: Cancelacion,
     credito: Credito,
+    inversion: Inversion,
   },
   plugins: [
     createPersistedState({
