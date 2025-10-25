@@ -71,6 +71,48 @@ const Inversion = {
           });
       });
     },
+
+    async postSaldoFijo({ commit }, saldoFijo) {
+      try {
+        const response = await axiosInstance.post(
+          "/api/Investment/saldofijo",
+          saldoFijo
+        );
+        commit("SET_ERROR", null);
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
+
+    async putSaldoFijo({ commit }, saldoFijo) {
+      try {
+        const response = await axiosInstance.put(
+          `/api/Investment/saldofijo/${saldoFijo.id}`,
+          saldoFijo
+        );
+        commit("SET_ERROR", null);
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
+
+    async deleteSaldoFijo({ commit }, id) {
+      try {
+        const response = await axiosInstance.delete(
+          `/api/Investment/saldofijo/${id}`
+        );
+        commit("SET_ERROR", null);
+        return response.data;
+      } catch (error) {
+        commit("SET_ERROR", error.response?.data || error.message);
+        throw error;
+      }
+    },
+
     async postSaldoDisponible({ commit }, pago) {
       try {
         const response = await axiosInstance.post(

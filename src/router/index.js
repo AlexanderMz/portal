@@ -159,6 +159,12 @@ const routes = [
         component: () => import("../views/Inversion/SaldoDisponible.vue"),
         meta: { desc: "Saldo disponible" },
       },
+      {
+        path: "/inversion/saldofijo",
+        name: "SaldoFijo",
+        component: () => import("../views/Inversion/SaldoFijo.vue"),
+        meta: { desc: "Saldo disponible" },
+      },
       ,
       // Always leave this as last one,
       // but you can also remove it
