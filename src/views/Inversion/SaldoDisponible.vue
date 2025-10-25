@@ -12,7 +12,8 @@
     </v-toolbar>
     <div>
       <v-row>
-        <v-text-field v-model="fecha" label="Fecha" prepend-icon="event" type="date" class="col-3"></v-text-field>
+        <v-text-field v-model="fecha" label="Fecha" prepend-icon="event" type="date" class="col-3"
+          @input="OnLoadData"></v-text-field>
         <v-col class="d-flex" cols="10">
           <v-file-input label="Buscar archivo" outlined dense @change="onFileChange"
             v-model="selectedFile"></v-file-input>
@@ -140,9 +141,9 @@ export default {
     },
     OnLoadData (fecha) {
       this.overlay = true;
-      this.getSaldoDisponible(fecha)
+      this.getSaldoDisponible(this.fecha)
         .then((res) => {
-          if (res) {
+          if (res && res.length > 0) {
             this.overlay = false;
             this.id = res[0].iD_Encabezado
             const columns = Object.keys(res[0]).map(k => {
@@ -153,6 +154,11 @@ export default {
             })
             this.columns = columns
             this.rows = res;
+          } else {
+            this.id = 0
+            this.overlay = false;
+            this.rows = [];
+            this.columns = []
           }
         })
         .catch((err) => {
