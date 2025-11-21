@@ -530,10 +530,10 @@ export default {
       } else alert("Tranferencia no encontrada, intente de nuevo.");
     },
     addItem (item) {
-      item.descuento1 = item.descuento1 || this.descuento1;
-      item.descuento2 = item.descuento2 || this.descuento2;
-      item.descuento3 = item.descuento3 || this.descuento3;
-      item.descuento4 = item.descuento4 || this.descuento4;
+      // item.descuento1 = item.descuento1 || this.descuento1;
+      // item.descuento2 = item.descuento2 || this.descuento2;
+      // item.descuento3 = item.descuento3 || this.descuento3;
+      // item.descuento4 = item.descuento4 || this.descuento4;
       item.rebajesoDevoluciones = item.rebajesoDevoluciones ?? item.saldoVencido;
       this.recalculate(item);
       this.selectedToFile.push(item);
@@ -822,10 +822,10 @@ export default {
             rebajesoDevoluciones: item.rebjDev,
             uuid: item.uuid,
             docDate: moment().format("YYYY-MM-DD"),
-            descuento1: item.montoDcto1 > 0 ? this.descuento1 : this.descuento1,
-            descuento2: item.montoDcto2 > 0 ? this.descuento2 : this.descuento2,
-            descuento3: item.montoDcto3 > 0 ? this.descuento3 : this.descuento3,
-            descuento4: item.montoDcto4 > 0 ? this.descuento4 : this.descuento4,
+            descuento1: item.montoDcto1 > 0 ? pago.porcDesc1 : 0,
+            descuento2: item.montoDcto2 > 0 ? pago.porcDesc2 : 0,
+            descuento3: item.montoDcto3 > 0 ? pago.porcDesc3 : 0,
+            descuento4: item.montoDcto4 > 0 ? pago.porcDesc4 : 0,
           })
         });
       }
